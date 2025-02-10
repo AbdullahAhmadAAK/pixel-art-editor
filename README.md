@@ -1,6 +1,11 @@
-# B3 Airdrop Eligibility Check
+# Basemint Platform
 
-Check if you are eligible for the $B3 Token Airdrop
+Temporary home for the B3 Mints taking place
+
+In the future:
+https://github.com/liveblocks/pixel-art-together?tab=readme-ov-file
+
+Onchain multiplayer pixel art making
 
 ## Development
 

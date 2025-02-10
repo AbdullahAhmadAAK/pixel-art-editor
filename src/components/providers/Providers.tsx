@@ -33,8 +33,8 @@ export function Providers({ children }: ProvidersProps) {
       disableTransitionOnChange
     >
       <PrivyProvider
-        clientId={process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID}
-        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}
+        clientId={process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID as string}
+        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string}
         config={{
           embeddedWallets: {
             ethereum: {
