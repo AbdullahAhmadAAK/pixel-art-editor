@@ -514,3 +514,25 @@ body .font-bold {
     2.209% 8.111%
   );
 }
+
+.card-container {
+  width: 100%;
+  perspective: 1000px;
+  transition: transform 0.3s ease-out;
+}
+
+.card-container:hover {
+  transform: scale(1.02);
+}
+
+.nft-card {
+  width: 100%;
+  height: auto;
+  transform-style: preserve-3d;
+  transform: translateZ(20px);
+  transition: transform 0.3s ease-out;
+}
+
+.nft-card:hover {
+  transform: translateZ(20px) rotateY(2deg) rotateX(2deg);
+}
