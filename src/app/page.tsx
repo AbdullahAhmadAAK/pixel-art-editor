@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import CheckAirdrop from "@/components/CheckAirdrop";
+import Drop from "@/components/Drop";
 
 export const metadata: Metadata = {
-  title: "B3 Airdrop Eligibility Check",
-  description: "Check if you are eligible for the $B3 Token Airdrop",
+  title: "Testnet Questers | NFT Drop",
+  description:
+    "A platform for minting NFTs for fun, built on the B3 blockchain.",
 };
 
 export default function Page() {
   return (
     <div className="flex h-screen">
       <main className="container mx-auto">
-        <CheckAirdrop />
+        <Drop />
       </main>
     </div>
   );

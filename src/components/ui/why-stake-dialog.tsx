@@ -1,6 +1,6 @@
 import { SquareArrowOutUpRight } from "lucide-react";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Button } from "./button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
 import Link from "next/link";
 
 interface WhyStakeDialogProps {

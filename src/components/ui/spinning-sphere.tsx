@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { SpinningText } from "./ui/spinning-text";
+import { SpinningText } from "./spinning-text";
 import { useState, useEffect } from "react";
 
 export interface SpinningSphereProps {
