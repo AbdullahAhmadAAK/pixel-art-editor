@@ -20,6 +20,8 @@ import { Loader2, Sparkle, CheckCircle, ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
 import ReactConfetti from "react-confetti";
 import { useWindowSize } from "react-use";
+import { MediaRenderer } from "thirdweb/react";
+import { client } from "@/lib/thirdweb";
 
 // Dynamic import of GamechainDiagram with loading state disabled
 const GamechainDiagram = dynamic(
@@ -217,9 +219,7 @@ export default function Drop() {
               </h2>
 
               <div className="card-container">
-                <img
-                  src={NFT_CONFIG.publicImage}
-                  alt="NFT"
+                <div
                   className="nft-card"
                   onMouseMove={(e) => {
                     const card = e.currentTarget;
@@ -238,6 +238,11 @@ export default function Drop() {
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "translateZ(20px)";
                   }}
+                />
+                <MediaRenderer
+                  src={NFT_CONFIG.publicImage}
+                  client={client}
+                  className="w-full"
                 />
               </div>
 
