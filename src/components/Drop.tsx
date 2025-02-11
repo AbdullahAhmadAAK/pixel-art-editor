@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useMediaQuery } from "react-responsive";
 import dynamic from "next/dynamic";
-import { usePrivy, useWallets, WalletWithMetadata } from "@privy-io/react-auth";
+import { usePrivy, WalletWithMetadata } from "@privy-io/react-auth";
+import {
+  WalletMetamask,
+  WalletCoinbase,
+  WalletWalletConnect,
+  WalletPhantom,
+  WalletRainbow,
+  WalletRabby,
+} from "@web3icons/react";
 
 // Dynamic import of GamechainDiagram with loading state disabled
 const GamechainDiagram = dynamic(
@@ -20,18 +28,13 @@ export default function Drop() {
   const isInView = useInView(diagramRef, { once: true });
 
   // Get turnstile instance to handle resets
-  const { login, authenticated, user, logout } = usePrivy();
-  const { wallets, ready } = useWallets();
+  const { login, authenticated, user, logout, ready } = usePrivy();
 
-  const selectedWalletAddress = user?.linkedAccounts
+  const selectedWallet = user?.linkedAccounts
     .filter((account) => account.type === "wallet")
     .sort(
       (a, b) => Number(b.latestVerifiedAt) - Number(a.latestVerifiedAt)
     )[0] as WalletWithMetadata;
-
-  const selectedWallet = wallets.filter(
-    (wallet) => wallet?.address === selectedWalletAddress?.address
-  )[0];
 
   // Keep video timer effect
   useEffect(() => {
@@ -42,11 +45,48 @@ export default function Drop() {
     return () => clearTimeout(timer);
   }, []);
 
+  const getWalletIcon = (walletType: string) => {
+    switch (walletType?.toLowerCase()) {
+      case "metamask":
+        return <WalletMetamask className="w-5 h-5" />;
+      case "coinbase":
+        return <WalletCoinbase className="w-5 h-5" />;
+      case "walletconnect":
+        return <WalletWalletConnect className="w-5 h-5" />;
+      case "phantom":
+        return <WalletPhantom className="w-5 h-5" />;
+      case "rainbow":
+        return <WalletRainbow className="w-5 h-5" />;
+      case "rabby":
+        return <WalletRabby className="w-5 h-5" />;
+      default:
+        return null;
+    }
+  };
+
+  const truncateAddress = (address: string) => {
+    if (!address) return "";
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
   return (
     <div className="min-h-screen flex flex-col justify-between gap-20">
-      {authenticated && (
-        <Button onClick={() => logout()} className="absolute top-4 right-4">
-          Logout
+      {authenticated ? (
+        <div className="flex absolute top-4 right-4 gap-4 items-center">
+          <div className="flex items-center gap-2">
+            {selectedWallet?.walletClientType &&
+              getWalletIcon(selectedWallet?.walletClientType)}
+            <span className="text-sm text-neutral-500">
+              {truncateAddress(selectedWallet?.address)}
+            </span>
+          </div>
+          <Button onClick={() => logout()} variant="outline">
+            Logout
+          </Button>
+        </div>
+      ) : (
+        <Button onClick={() => login()} className="absolute top-4 right-4">
+          Connect
         </Button>
       )}
       <div className="flex-1 flex flex-col justify-center">
