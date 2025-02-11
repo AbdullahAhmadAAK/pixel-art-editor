@@ -18,6 +18,8 @@ import { toast } from "sonner";
 import { NFT_CONFIG } from "@/config/nft";
 import { Loader2, Sparkle, CheckCircle, ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
+import ReactConfetti from "react-confetti";
+import { useWindowSize } from "react-use";
 
 // Dynamic import of GamechainDiagram with loading state disabled
 const GamechainDiagram = dynamic(
@@ -53,6 +55,8 @@ export default function Drop() {
   const [isEligible, setIsEligible] = useState<boolean | null>(null);
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimStatus, setClaimStatus] = useState<ClaimResponse | null>(null);
+  const { width, height } = useWindowSize();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const checkEligibility = useCallback(async (address: string) => {
     try {
@@ -91,6 +95,8 @@ export default function Drop() {
 
       toast.success("Successfully claimed your NFT!");
       setIsEligible(false);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
     } catch (error) {
       console.error("Claim error:", error);
       toast.error(
@@ -140,7 +146,25 @@ export default function Drop() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between gap-20 ">
+    <div className="min-h-screen flex flex-col justify-between gap-20">
+      {showConfetti && (
+        <ReactConfetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={500}
+          gravity={0.15}
+          colors={[
+            "#FF0000", // Red
+            "#00FF00", // Green
+            "#0000FF", // Blue
+            "#FFFF00", // Yellow
+            "#FF00FF", // Magenta
+            "#00FFFF", // Cyan
+          ]}
+        />
+      )}
+
       {authenticated ? (
         <div className="flex absolute top-4 right-4 gap-4 items-center">
           <div className="flex items-center gap-2">

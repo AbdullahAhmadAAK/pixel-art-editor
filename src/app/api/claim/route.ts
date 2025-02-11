@@ -115,8 +115,6 @@ export async function GET(req: Request) {
       const data = await response.json();
       const hasNFT = data.nfts?.length > 0;
 
-      console.log(data);
-
       if (hasNFT) {
         const nft = data.nfts[0];
         return NextResponse.json({
