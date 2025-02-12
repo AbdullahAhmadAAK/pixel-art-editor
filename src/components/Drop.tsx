@@ -37,6 +37,7 @@ interface ClaimResponse {
   status: ClaimStatus;
   tokenId?: string;
   txHash?: string;
+  claimedCount?: number;
 }
 
 export default function Drop() {
@@ -92,6 +93,13 @@ export default function Drop() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.error === "Claim limit reached for this wallet") {
+          // Update claim status to show limit reached
+          await checkEligibility(selectedWallet.address);
+          throw new Error(
+            "You've reached the maximum claims allowed for this wallet"
+          );
+        }
         throw new Error(data.error || "Failed to claim NFT");
       }
 
@@ -99,6 +107,9 @@ export default function Drop() {
       setIsEligible(false);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 5000);
+
+      // Refresh eligibility status after successful claim
+      await checkEligibility(selectedWallet.address);
     } catch (error) {
       console.error("Claim error:", error);
       toast.error(
@@ -285,6 +296,14 @@ export default function Drop() {
                           </div>
                           <div className="text-sm text-neutral-500">
                             <p>You claimed NFT #{claimStatus.tokenId}</p>
+                            {NFT_CONFIG.allowlist.maxPerWallet && (
+                              <p className="mt-1">
+                                {NFT_CONFIG.allowlist.maxPerWallet > 1 &&
+                                  `(${claimStatus.claimedCount || 1}/${
+                                    NFT_CONFIG.allowlist.maxPerWallet
+                                  } claims used)`}
+                              </p>
+                            )}
                             <Link
                               href={`https://explorer.b3.fun/tx/${claimStatus.txHash}`}
                               target="_blank"

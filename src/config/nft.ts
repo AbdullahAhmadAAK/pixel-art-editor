@@ -8,9 +8,14 @@ export const NFT_CONFIG = {
   animation_url: null,
   publicImage:
     "https://f393c7eb287696dc4db76d980cc68328.ipfscdn.io/ipfs/bafybeiek2yspjqeo6zrl7x2uaerc24dyza4qpvawmzndb4arxzp47ttwr4",
+  allowlist: {
+    type: "redis",
+    redisKey: "quest-seekers-allowlist",
+    maxPerWallet: 1,
+  },
 };
 
-// Allowlist of wallets (lowercase)
+// Keep in-memory allowlist as fallback
 export const ALLOWLIST = [
   "0x1216de6853e2c2cAEd6F5B0C2791D2E4a765D954",
   // ... rest of the addresses ...

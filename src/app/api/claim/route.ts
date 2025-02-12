@@ -5,6 +5,28 @@ import Redis from "ioredis";
 const redis = new Redis(process.env.REDIS_URL!);
 const SIMPLEHASH_API_KEY = process.env.SIMPLEHASH_API_KEY;
 
+async function checkAllowlist(address: string): Promise<boolean> {
+  const normalizedAddress = address.toLowerCase();
+
+  if (NFT_CONFIG.allowlist.type === "redis") {
+    const result = await redis.sismember(
+      NFT_CONFIG.allowlist.redisKey,
+      normalizedAddress
+    );
+    return result === 1;
+  } else {
+    return ALLOWLIST.includes(normalizedAddress);
+  }
+}
+
+async function getWalletClaimCount(address: string): Promise<number> {
+  const claimed = await redis.get(`claimed:${address.toLowerCase()}`);
+  if (!claimed) return 0;
+
+  const claimData = JSON.parse(claimed);
+  return Array.isArray(claimData) ? claimData.length : 1;
+}
+
 export async function POST(req: Request) {
   try {
     const { address } = await req.json();
@@ -18,10 +40,20 @@ export async function POST(req: Request) {
 
     const normalizedAddress = address.toLowerCase();
 
-    if (!ALLOWLIST.includes(normalizedAddress)) {
+    // Use new allowlist checking function
+    if (!(await checkAllowlist(normalizedAddress))) {
       return NextResponse.json(
         { error: "Address is not in the allowlist" },
         { status: 403 }
+      );
+    }
+
+    // Check claim limit
+    const claimCount = await getWalletClaimCount(normalizedAddress);
+    if (claimCount >= NFT_CONFIG.allowlist.maxPerWallet) {
+      return NextResponse.json(
+        { error: "Claim limit reached for this wallet" },
+        { status: 400 }
       );
     }
 
@@ -67,8 +99,11 @@ export async function POST(req: Request) {
 
     const mintData = await mintResponse.json();
 
-    // Record claim in Redis
-    await redis.set(`claimed:${normalizedAddress}`, JSON.stringify(mintData));
+    // Store claim data as array to track multiple claims
+    const existingClaims = await redis.get(`claimed:${normalizedAddress}`);
+    const claims = existingClaims ? JSON.parse(existingClaims) : [];
+    claims.push(mintData);
+    await redis.set(`claimed:${normalizedAddress}`, JSON.stringify(claims));
 
     return NextResponse.json(mintData);
   } catch (error) {
@@ -93,8 +128,8 @@ export async function GET(req: Request) {
 
   const normalizedAddress = address.toLowerCase();
 
-  // First check if they're in allowlist
-  if (!ALLOWLIST.includes(normalizedAddress)) {
+  // Use new allowlist checking function
+  if (!(await checkAllowlist(normalizedAddress))) {
     return NextResponse.json({ canClaim: false, status: "not_eligible" });
   }
 
