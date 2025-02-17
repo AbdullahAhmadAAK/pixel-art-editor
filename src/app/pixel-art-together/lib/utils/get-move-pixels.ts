@@ -1,13 +1,25 @@
-import { Direction } from "../../types";
+import { Direction } from "@/lib/types";
+import { PixelColor, PixelKey, PixelObject } from "../../page";
 
-export function getMovePixels({ detail, selected, keyToPixel, pixelStorage }) {
+export function getMovePixels({
+  detail,
+  selected,
+  keyToPixel,
+  pixelStorage
+}: {
+  detail: { direction: Direction },
+  selected: number,
+  keyToPixel: (key: PixelKey) => PixelObject,
+  pixelStorage: Record<PixelKey, PixelColor>
+}) {
   const direction: Direction = detail.direction;
 
-  const newLayer = [];
+  const newLayer: PixelObject[] = [];
+
   const pixelKeys = Object.keys(pixelStorage)
     .map((pixelKey) => ({
       ...keyToPixel(pixelKey),
-      value: pixelStorage[pixelKey],
+      value: { color: pixelStorage[pixelKey] }, // note: old developer made an error here
     }))
     .filter(({ layer }) => layer === selected);
 
@@ -30,6 +42,7 @@ export function getMovePixels({ detail, selected, keyToPixel, pixelStorage }) {
         newLayer.push({
           ...pixel,
           row: newRowIndex,
+          layer: selected // I added this, so that the pixel stays in the same layer it was
         });
       }
     });
@@ -40,6 +53,7 @@ export function getMovePixels({ detail, selected, keyToPixel, pixelStorage }) {
         col: index,
         row: up ? maxRow : 0,
         value: { color: "transparent" },
+        layer: selected // I added this, so that the pixel stays in the same layer it was
       }))
       .forEach((pixel) => newLayer.push(pixel));
   } else {
@@ -60,6 +74,7 @@ export function getMovePixels({ detail, selected, keyToPixel, pixelStorage }) {
         col: left ? maxRow : 0,
         row: index,
         value: { color: "transparent" },
+        layer: selected // I added this, so that the pixel stays in the same layer it was
       }))
       .forEach((pixel) => newLayer.push(pixel));
   }

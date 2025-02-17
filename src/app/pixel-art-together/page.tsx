@@ -12,7 +12,7 @@ import {
 } from "@liveblocks/react/suspense";
 
 import { motion, useSpring } from "framer-motion";
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef, RefObject } from 'react';
 import { formatLayers, Layer } from "./lib/utils/format-layers";
 import { generateLayer } from "./lib/utils/generate-layer";
 // import { useStorage } from "@liveblocks/react";
@@ -20,10 +20,20 @@ import { generateLayer } from "./lib/utils/generate-layer";
 // import { ClientSideSuspense, useStorage } from "@liveblocks/react/suspense";
 import { useStorage, useMutation } from "@liveblocks/react";
 
-import { Brush, Direction, Pixel, Tool } from "@/lib/types";
+import { Brush, Direction, Pixel, PixelGrid, Tool } from "@/lib/types";
+
 import { getFillPixels } from "./lib/utils/get-fill-pixels";
 import { getMovePixels } from "./lib/utils/get-move-pixels";
+
 import { PanelName } from "../../../liveblocks.config";
+
+import { Cursor } from "@/components/live-blocks/cursor";
+import { IntroDialog } from "@/components/live-blocks/intro-dialog";
+import { BrushPanel } from "@/components/live-blocks/brush-panel";
+import { LayersPanel } from '../../components/live-blocks/layers-panel';
+
+// Import CSS
+import './pixel-art-styles.css'
 
 export type PixelObject = {
   layer: number;
@@ -157,12 +167,12 @@ export default function PixelArtEditor() {
   // ================================================================================
   // INTRO DIALOG
 
-  let nameSet = false;
+  const [nameSet, setNameSet] = useState<boolean>(false)
 
   // Set name inside presence
   function setName({ detail }: { detail: { name: string } }) {
     updateMyPresence({ name: detail.name })
-    nameSet = true;
+    setNameSet(true)
   }
 
   // TODO: is this even correct?
@@ -222,18 +232,25 @@ export default function PixelArtEditor() {
   const redo = useRedo();
 
   // Is grid showing on canvas
-  let showGrid = false;
+  const [showGrid, setShowGrid] = useState<boolean>(false)
 
   // Are move tools showing on canvas
-  let showMove = false;
+  const [showMove, setShowMove] = useState<boolean>(false)
+
+  // This is the value used in brush panel component, added by me only
+  const [colorValue, setColorValue] = useState<string>("")
 
   // Will be bound to a function that allows the current color to be updated
-  let updateBrushColor;
+  const updateBrushColor = (hex: string) => {
+    setColorValue(hex)
+  };
+
+  // const [updateBrushColor, setUpdateBrushColor] = useState()
 
   // Recently used colors to be passed to the swatch
   let recentColors = new Array(16).fill("#ffffffff");
 
-  // On brush component change, update presence with new brush
+  // On brush component change, update presence with new brush TODO: usecallback
   function handleBrushChange({ detail }: { detail: Brush }) {
     updateMyPresence({ brush: detail })
   }
@@ -248,7 +265,7 @@ export default function PixelArtEditor() {
     const color = myPresence.brush.color;
     const selected = myPresence.selectedLayer;
 
-    const currentPixel = {
+    const currentPixel: PixelObject = {
       row: detail.row,
       col: detail.col,
       layer: selected,
@@ -276,8 +293,9 @@ export default function PixelArtEditor() {
     }
   }
 
+  // TODO: add callback
   // Move pixels by 1 pixel in detail.direction Direction
-  function handleLayerMove({ detail }: { detail: { direction: Direction } }) {
+  const handleLayerMove = ({ detail }: { detail: { direction: Direction } }) => {
     if (!myPresence?.brush?.color || !pixelStorage || !canvasReady) {
       return;
     }
@@ -304,23 +322,30 @@ export default function PixelArtEditor() {
    */
 
   // The different panels TODO: add ts here soon
-  const panels: Record<PanelName, HTMLElement | null> = {
-    multiplayerPanel: null,
-    mainPanel: null,
-    toolsPanel: null,
+  // const panels: Record<PanelName, RefObject(HTMLElement | null)> = {
+  //   multiplayerPanel: useRef(null),
+  //   mainPanel: useRef(null),
+  //   toolsPanel: useRef(null),
+  // };
+
+  const panels: Record<PanelName, React.RefObject<HTMLDivElement | null>> = {
+    multiplayerPanel: useRef<HTMLDivElement | null>(null),
+    mainPanel: useRef<HTMLDivElement | null>(null),
+    toolsPanel: useRef<HTMLDivElement | null>(null),
   };
 
+
   // Pass current cursor position on panel, and current panel, to presence
-  function handleMouseMove(event: PointerEvent, area: PanelName) {
-    if (!panels[area] || !myPresence) {
+  function handleMouseMove(event: React.PointerEvent<HTMLDivElement>, area: PanelName) {
+    if (!panels[area] || !panels[area].current || !myPresence) {
       return;
     }
 
-    const { top, left, width, height } = panels[area].getBoundingClientRect();
+    const { top, left, width, height } = panels[area].current.getBoundingClientRect();
 
     // Position from top left corner by default
     let x = Math.round(event.clientX - left);
-    let y = Math.round(event.clientY - top + panels[area].scrollTop);
+    let y = Math.round(event.clientY - top + panels[area].current.scrollTop);
 
     // Percentage from center of element for main panel
     if (area === "mainPanel") {
@@ -338,11 +363,11 @@ export default function PixelArtEditor() {
 
   // Reverse of above, find location of cursor according to coords and panel
   function calculateCursorPosition({ x, y, area }: { x: number, y: number, area: PanelName }) {
-    if (!panels?.[area]) {
+    if (!panels?.[area] || !panels[area].current) {
       return;
     }
 
-    const { top, left, width, height } = panels[area].getBoundingClientRect();
+    const { top, left, width, height } = panels[area].current.getBoundingClientRect();
     let newX;
     let newY;
 
@@ -406,12 +431,12 @@ export default function PixelArtEditor() {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!event.ctrlKey && !event.metaKey) {
       if (event.key === "g") {
-        showGrid = !showGrid;
+        setShowGrid(!showGrid)
         return;
       }
 
       if (event.key === "m") {
-        showMove = !showMove;
+        setShowMove(!showMove)
         return;
       }
 
@@ -455,11 +480,7 @@ export default function PixelArtEditor() {
       event.preventDefault();
       redo();
     }
-  }, [showMove, showGrid])
-
-
-
-
+  }, [showMove, showGrid, handleLayerMove, myPresence, redo, undo, updateMyPresence])
 
 
   // Handle pointerdown and pointerup
@@ -485,9 +506,88 @@ export default function PixelArtEditor() {
     };
   }, [handlePointerDown, handlePointerUp, handleKeyDown]);
 
+
+
+
+
+
   return (
     <>
-      <h1>hi</h1>
+      {/* <!-- Live Cursors --> */}
+      <div className="pointer-events-none absolute inset-0 z-50">
+        {others?.map(({ presence, info, connectionId }) => {
+
+          return presence?.cursor && presence?.brush ? (
+            <Cursor
+              key={connectionId}
+              {...calculateCursorPosition(presence.cursor)}
+              shrink={presence.mouseDown}
+              brush={presence.brush} // 
+              tool={presence.tool}
+              name={presence.name || info?.name || 'NaN'} // NaN is a new addition from me, in case presence.name and info.name are falsy
+            />
+          ) : null
+        }
+
+        )}
+      </div>
+
+      {/* <!-- Intro dialog --> */}
+      {!nameSet && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center">
+          <IntroDialog
+            maxPixels={maxPixels}
+            loading={!pixelStorage}
+            shouldCreateCanvas={!canvasReady}
+            // on:createCanvas={createCanvas}
+            // on:setName={setName}
+            createCanvas={createCanvas}
+            setName={setName}
+          />
+        </div>
+      )}
+
+      {/* <!-- App --> */}
+      <div className="relative flex h-full min-h-full bg-white">
+
+        {/* <!-- Left panel, containing layers etc --> */}
+        <div
+          className={`side-panel fixed right-full z-20 h-full w-auto flex-shrink-0 flex-grow-0 overflow-y-auto overflow-x-hidden border-gray-100 bg-white md:!relative md:right-auto md:z-10 md:!w-auto md:min-w-[320px] md:!translate-x-0 ${mobileMenuOpen
+            ? 'border-r-2 drop-shadow-xl'
+            : ''}`}
+          id="tools-panel"
+          style={{ transform: `translateX(${mobileMenuTransform}%)` }}
+        // style="transform: translateX({$mobileMenuTransform}%);"
+        >
+          {layers && canvasReady && (
+            <div
+              ref={panels.toolsPanel}
+              onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => handleMouseMove(e, "toolsPanel")}
+              onPointerLeave={(handleMouseLeave)}
+              // transition:fade TODO: think of alternative, this is from svelte package
+              className="relative top-[-455px] flex h-full min-h-full flex-col md:top-0"
+            >
+              <BrushPanel
+                // on:brushChange={handleBrushChange}
+                handleBrushChange={handleBrushChange}
+                // bind:updateColor={updateBrushColor}
+                updateColor={updateBrushColor}
+                colorValue={colorValue}  // added by me only
+                setColorValue={setColorValue}
+                swatch={recentColors}
+              />
+              <LayersPanel layers={layers} maxPixels={maxPixels} />
+              {/* <ExportsPanel />
+              <div class="-mt-2 mb-5 xl:hidden">
+                <SharePanel />
+              </div>
+              <MobileLinksPanel /> */}
+            </div>
+          )}
+        </div>
+
+      </div>
+
     </>
   );
 }

@@ -1,16 +1,17 @@
+import { PixelGrid } from "@/lib/types";
 import { PixelObject } from "../../page";
 
 // Find all neighbours, and neighbours of neighbours, with same color
-export function getFillPixels(initialPixel, grid) {
+export function getFillPixels(initialPixel: PixelObject, grid: PixelGrid) {
   const layer = initialPixel.layer;
   const pixels: PixelObject[] = [];
 
-  const alreadyCounted = ({ row, col }) =>
+  const alreadyCounted = ({ row, col }: { row: number, col: number }) =>
     pixels.some((pixel) => {
       return pixel.row === row && pixel.col === col;
     });
 
-  function findClosest({ row, col }) {
+  function findClosest({ row, col }: { row: number, col: number }) {
     const neighbours = [
       { row: row - 1, col },
       { row: row + 1, col },

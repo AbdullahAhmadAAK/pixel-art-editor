@@ -26,15 +26,16 @@
  * ]
  */
 
+import { Layer } from "@/lib/types";
 import { PixelObject, PixelStorage } from "../../page";
 
 // Define Layer type with required properties
-export interface Layer {
-  id: number;
-  opacity: number;
-  blendMode: string;
-  grid: Array<Array<{ color: string }>>;
-}
+// export interface Layer {
+//   id: number;
+//   opacity: number;
+//   blendMode: string;
+//   grid: Array<Array<{ color: string }>>;
+// }
 
 // Define the shape of the function argument types
 interface FormatLayersArgs {

@@ -1,0 +1,20 @@
+.main-panel, .side-panel {
+  max-height: calc(var(--full-height) - var(--header-height));
+}
+
+.side-panel {
+  scrollbar-width: thin;
+}
+
+.side-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.side-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.side-panel::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border: transparent;
+}
