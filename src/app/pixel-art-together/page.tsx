@@ -34,6 +34,9 @@ import { LayersPanel } from '../../components/live-blocks/layers-panel';
 
 // Import CSS
 import './pixel-art-styles.css'
+import { ExportsPanel } from "@/components/live-blocks/exports-panel";
+import { SharePanel } from "@/components/live-blocks/share-panel";
+import { MobileLinksPanel } from "@/components/live-blocks/mobile-links-panel";
 
 export type PixelObject = {
   layer: number;
@@ -581,14 +584,19 @@ export default function PixelArtEditor() {
                 swatch={recentColors}
               />
               <LayersPanel layers={layers} maxPixels={maxPixels} />
-              {/* <ExportsPanel />
-              <div class="-mt-2 mb-5 xl:hidden">
+              <ExportsPanel />
+              <div className="-mt-2 mb-5 xl:hidden">
                 <SharePanel />
               </div>
-              <MobileLinksPanel /> */}
+              <MobileLinksPanel />
             </div>
           )}
         </div>
+
+        {/* <!-- Center panel, containing canvas, undo/redo etc. --> */}
+          
+
+        {/* <!-- Right panel, containing share links, users' colors etc. (only on large screens) --> */}
 
       </div>
 
