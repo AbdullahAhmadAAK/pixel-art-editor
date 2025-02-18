@@ -37,6 +37,8 @@ import './pixel-art-styles.css'
 import { ExportsPanel } from "@/components/live-blocks/exports-panel";
 import { SharePanel } from "@/components/live-blocks/share-panel";
 import { MobileLinksPanel } from "@/components/live-blocks/mobile-links-panel";
+import { LinksPanel } from "@/components/live-blocks/links-panel";
+import { UserOnline } from '../../components/pixel-art-editor/user-online';
 
 export type PixelObject = {
   layer: number;
@@ -594,10 +596,79 @@ export default function PixelArtEditor() {
         </div>
 
         {/* <!-- Center panel, containing canvas, undo/redo etc. --> */}
-          
+
 
         {/* <!-- Right panel, containing share links, users' colors etc. (only on large screens) --> */}
+        <div
+          ref={panels.multiplayerPanel}
+          className="side-panel relative left-full flex  w-0 flex-col overflow-y-auto py-5 xl:left-auto xl:w-[300px]"
+          id="multiplayer-panel"
+          onPointerLeave={handleMouseLeave}
+          onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => handleMouseMove(e, "multiplayerPanel")}
+        >
+          {others && (
+            <>
+              <div
+              // transition:fade TODO:
+              >
+                <div>
+                  <div
+                    className="border-gray-200 px-5 pb-1 text-sm font-semibold text-gray-500"
+                  >
+                    Currently online
+                  </div>
 
+                  {/* <!-- You --> */}
+                  {myPresence && self && myPresence.brush && (
+                    <UserOnline
+                      // TODO: solve info soon with auth.ts changes
+                      // picture={self.info.picture}
+                      // name={myPresence.name || self.info.name}
+                      picture={"/NaN"}
+                      name={myPresence.name || self?.info?.name || 'NaN'}
+                      brush={myPresence.brush}
+                      selectedLayer={myPresence.selectedLayer}
+                      tool={myPresence.tool}
+                      isYou={true}
+                    />
+                  )}
+
+                  {/* <!-- Other users --> */}
+                  {others.map(({ presence, info, connectionId }) => {
+                    if (presence?.brush?.color) return (
+                      <UserOnline
+                        key={connectionId}
+                        // TODO: solve info soon with auth.ts changes
+                        // picture={info.picture}
+                        // name={presence.name || info.name}
+                        picture={'/NaN'}
+                        name={'NaN'}
+                        brush={presence.brush}
+                        selectedLayer={presence.selectedLayer}
+                        tool={presence.tool}
+                        handleSelectColor={({ detail }: { detail: { color: string } }) => updateBrushColor(detail.color)}
+                        isYou={false}
+                      />
+                    )
+                  })}
+                </div>
+
+                {/* <!-- Share buttons--> */}
+                <SharePanel></SharePanel>
+              </div>
+
+
+              {/* // < !--Liveblocks logo --> */}
+              <div
+                // transition:fade TODO:
+                className="flex flex-grow items-end"
+              >
+                <LinksPanel />
+              </div>
+            </>
+
+          )}
+        </div>
       </div>
 
     </>

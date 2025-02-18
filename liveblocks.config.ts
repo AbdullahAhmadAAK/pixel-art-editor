@@ -1,8 +1,10 @@
 import { PixelColor, PixelKey } from "@/app/pixel-art-together/page";
-import { Layer, Tool } from "@/lib/types";
+import { Brush, Layer, Tool } from "@/lib/types";
 import { LiveObject } from "@liveblocks/client";
 
 export type PanelName = 'multiplayerPanel' | 'mainPanel' | 'toolsPanel'
+
+// TODO: I think brushdata is something more meaninngful i came up with, but can totally replace brush everywhere. need to check later
 export type BrushData = {
   color: string,
   hue: number,
@@ -20,7 +22,7 @@ declare global {
   interface Liveblocks {
     Presence: {
       name: string,
-      brush?: BrushData | null,
+      brush?: Brush | null,
       selectedLayer: number,
       cursor: { x: number, y: number, area: PanelName } | null,
       tool: Tool,
