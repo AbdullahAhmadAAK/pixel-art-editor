@@ -1,6 +1,8 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
+import SlButtonGroup from '@shoelace-style/shoelace/dist/react/button-group/index.js';
+
 
 import {
   useMyPresence,
@@ -39,6 +41,7 @@ import { SharePanel } from "@/components/live-blocks/share-panel";
 import { MobileLinksPanel } from "@/components/live-blocks/mobile-links-panel";
 import { LinksPanel } from "@/components/live-blocks/links-panel";
 import { UserOnline } from '../../components/pixel-art-editor/user-online';
+import { IconButton } from '@/components/pixel-art-editor/icon-button';
 
 export type PixelObject = {
   layer: number;
@@ -595,7 +598,129 @@ export default function PixelArtEditor() {
           )}
         </div>
 
+
+
+
         {/* <!-- Center panel, containing canvas, undo/redo etc. --> */}
+        <div
+          className="main-panel relative flex flex-grow flex-col overflow-hidden bg-gray-100"
+          id="main-panel"
+          onPointerLeave={handleMouseLeave}
+          onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => handleMouseMove(e, "mainPanel")}
+        >
+          {/* Part 1 conditional */}
+          {canvasReady && (
+            // <!-- Tool bar above canvas -->
+            <div
+              // transition:fade
+              className="relative z-10 flex w-full flex-shrink-0 flex-grow-0 items-center justify-between border-2 border-t-0 border-gray-100 bg-white p-4"
+            >
+              {/* <!-- Buttons: left side --> */}
+              <div className="flex gap-3">
+                <SlButtonGroup>
+                  {/* Brush tool HTML */}
+                  <IconButton
+                    screenReader="Brush tool (B)"
+                    toggled={myPresence.tool === Tool.Brush}
+                    handleClick={() => {
+                      updateMyPresence({ tool: Tool.Brush })
+                      // myPresence.update({ tool: "brush" })
+                    }}
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z"
+                      />
+                    </svg>
+                  </IconButton>
+
+                  {/* Eraser tool HTML */}
+                  <IconButton
+                    screenReader="Eraser tool (E)"
+                    toggled={myPresence.tool === Tool.Eraser}
+                    handleClick={() => {
+                      updateMyPresence({ tool: Tool.Eraser })
+                      // myPresence.update({ tool: "eraser" })
+                    }}
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"
+                      />
+                    </svg>
+                  </IconButton>
+
+                  {/* Fill tool button HTML */}
+                  <IconButton
+                    screenReader="Fill tool (F)"
+                    toggled={myPresence.tool === Tool.Fill}
+                    handleClick={() => {
+                      updateMyPresence({ tool: Tool.Fill })
+                      // myPresence.update({ tool: "fill" })
+                    }}
+                  >
+                    <svg className="mt-[6px] h-6 w-6 scale-x-[-1]" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M19,11.5C19,11.5 17,13.67 17,15A2,2 0 0,0 19,17A2,2 0 0,0 21,15C21,13.67 19,11.5 19,11.5M5.21,10L10,5.21L14.79,10M16.56,8.94L7.62,0L6.21,1.41L8.59,3.79L3.44,8.94C2.85,9.5 2.85,10.47 3.44,11.06L8.94,16.56C9.23,16.85 9.62,17 10,17C10.38,17 10.77,16.85 11.06,16.56L16.56,11.06C17.15,10.47 17.15,9.5 16.56,8.94Z"
+                      />
+                    </svg>
+                  </IconButton>
+                </SlButtonGroup>
+                <SlButtonGroup>
+                  {/* Toggle grid button */}
+                  <IconButton
+                    screenReader="Toggle grid (G)"
+                    toggled={showGrid}
+                    handleClick={() => (setShowGrid(!showGrid))}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                      />
+                    </svg>
+                  </IconButton>
+
+                  {/* Toggle move button HTML */}
+                  <IconButton
+                    screenReader="Toggle move (M)"
+                    toggled={showMove}
+                    handleClick={() => (setShowMove(!showMove))}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        transform="translate(10, -2.7) rotate(45) scale(0.95)"
+                        fillRule="evenodd"
+                        d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 112 0v1.586l2.293-2.293a1 1 0 011.414 1.414L6.414 15H8a1 1 0 110 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 011.414-1.414L15 13.586V12a1 1 0 011-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </IconButton>
+                </SlButtonGroup>
+              </div>
+
+              {/* <!-- Buttons: right side TODO: in progress --> */}
+              <div className="ml-3 flex gap-3">
+              </div>
+
+            </div>
+          )}
+          {/* <!-- Part 2 Main canvas --> */}
+          {/* Part 3 Mobile menu bar at bottom */}
+        </div>
+
 
 
         {/* <!-- Right panel, containing share links, users' colors etc. (only on large screens) --> */}
