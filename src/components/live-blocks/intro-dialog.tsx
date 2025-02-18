@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import logo from "/public/liveblocks/logo.svg";
-import '@shoelace-style/shoelace/dist/shoelace.css'; // Import Shoelace styles
+// import logo from "/public/liveblocks/logo.svg";
+// import '@shoelace-style/shoelace/dist/shoelace.css'; // Import Shoelace styles
 // import dialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 
+import type SlDialogType from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.d.ts'
 import SlDialog, { SlRequestCloseEvent } from '@shoelace-style/shoelace/dist/react/dialog/index.js';
+
+import type SlInputType from '@shoelace-style/shoelace/dist/components/input/input.component.d.ts'
 import SlInput, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/input/index.js';
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
-import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 
+import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts'
+import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 
 import Image from "next/image";
 
@@ -34,9 +38,7 @@ export function IntroDialog({
     }
   }) => void
 }) {
-  // let dialog;
-  // TODO: can't find the TS for SLDialog
-  const dialogRef = useRef<HTMLElement | null>(null)
+  const dialogRef = useRef<SlDialogType | null>(null)
 
   // Min and max width/height for canvas
   const pixelSizeMin: number = 2;
@@ -79,8 +81,7 @@ export function IntroDialog({
   }
 
   // Submit dialog when return key pressed in input
-  // TODO: could improve from string to more precise one
-  function handleInputKeyDown({ code }: { code: string }) {
+  function handleInputKeyDown({ code }: { code: KeyboardEvent["code"] }) {
     if (code === "Enter") {
       setTimeout(() => submitDialog(), 20);
     }
@@ -113,19 +114,20 @@ export function IntroDialog({
 
   return (
     <SlDialog
-      ref={dialogRef} // TOOD: fix ts
+      ref={dialogRef}
       label="Create a pixel canvas"
       no-header
       open
-      style={{ width: '300px' }} // TODO: is this the same as below
-    // style="--width: 300px;"
+      style={{ '--width': '300px' } as object}
     >
       <div className="flex flex-col">
         <h1 className="mt-2.5 text-2xl">
           <Image
             alt="Pixel art together"
             className="mx-auto block max-w-full"
-            src={logo}
+            src={'/liveblocks/logo.svg'}
+            width={100}
+            height={100}
           />
         </h1>
 
@@ -133,9 +135,10 @@ export function IntroDialog({
           className="mt-5"
           onKeyDown={handleInputKeyDown}
           onSlInput={(e) => {
-            // TODO: check this out later, fix TS
-            if (e?.target?.value)
-              setLocalName(e?.target?.value)
+            const target = e.target as SlInputType
+            if (target) {
+              setLocalName(target.value)
+            }
           }}
           placeholder="Enter your name"
           value={name}
@@ -155,8 +158,9 @@ export function IntroDialog({
                   max={pixelSizeMax}
                   value={height}
                   onSlChange={(e: SlChangeEvent) => {
-                    if (e?.target?.value) {
-                      setHeight(e?.target?.value)
+                    const target = e.target as SlRangeType
+                    if (target) {
+                      setHeight(target.value)
                     }
                   }}
                 >
@@ -177,8 +181,9 @@ export function IntroDialog({
                   max={pixelSizeMax}
                   value={width}
                   onSlChange={(e: SlChangeEvent) => {
-                    if (e?.target?.value) {
-                      setWidth(e?.target?.value)
+                    const target = e.target as SlRangeType
+                    if (target) {
+                      setWidth(target.value)
                     }
                   }}
                 >

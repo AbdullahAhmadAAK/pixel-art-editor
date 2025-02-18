@@ -1,3 +1,9 @@
+// Note: we used these two lines, due to an error within the shoelace library
+// alpha, saturation, brightness, and hue are all accessible values, but the TS error states that they are private and can't be accessed outside of the class.
+// Since there was no way to resolve them, I disabled typescript checking for this file.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react/suspense";
 import { hexToRgb } from "@/app/pixel-art-together/lib/utils/hex-to-rgb";
 import { Brush, Tool } from "@/lib/types";
@@ -5,7 +11,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import SlColorPicker, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/color-picker/index.js';
 import type SlColorPickerType from "@shoelace-style/shoelace/dist/components/color-picker/color-picker.component.d.ts";
-
 
 export function BrushPanel({
   handleBrushChange,
@@ -66,10 +71,9 @@ export function BrushPanel({
   //   applyCustomStyles(colorPicker);
   // });
   useEffect(() => {
-
     if (setColorValue) {
       const applyPostmountLogic = async () => {
-        await import("@shoelace-style/shoelace/dist/components/color-picker/color-picker.js");
+        // await import("@shoelace-style/shoelace/dist/components/color-picker/color-picker.js");
         // colorValue = '#fa3030';
         setColorValue("#fa3030")
         applyCustomStyles(colorPickerRef.current!); // TODO: ts am i sure about this though
@@ -90,7 +94,6 @@ export function BrushPanel({
   }, [swatch])
 
 
-
   // When color changes, update presence
   function colorChange(e: SlChangeEvent) {
     const target = e.target as SlColorPickerType
@@ -100,26 +103,27 @@ export function BrushPanel({
     }
 
     let chosenColorValue = target.value; // can be in any format
+    if (chosenColorValue[0] !== "#") { // if it is not in hex format, change it
+      // note: I changed from hex to hexa, so that opacity changes in other formats could be detected and shown on the UI. Not sure why this was not an issue on the old repo.
+      chosenColorValue = colorPickerRef.current.getFormattedValue("hexa"); // format the chosen color's value (can be "rgba(147, 72, 72, 1.00)" as well as "#5d1111ff")
+    }
 
-    // checks whether it's valid
+    // checks whether it's valid (at this moment, value is now in hex)
     const rgb = hexToRgb(chosenColorValue.slice(0, 7))
     if (!rgb) return;
 
-    if (chosenColorValue[0] !== "#") { // if it is not in hex format, change it
-      chosenColorValue = colorPickerRef.current.getFormattedValue("hex"); // format the chosen color's value (can be "rgba(147, 72, 72, 1.00)" as well as "#5d1111ff")
-    }
-
     // Note: we can ignore the errors "Property 'alpha' is private and only accessible within class 'SlColorPicker'.ts(2341)" and those for saturation and lightness, as the values are accessible
-    // TODO: what to do about lightness? How is it even implemented? It is coming up as undefined on the other app, and the error is:
-    // "Property 'lightness' does not exist on type 'SlColorPicker'.ts(2339)"
     setBrush({
       color: chosenColorValue,
       opacity: parseInt(target.alpha),
       hue: parseInt(target.hue),
       saturation: parseInt(target.saturation),
-      lightness: parseInt(target.lightness),
+      // old developer mistakenly used target.lightness instead of target.brightness. Doesn't seem to be changable within color picker component though. It isn't mentioned in the docs, but is present in the color-picker.component.d.ts file.
+      lightness: parseInt(target.brightness),
       rgb
     })
+
+    updateColor(chosenColorValue)
 
     if (myPresence.tool === "eraser") {
       // myPresence.update({ tool: "brush" });

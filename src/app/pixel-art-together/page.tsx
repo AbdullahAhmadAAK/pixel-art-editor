@@ -12,7 +12,7 @@ import {
 } from "@liveblocks/react/suspense";
 
 import { motion, useSpring } from "framer-motion";
-import { useCallback, useState, useEffect, useRef, RefObject } from 'react';
+import { useCallback, useState, useEffect, useRef, RefObject, useMemo } from 'react';
 import { formatLayers, Layer } from "./lib/utils/format-layers";
 import { generateLayer } from "./lib/utils/generate-layer";
 // import { useStorage } from "@liveblocks/react";
@@ -241,19 +241,22 @@ export default function PixelArtEditor() {
   const [colorValue, setColorValue] = useState<string>("")
 
   // Will be bound to a function that allows the current color to be updated
-  const updateBrushColor = (hex: string) => {
+  const updateBrushColor = useCallback((hex: string) => {
     setColorValue(hex)
-  };
+  }, [])
 
   // const [updateBrushColor, setUpdateBrushColor] = useState()
 
   // Recently used colors to be passed to the swatch
-  let recentColors = new Array(16).fill("#ffffffff");
+  // const recentColors = useMemo(() => new Array(16).fill("#ffffffff"))
+  // let recentColors = new Array(16).fill("#ffffffff");
+  // const recentColors = useMemo(() => new Array(16).fill("#ffffffff"), []);
+  const [recentColors, setRecentColors] = useState(new Array(16).fill("#ffffffff"))
 
   // On brush component change, update presence with new brush TODO: usecallback
-  function handleBrushChange({ detail }: { detail: Brush }) {
+  const handleBrushChange = useCallback(({ detail }: { detail: Brush }) => {
     updateMyPresence({ brush: detail })
-  }
+  }, [updateMyPresence])
 
   // On pixel change, update pixels according to the current tool TODO: pixel storage rework?
   function handlePixelChange({ detail }: { detail: { col: number; row: number; hex: string } }) {
@@ -289,7 +292,8 @@ export default function PixelArtEditor() {
       const a = recentColors;
       a.pop();
       a.unshift(color);
-      recentColors = a;
+      // recentColors = a;
+      setRecentColors(a)
     }
   }
 
