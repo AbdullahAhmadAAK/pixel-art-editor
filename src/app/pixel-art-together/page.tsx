@@ -183,22 +183,25 @@ export default function PixelArtEditor() {
     setNameSet(true)
   }
 
-  // TODO: is this even correct?
-  const updatePixelStorageWithLayer = useMutation(({ storage }, layer) => {
-    storage.set('pixelStorage', layer)
+  const updatePixelStorageWithLayer = useMutation(({ storage }, layerPixels) => {
+    const pixelStorageTester = storage.get('pixelStorage')
+
+    Object.keys(layerPixels).map(pixelKey => {
+      pixelStorageTester.set(pixelKey, layerPixels[pixelKey])
+    })
   }, []);
 
   // Create canvas with dialog settings and default color TODO: needs to be fixed
   function createCanvas({ detail }: { detail: { name: string, width: number, height: number } }) {
     if (layerStorage) {
-      const defaultLayer = generateLayer({
+      const defaultLayerPixels = generateLayer({
         layer: 0,
         rows: detail.height,
         cols: detail.width,
         defaultValue: "",
       });
 
-      updatePixelStorageWithLayer(defaultLayer)
+      updatePixelStorageWithLayer(defaultLayerPixels)
       // $pixelStorage.update(defaultLayer);
 
       // layerStorage.set(0, {

@@ -46,12 +46,19 @@ export function LayersPanel({
 
   // const layerPixelCount = layers[0].grid.length * layers[0].grid[0].length;
   // $: willExceedPixelCount = (layers.length + 1) * layerPixelCount > maxPixels;
-  const [layerPixelCount, setLayerPixelCount] = useState<number>(layers?.length > 0 ? layers[0].grid.length * layers[0].grid[0].length : 0);
+
+  const layerPixelCountFinder = (layers: Layer[]) => {
+    if (!layers || layers.length == 0 || !layers[0].grid || !layers[0].grid[0] || layers[0].grid[0].length == 0) return 0
+    else return layers[0].grid.length * layers[0].grid[0].length
+  }
+
+  // const [layerPixelCount, setLayerPixelCount] = useState<number>(layers?.length > 0 ? layers[0].grid.length * layers[0].grid[0].length : 0);
+  const [layerPixelCount, setLayerPixelCount] = useState<number>(layerPixelCountFinder(layers));
+
   useEffect(() => {
-    if (layers?.length > 0) {
-      const newLayerPixelCount = layers[0].grid.length * layers[0].grid[0].length
-      setLayerPixelCount(newLayerPixelCount)
-    }
+    // const newLayerPixelCount = layers[0].grid.length * layers[0].grid[0].length
+    const newLayerPixelCount = layerPixelCountFinder(layers)
+    setLayerPixelCount(newLayerPixelCount)
   }, [layers])
 
   const [willExceedPixelCount, setWillExceedPixelCount] = useState<boolean>((layers.length + 1) * layerPixelCount > maxPixels)
