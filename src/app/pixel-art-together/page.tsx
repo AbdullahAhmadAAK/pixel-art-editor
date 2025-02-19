@@ -15,14 +15,15 @@ import {
 
 import { motion, useSpring } from "framer-motion";
 import { useCallback, useState, useEffect, useRef, RefObject, useMemo } from 'react';
-import { formatLayers, Layer } from "./lib/utils/format-layers";
+import { formatLayers } from "./lib/utils/format-layers";
+import { Layer } from '@/lib/types';
 import { generateLayer } from "./lib/utils/generate-layer";
 // import { useStorage } from "@liveblocks/react";
 
 // import { ClientSideSuspense, useStorage } from "@liveblocks/react/suspense";
 import { useStorage, useMutation } from "@liveblocks/react";
 
-import { Brush, Direction, Pixel, PixelGrid, Tool } from "@/lib/types";
+import { Brush, Direction, Pixel, Tool } from "@/lib/types";
 
 import { getFillPixels } from "./lib/utils/get-fill-pixels";
 import { getMovePixels } from "./lib/utils/get-move-pixels";
@@ -42,6 +43,9 @@ import { MobileLinksPanel } from "@/components/live-blocks/mobile-links-panel";
 import { LinksPanel } from "@/components/live-blocks/links-panel";
 import { UserOnline } from '../../components/pixel-art-editor/user-online';
 import { IconButton } from '@/components/pixel-art-editor/icon-button';
+import { PixelGrid as PixelGridSegment } from '@/components/pixel-art-editor/pixel-grid';
+import Image from 'next/image';
+import { MobileColorPicker } from '@/components/pixel-art-editor/mobile-color-picker';
 
 export type PixelObject = {
   layer: number;
@@ -60,7 +64,7 @@ export type PixelStorage = {
 
 export default function PixelArtEditor() {
 
-  const [myPresence, updateMyPresenceTest] = useMyPresence();
+  const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
 
   const others = useOthers()
@@ -308,9 +312,8 @@ export default function PixelArtEditor() {
     }
   }
 
-  // TODO: add callback
   // Move pixels by 1 pixel in detail.direction Direction
-  const handleLayerMove = ({ detail }: { detail: { direction: Direction } }) => {
+  const handleLayerMove = useCallback(({ detail }: { detail: { direction: Direction } }) => {
     if (!myPresence?.brush?.color || !pixelStorage || !canvasReady) {
       return;
     }
@@ -324,7 +327,7 @@ export default function PixelArtEditor() {
     });
 
     updatePixels(movedLayer, "");
-  }
+  }, [canvasReady, keyToPixel, myPresence, pixelStorage, updatePixels])
 
   // ================================================================================
   // LIVE CURSORS
@@ -611,7 +614,7 @@ export default function PixelArtEditor() {
           onPointerLeave={handleMouseLeave}
           onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => handleMouseMove(e, "mainPanel")}
         >
-          {/* Part 1 conditional */}
+          {/* Part 1 conditional segment */}
           {canvasReady && (
             // <!-- Tool bar above canvas -->
             <div
@@ -714,17 +717,175 @@ export default function PixelArtEditor() {
                 </SlButtonGroup>
               </div>
 
-              {/* <!-- Buttons: right side TODO: in progress --> */}
+              {/* <!-- Buttons: right side --> */}
               <div className="ml-3 flex gap-3">
+                <SlButtonGroup>
+                  <IconButton screenReader="Undo" handleClick={() => undo()}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </IconButton>
+
+                  <IconButton screenReader="Redo" handleClick={() => redo()}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </IconButton>
+                </SlButtonGroup>
               </div>
 
             </div>
           )}
+
           {/* <!-- Part 2 Main canvas --> */}
+          <div className="relative flex-shrink flex-grow">
+            {canvasReady && layers?.[0].grid.length && (
+              <PixelGridSegment
+                showGrid={showGrid}
+                showMove={showMove}
+                layers={layers}
+                handleLayerMove={handleLayerMove}
+                handlePixelChange={handlePixelChange}
+                mainPanelElementRef={panels.mainPanel}
+              />
+            )}
+          </div>
+
           {/* Part 3 Mobile menu bar at bottom */}
+          <div
+            className="relative z-30 w-full flex-shrink-0 flex-grow-0 border-2 border-gray-100 bg-white py-3 pr-4 xl:hidden"
+          >
+            <div className="flex items-center justify-between">
+              {/* <!-- Open mobile menu button --> */}
+              <div className="flex md:hidden">
+                <button
+                  className="px-4 py-2"
+                  onClick={() => (setMobileMenuOpen(!mobileMenuOpen))}
+                >
+                  {mobileMenuOpen ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin-linejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+
+              {/* <!-- User avatars --> */}
+              <div
+                className="-mr-3 flex flex-grow flex-row-reverse items-center justify-center md:mr-0"
+              >
+                {others && (
+                  <>
+                    {others.map(({ presence, info, connectionId }) =>
+                      presence ? (
+                        <div
+                          key={connectionId}
+                          className="transparent-bg relative -ml-2 h-10 w-10 rounded-full ring-4 ring-white"
+                        >
+                          {/* TODO: change once info fixed */}
+                          <Image
+                            // alt={`${presence?.name || info.name}'s avatar`}
+                            // src={info.picture}
+                            alt='testing'
+                            src={'/testing'}
+                          />
+                        </div>
+                      ) : null
+                    )}
+                  </>
+                )}
+
+                {self && myPresence && myPresence.brush && (
+                  <>
+                    <div className="-my-2 mr-2 hidden flex-grow md:block">
+                      <div className="flex-grow-0">
+                        <UserOnline
+                          // picture={self.info.picture}
+                          // name={myPresence.name || self.info.name}
+                          picture={'/test'}
+                          name={'test until info ok'}
+                          brush={myPresence.brush}
+                          selectedLayer={myPresence.selectedLayer}
+                          tool={myPresence.tool}
+                          handleSelectColor={({ detail }: { detail: { color: string } }) => updateBrushColor(detail.color)}
+                          isYou={true}
+                          short={true}
+                        />
+                      </div>
+                      <div className="w-full flex-grow" />
+                    </div>
+
+                    <div
+                      className="transparent-bg relative -ml-2 block h-10 w-10 rounded-full ring-4 ring-white md:hidden"
+                    >
+                      <Image
+                        // alt={`${myPresence?.name || self.info.name}'s avatar`}
+                        // src={self.info.picture}
+                        alt={`test avatar`}
+                        src={'/testpic'}
+                        // TODO: better sizes
+                        height={40}
+                        width={40}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* <!-- Mobile color picker TODO: in progress--> */}
+              <div className="flex md:hidden">
+                <MobileColorPicker
+                  handleBrushChange={handleBrushChange}
+                  swatch={recentColors}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-
-
 
         {/* <!-- Right panel, containing share links, users' colors etc. (only on large screens) --> */}
         <div

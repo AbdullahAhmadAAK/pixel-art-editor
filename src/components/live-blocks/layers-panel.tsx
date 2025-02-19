@@ -38,7 +38,7 @@ export function LayersPanel({
   maxPixels: number
 }) {
 
-  const [myPresence, updateMyPresenceTest] = useMyPresence();
+  const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
 
   const pixelStorage = useStorage((root) => root.pixelStorage);

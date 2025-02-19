@@ -1,3 +1,5 @@
+import { CSSProperties } from "react";
+
 export type Pixel = {
   color: string;
 };
@@ -8,7 +10,8 @@ export type Layer = {
   id: number;
   grid?: PixelGrid;
   opacity: number;
-  blendMode: string;
+  // blendMode: string; MixBlendMode TODO: changed this, see if any ripple effect
+  blendMode: CSSProperties["mixBlendMode"];
   hidden: boolean;
 };
 
