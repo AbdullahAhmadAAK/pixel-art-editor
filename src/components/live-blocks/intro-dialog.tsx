@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef, useState } from "react";
 // import logo from "/public/liveblocks/logo.svg";
 // import '@shoelace-style/shoelace/dist/shoelace.css'; // Import Shoelace styles
@@ -38,6 +40,12 @@ export function IntroDialog({
     }
   }) => void
 }) {
+
+  useEffect(() => {
+    console.log('identifier max pixels: ', maxPixels)
+
+    console.log('stats in IntroDialog comp: ', { shouldCreateCanvas, loading })
+  }, [shouldCreateCanvas, loading, maxPixels])
   const dialogRef = useRef<SlDialogType | null>(null)
 
   // Min and max width/height for canvas

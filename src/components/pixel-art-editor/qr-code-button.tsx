@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';

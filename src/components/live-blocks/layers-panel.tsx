@@ -149,7 +149,14 @@ export function LayersPanel({
   }, [])
 
   // Update current layer opacity on change
-  const handleOpacityChange = useMutation(({ storage }, { target }) => {
+  const handleOpacityChange = useMutation(({ storage }, event) => {
+    // event.stopPropagation();
+    // event.preventDefault();
+
+    const target = event.target
+
+
+    console.log('i got fireddddd')
     const layerStorage = storage.get('layerStorage')
 
     if (!myPresence || !layerStorage) {
@@ -270,6 +277,22 @@ export function LayersPanel({
     }
   }
 
+  // The onSlChange={handleOpacityChange} seems to only work in Inspect Element mode. Might be something to do with React's synthetic events. 
+  // useEffect(() => {
+
+  //   const rangeElement = rangeElementRef.current;
+  //   if (rangeElement) {
+  //     rangeElement.addEventListener("sl-change", handleOpacityChange);
+  //   }
+  //   return () => {
+  //     if (rangeElement) {
+  //       rangeElement.removeEventListener("sl-change", handleOpacityChange);
+  //     }
+  //   };
+
+  //   // document.getElementById('opacity-changer')?.addEventListener('sl-change', handleOpacityChange)
+  // }, [handleOpacityChange])
+
   return (
     <>
       <div className="border-t-2 border-gray-100 p-5 text-sm">
@@ -313,7 +336,8 @@ export function LayersPanel({
                   <label htmlFor="opacity-changer" className="sr-only">Change opacity</label>
                   <SlRange
                     id="opacity-changer"
-                    onSlChange={handleOpacityChange}
+                    onInput={handleOpacityChange}
+                    // onSlChange={(e) => handleOpacityChange(e)}
                     ref={rangeElementRef}
                   />
                 </div>

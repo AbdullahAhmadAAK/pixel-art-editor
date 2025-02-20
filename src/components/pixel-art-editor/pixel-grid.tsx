@@ -1,3 +1,5 @@
+'use client'
+
 // import { createEventDispatcher, onMount } from "svelte";
 // import { fade } from "svelte/transition"; // TODO: get this working
 // import { useHistory, useMyPresence } from "../lib-liveblocks";
@@ -224,7 +226,6 @@ export function PixelGrid({
   }, []);
 
   const colsIn100 = 100 / cols
-
 
   return (
     <div
