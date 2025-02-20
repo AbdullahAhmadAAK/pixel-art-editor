@@ -6,7 +6,6 @@ import { useStorage, useMyPresence, useUpdateMyPresence, useMutation } from '@li
 import { generateLayer } from "@/app/pixel-art-together/lib/utils/generate-layer";
 import { blendModes } from "@/app/pixel-art-together/lib/utils/blend-modes";
 
-import { debounce } from "@/app/pixel-art-together/lib/utils/debounce";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 // import("@shoelace-style/shoelace/dist/components/menu-item/menu-item.js");
@@ -28,7 +27,6 @@ import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
 import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts';
 // import { color } from "framer-motion";
-import { LiveObject } from '@liveblocks/client';
 
 export function LayersPanel({
   layers = [],
@@ -38,10 +36,11 @@ export function LayersPanel({
   maxPixels: number
 }) {
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
 
-  const pixelStorage = useStorage((root) => root.pixelStorage);
+  // const pixelStorage = useStorage((root) => root.pixelStorage);
   const layerStorage = useStorage((root) => root.layerStorage);
 
   // const layerPixelCount = layers[0].grid.length * layers[0].grid[0].length;
