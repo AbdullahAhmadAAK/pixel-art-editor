@@ -10,7 +10,7 @@ import {
   useUpdateMyPresence,
   useUndo,
   useRedo
-} from "@liveblocks/react/suspense";
+} from "@liveblocks/react";
 
 import { motion, useSpring } from "framer-motion";
 import { useCallback, useState, useEffect, useRef, RefObject, useMemo } from 'react';

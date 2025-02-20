@@ -10,7 +10,7 @@
 // import panzoom from "panzoom";
 
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { useHistory, useMyPresence } from "@liveblocks/react/suspense";
+import { useHistory, useMyPresence } from "@liveblocks/react";
 import { IconButton } from '@/components/pixel-art-editor/icon-button';
 import { Layer, Direction } from "@/lib/types";
 import panzoom from "panzoom"

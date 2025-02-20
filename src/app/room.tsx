@@ -5,7 +5,7 @@ import {
   LiveblocksProvider,
   RoomProvider,
   ClientSideSuspense,
-} from "@liveblocks/react/suspense";
+} from "@liveblocks/react";
 import { Layer, Tool } from "@/lib/types";
 import { LiveObject } from '@liveblocks/client';
 import { PixelColor, PixelKey } from "./pixel-art-together/page";
