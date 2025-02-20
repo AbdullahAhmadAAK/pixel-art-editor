@@ -24,11 +24,11 @@ const config = createConfig({
   },
 });
 
-import { LiveblocksProvider, RoomProvider } from "@liveblocks/react";
-import { ClientSideSuspense } from "@liveblocks/react/suspense";
-import { LiveObject } from '@liveblocks/client';
-import { PixelColor, PixelKey } from "@/app/pixel-art-together/page";
-import { Layer, Tool } from "@/lib/types";
+// import { LiveblocksProvider, RoomProvider } from "@liveblocks/react";
+// import { ClientSideSuspense } from "@liveblocks/react/suspense";
+// import { LiveObject } from '@liveblocks/client';
+// import { PixelColor, PixelKey } from "@/app/pixel-art-together/page";
+// import { Layer, Tool } from "@/lib/types";
 // import { Layer } from "@/lib/types";
 // import { PixelColor, PixelKey } from "@/app/pixel-art-together/page";
 
