@@ -199,7 +199,7 @@ export function LayersPanel({
       layer: newId,
       cols: layers[0].grid[0].length,
       rows: layers[0].grid.length,
-      defaultValue: "",
+      defaultValue: "transparent", // TODO: constantize
     });
 
     const pixelStorage = storage.get('pixelStorage')
@@ -217,6 +217,7 @@ export function LayersPanel({
       opacity: 1,
       blendMode: "normal",
       hidden: false,
+      grid: []
     })
 
     setAddingNewLayer(true)
@@ -234,7 +235,7 @@ export function LayersPanel({
     const layerStorage = storage.get('layerStorage')
     const pixelStorage = storage.get('pixelStorage')
 
-    if (layerStorage && layers.length > 0 && layers[0].grid) {
+    if (layerStorage && layers.length > 1) {
       layerStorage.delete(`${id}` as unknown as number) // The old developer had layer ID as number, but liveblocks expects strings, so we cast it
 
       for (let row = 0; row < layers[0].grid.length; row++) {
@@ -244,7 +245,7 @@ export function LayersPanel({
       }
       selectTopLayer();
     }
-  }, [])
+  }, [layers]) // This will update the layers array in the function whenever the layers state changes 
 
   // Changes to layer using `id`
   function changeLayer(id: number) {

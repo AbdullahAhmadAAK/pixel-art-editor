@@ -305,18 +305,15 @@ export default function PixelArtEditor() {
     // Current pixel
     let pixelsToChange: PixelObject[] = [currentPixel];
 
-    console.log('pixelstochange are: ', pixelsToChange)
-
-    // If fill tool, find neighbour pixels // TODO: fix ts late  // try this first
+    // If fill tool, find neighbour pixels
     if (tool === Tool.Fill) {
-      const currentLayer = layers.find((layer) => layer.id === selected)!;
+      const currentLayer = layers.find((layer) => layer.id === selected)!; // had no other option but to assert here
       pixelsToChange = [
         ...pixelsToChange,
         ...getFillPixels(currentPixel, currentLayer.grid),
       ];
     }
 
-    console.log('Pixels to change: ', pixelsToChange)
     updatePixels(pixelsToChange, tool === Tool.Eraser ? "" : color);
 
     if (!recentColors.includes(color)) {
@@ -330,9 +327,6 @@ export default function PixelArtEditor() {
 
   // Move pixels by 1 pixel in detail.direction Direction
   const handleLayerMove = useCallback(({ detail }: { detail: { direction: Direction } }) => {
-
-    console.log('handleLayerMove called with direction as: ', detail.direction)
-
     if (!myPresence?.brush?.color || !pixelStorage || !canvasReady) {
       return;
     }
@@ -344,9 +338,6 @@ export default function PixelArtEditor() {
       selected,
       keyToPixel,
     });
-
-    console.log('With selected layer: ', selected)
-    console.log('the new layer is now: ', movedLayer)
 
     updatePixels(movedLayer, "");
   }, [canvasReady, keyToPixel, myPresence, pixelStorage, updatePixels])

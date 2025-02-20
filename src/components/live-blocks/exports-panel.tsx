@@ -16,7 +16,6 @@ export function ExportsPanel({
   function handleSaveSvg() {
     const queryResult = document.querySelector("#svg-image")
 
-    console.log('query result: ', queryResult)
     if (!queryResult) return;
 
     const svgContent = queryResult.outerHTML;
