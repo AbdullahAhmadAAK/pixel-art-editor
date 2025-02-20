@@ -95,7 +95,7 @@ export function IntroDialog({
     }
   }
 
-  // Equivalent of onmount and ondestroy
+  // Equivalent of onmount and ondestroy 
   useEffect(() => {
     const dialogElement = dialogRef.current
 
@@ -105,6 +105,7 @@ export function IntroDialog({
 
       if (dialogElement) {
         dialogElement.addEventListener('sl-request-close', cancelClose);
+        dialogElement.show()
       }
 
       // await import('@shoelace-style/shoelace/dist/components/range/range.js');
@@ -118,15 +119,19 @@ export function IntroDialog({
         dialogElement.removeEventListener('sl-request-close', cancelClose);
       }
     };
-  })
+  }, [])
 
   return (
     <SlDialog
       ref={dialogRef}
       label="Create a pixel canvas"
       no-header
-      open
-      style={{ '--width': '300px' } as object}
+      style={{
+        '--width': '300px',
+        '--height': 'auto',
+        '--max-height': '600px',
+        '--min-height': '600px'
+      } as object}
     >
       <div className="flex flex-col">
         <h1 className="mt-2.5 text-2xl">
