@@ -4,6 +4,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
+// This is for the styles from shoelace library
+import '@shoelace-style/shoelace/dist/components/color-picker/color-picker.styles.js'
+
 import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react/suspense";
 import { hexToRgb } from "@/app/pixel-art-together/lib/utils/hex-to-rgb";
 import { Brush, Tool } from "@/lib/types";

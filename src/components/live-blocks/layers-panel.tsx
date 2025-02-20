@@ -7,7 +7,7 @@ import { generateLayer } from "@/app/pixel-art-together/lib/utils/generate-layer
 import { blendModes } from "@/app/pixel-art-together/lib/utils/blend-modes";
 
 import { debounce } from "@/app/pixel-art-together/lib/utils/debounce";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 // import("@shoelace-style/shoelace/dist/components/menu-item/menu-item.js");
 //     import("@shoelace-style/shoelace/dist/components/menu/menu.js");
@@ -135,67 +135,60 @@ export function LayersPanel({
 
   // Update current layer blend mode on change
   const handleBlendModeChange = useMutation(({ storage }, { detail }) => {
+    const layerStorage = storage.get('layerStorage')
     if (!myPresence || !layerStorage || !blendTextRef?.current) {
       return;
     }
 
+    const layerStorageObject = layerStorage.toObject()
     const index = myPresence.selectedLayer;
-    const oldLayer = layerStorage[index];
+    const oldLayer = layerStorageObject[index];
     const newLayer = { ...oldLayer, blendMode: detail.item.dataset.value };
 
-    const layerStorageMutator = storage.get('layerStorage')
-    layerStorageMutator.set(myPresence.selectedLayer, newLayer)
-    // $layerStorage.set("" + $myPresence.selectedLayer, newLayer);
-
+    layerStorage.set(myPresence.selectedLayer, newLayer)
     blendTextRef.current.innerText = detail.item.dataset.value;
   }, [])
 
   // Update current layer opacity on change
-  // TODO: how to combine debounce and usemutation
-  const handleOpacityChange = debounce(
-    async function ({ target }) {
-      if (!myPresence || !layerStorage) {
-        return;
-      }
+  const handleOpacityChange = useMutation(({ storage }, { target }) => {
+    const layerStorage = storage.get('layerStorage')
 
-      const firstIndex = myPresence.selectedLayer;
-      // const oldLayer = $layerStorage.get("" + firstIndex);
-      const oldLayer = layerStorage[firstIndex];
-      const newLayer = { ...oldLayer, opacity: target.value / 100 };
+    if (!myPresence || !layerStorage) {
+      return;
+    }
 
-      // const layerStorageMutator = Storage.get('layerStorage')
-      // layerStorageMutator.set(myPresence.selectedLayer, newLayer)
-      // $layerStorage.set("" + myPresence.selectedLayer, newLayer);
-    },
-    100,
-    false
-  );
+    const layerStorageObject = layerStorage.toObject()
+    const firstIndex = myPresence.selectedLayer;
+    const oldLayer = layerStorageObject[firstIndex];
+    const newLayer: Layer = { ...oldLayer, opacity: target.value / 100 };
 
-  // toggleVisibility
+    layerStorage.set(myPresence.selectedLayer, newLayer)
+  }, [myPresence.selectedLayer])
+
   // Toggle visibility of current layer
-  const toggleVisibility = useMutation(({ storage }, layerId, event) => {
+  const toggleVisibility = useMutation(({ storage }, layerId: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (event) {
       event.stopPropagation();
     }
 
+    const layerStorage = storage.get('layerStorage')
+    const layerStorageObject = layerStorage.toObject()
     if (!layerStorage) return
 
-    // const oldLayer = layerStorage.get("" + layerId);
-    const oldLayer = layerStorage[layerId]
+    const oldLayer = layerStorageObject[layerId]
     const newLayer = { ...oldLayer, hidden: !oldLayer.hidden };
-
-    const layerStorageMutator = storage.get('layerStorage')
-    layerStorageMutator.set(layerId, newLayer)
-    // $layerStorage.set(layerId, newLayer);
+    layerStorage.set(layerId, newLayer)
   }, [])
 
-  // addLayer
   // Adds new layer to top of stack
   const addLayer = useMutation(({ storage }) => {
+    const layerStorage = storage.get('layerStorage')
+
     if (!layerStorage || !layers || layers.length == 0 || !layers[0].grid) return;
 
+    const layerStorageObject = layerStorage.toObject()
     let newId = 0;
-    Object.values(layerStorage).map((layer) => {
+    Object.values(layerStorageObject).map((layer) => {
       if (layer.id > newId) {
         newId = layer.id;
       }
@@ -209,91 +202,52 @@ export function LayersPanel({
       defaultValue: "",
     });
 
-    // Batching changes means one undo click will reverse all
-    // batch(() => {
-    const pixelStorageMutator = storage.get('pixelStorage')
-    console.log('this is the mutator: ', typeof pixelStorageMutator, pixelStorageMutator)
+    const pixelStorage = storage.get('pixelStorage')
 
     Object.keys(generatedLayer).forEach(key => {
-      pixelStorageMutator.set(key, generatedLayer[key])
+      pixelStorage.set(key, generatedLayer[key])
     })
 
     // pixelStorageMutator.update({ ...generatedLayer }) // TODO: will this work the way I expect it to? old ones shouldnt be overwritten
     // $pixelStorage.update({ ...generatedLayer });
 
 
-
-    const layerStorageMutator = storage.get('layerStorage')
-    layerStorageMutator.set(newId, {
+    layerStorage.set(newId, {
       id: newId,
       opacity: 1,
       blendMode: "normal",
       hidden: false,
     })
 
-    // $layerStorage.set("" + newId, {
-    //   id: newId,
-    //   opacity: 1,
-    //   blendMode: "normal",
-    //   hidden: false,
-    // });
-    // addingNewLayer = true;
     setAddingNewLayer(true)
-
     updateMyPresence({ selectedLayer: newId })
-    // myPresence?.update({ selectedLayer: newId });
-    // });
-    // setTimeout(() => (addingNewLayer = false));
     setTimeout(() => (setAddingNewLayer(false)));
   }, [])
 
 
-  // deleteLayer
   // Deletes layer using `id`
-  function deleteLayer(id, event) {
+  const deleteLayer = useMutation(({ storage }, id: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (event) {
       event.stopPropagation();
     }
 
-    if (layerStorage && Object.values(layerStorage).length > 1 && layers.length > 0 && layers[0].grid) {
-      // batch(() => {
-      //   layerStorage.delete("" + id);
-      //   for (let row = 0; row < layers[0].grid.length; row++) {
-      //     for (let col = 0; col < layers[0].grid[0].length; col++) {
-      //       $pixelStorage.delete(`${id}_${row}_${col}`);
-      //     }
-      //   }
-      // });
-      deleteLayerStorageKeyValuePair("" + id)
+    const layerStorage = storage.get('layerStorage')
+    const pixelStorage = storage.get('pixelStorage')
+
+    if (layerStorage && layers.length > 0 && layers[0].grid) {
+      layerStorage.delete(`${id}` as unknown as number) // The old developer had layer ID as number, but liveblocks expects strings, so we cast it
+
       for (let row = 0; row < layers[0].grid.length; row++) {
         for (let col = 0; col < layers[0].grid[0].length; col++) {
-          // $pixelStorage.delete(`${id}_${row}_${col}`);
-          deletePixelStorageKeyValuePair(`${id}_${row}_${col}`)
+          pixelStorage.delete(`${id}_${row}_${col}`)
         }
       }
-
       selectTopLayer();
     }
-  }
+  }, [])
 
-  const deletePixelStorageKeyValuePair = useMutation(({ storage }, key) => {
-    const pixelStorage = storage.get('pixelStorage')
-    if (pixelStorage) {
-      pixelStorage.delete(key)
-    }
-  }, []);
-
-  const deleteLayerStorageKeyValuePair = useMutation(({ storage }, key) => {
-    const layerStorage = storage.get('layerStorage')
-    if (layerStorage) {
-      layerStorage.delete(key)
-    }
-  }, []);
-
-  // changeLayer
   // Changes to layer using `id`
-  function changeLayer(id) {
-    // myPresence?.update({ selectedLayer: id });
+  function changeLayer(id: number) {
     updateMyPresence({ selectedLayer: id })
 
     if (blendTextRef.current) {

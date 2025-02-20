@@ -2,6 +2,7 @@ import { copyUrlToClipboard } from "@/app/pixel-art-together/lib/utils/copy-text
 import { useState } from "react";
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
 
+import '@shoelace-style/shoelace/dist/components/button/button.styles.js'
 export function CopyLinkButton() {
 
   const [copied, setCopied] = useState<boolean>(false)

@@ -20,11 +20,12 @@ export function IconButton({
   children,
 }: IconButtonProps) {
   return (
-    <SlTooltip content={screenReader} hoist>
+    <SlTooltip content={screenReader} hoist className="bg-gray-800">
+      {/* TODO: need to add the styles ourselves due to bug with shoelace buttons */}
       <SlButton
         className={`relative flex h-10 w-10 items-center justify-center ${classes}`}
         onClick={(e) => handleClick?.(e as unknown as React.MouseEvent<HTMLButtonElement>)}
-        variant={toggled ? "primary" : "default"}
+        variant={toggled ? "primary" : "primary"}
       >
         <span className="sr-only">{screenReader}</span>
         <div className="absolute inset-0 flex items-center justify-center">

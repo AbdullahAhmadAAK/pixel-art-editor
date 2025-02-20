@@ -10,7 +10,6 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useHistory, useMyPresence } from "@liveblocks/react/suspense";
 import { IconButton } from '@/components/pixel-art-editor/icon-button';
-import { debounce } from "@/app/pixel-art-together/lib/utils/debounce";
 import { Layer, Direction } from "@/lib/types";
 import panzoom from "panzoom"
 import type { PanZoom } from "panzoom"
@@ -52,7 +51,7 @@ export function PixelGrid({
 
   const history = useHistory();
 
-  // TODO: need to check this
+  // This will either turn on or turn off the panning mode on the panzoom instance, based on what the panning state variable is set as
   useEffect(() => {
     if (panInstanceRef.current) {
       panInstanceRef.current[panning ? "resume" : "pause"]();
@@ -88,18 +87,18 @@ export function PixelGrid({
     // });
   }
 
-  // Move layer event TODO: handle debounce and layermove combo later
-  const layerMove = debounce(
-    function (direction: Direction) {
-      handleLayerMove({ detail: { direction } })
-      // 
-      // dispatch("layerMove", {
-      //   direction,
-      // });
-    },
-    100,
-    true
-  );
+  // TODO: debounce needed? parked on sean.
+  // const layerMove = debounce(
+  //   function (direction: Direction) {
+  //     handleLayerMove({ detail: { direction } })
+  //   },
+  //   100,
+  //   true
+  // );
+  const layerMove = (direction: Direction) => {
+    handleLayerMove({ detail: { direction } })
+  }
+
 
   function handleMouseDown() {
     setMouseIsDown(true);
@@ -127,7 +126,7 @@ export function PixelGrid({
   // TODO: this function was passed hex, row, col, but here definition was only for hex. will be changing the usage of this function against old dev's way
   // On touch move, take hovered col/row from data-col/data-row and pass to handleMouseMove
   function handleTouchMove(event: React.TouchEvent<HTMLDivElement>, { hex }: { hex: string }) {
-    event.preventDefault();
+    // event.preventDefault(); // TODO: error coming of passive function, so cant prevent default inside that
     const location =
       event?.touches?.[0] ||
       event?.changedTouches?.[0] ||
@@ -142,7 +141,11 @@ export function PixelGrid({
     if (target?.dataset?.col && target?.dataset?.row) {
       // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)"
       const { col, row } = target.dataset;
-      handleMouseMove({ target, hex, col, row }); // here, target is sent as Element
+
+      const colNumber = Number(col)
+      const rowNumber = Number(row)
+
+      handleMouseMove({ target, hex, col: colNumber, row: rowNumber }); // here, target is sent as Element
     }
   }
 
@@ -200,6 +203,7 @@ export function PixelGrid({
     // Add panning support to canvas (hold space to pan)
     if (panElementRef.current) {
       panInstanceRef.current = panzoom(panElementRef.current);
+      panInstanceRef.current.pause() // The panzoom instance is turned on by default, so we need to pause it until a space keydown event turns it on 
       setPanning(false)
 
       fixAspectRatioSupport();
@@ -275,7 +279,7 @@ export function PixelGrid({
               <svg
                 className="mx-auto h-full max-w-full"
                 id="svg-image"
-                viewBox="0 0 {(rows / cols) * 100} 100"
+                viewBox={`0 0 ${(rows / cols) * 100} 100`}
                 xmlns="http://www.w3.org/2000/svg"
               >
                 {layers.map(layer => {

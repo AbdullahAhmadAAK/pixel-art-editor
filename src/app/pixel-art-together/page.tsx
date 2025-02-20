@@ -63,7 +63,18 @@ export type PixelStorage = {
 };
 
 export default function PixelArtEditor() {
+  // This was in onMount on __layout.svelte, which I brought here
+  useEffect(() => {
+    function onResize() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    }
 
+    onResize();
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+
+  }, [])
   const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
 
@@ -292,7 +303,9 @@ export default function PixelArtEditor() {
     // Current pixel
     let pixelsToChange: PixelObject[] = [currentPixel];
 
-    // If fill tool, find neighbour pixels
+    console.log('pixelstochange are: ', pixelsToChange)
+
+    // If fill tool, find neighbour pixels // TODO: fix ts late
     if (tool === Tool.Fill) {
       const currentLayer = layers.find((layer) => layer.id === selected)!;
       pixelsToChange = [
@@ -301,6 +314,7 @@ export default function PixelArtEditor() {
       ];
     }
 
+    console.log('Pixels to change: ', pixelsToChange)
     updatePixels(pixelsToChange, tool === Tool.Eraser ? "" : color);
 
     if (!recentColors.includes(color)) {
@@ -757,7 +771,7 @@ export default function PixelArtEditor() {
 
           {/* <!-- Part 2 Main canvas --> */}
           <div className="relative flex-shrink flex-grow">
-            {canvasReady && layers?.[0].grid.length && (
+            {canvasReady && layers?.[0]?.grid?.length && (
               <PixelGridSegment
                 showGrid={showGrid}
                 showMove={showMove}
