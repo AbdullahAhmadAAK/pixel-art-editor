@@ -101,13 +101,13 @@ export function IntroDialog({
 
     // Load components and prevent closing
     const loadComponents = async () => {
-      await import('@shoelace-style/shoelace/dist/components/dialog/dialog.js');
+      // await import('@shoelace-style/shoelace/dist/components/dialog/dialog.js');
 
       if (dialogElement) {
         dialogElement.addEventListener('sl-request-close', cancelClose);
       }
 
-      await import('@shoelace-style/shoelace/dist/components/range/range.js');
+      // await import('@shoelace-style/shoelace/dist/components/range/range.js');
     };
 
     loadComponents();
