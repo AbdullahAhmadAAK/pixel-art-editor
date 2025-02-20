@@ -329,8 +329,8 @@ export function PixelGrid({
                       x="-0.5"
                       y="-0.5"
                       id="grid"
-                      width="{100 / rows}%"
-                      height="{100 / cols}%"
+                      width={`${100 / rows}%`}
+                      height={`${100 / cols}%`}
                       patternUnits="userSpaceOnUse"
                     >
                       <path

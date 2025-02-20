@@ -51,7 +51,7 @@ export type PixelObject = {
   layer: number;
   row: number;
   col: number;
-  value?: object;
+  value?: string;
 };
 
 // A key for a pixel, e.g. '0_1_2'
@@ -151,7 +151,8 @@ export default function PixelArtEditor() {
   const updatePixels = useMutation(({ storage }, pixelArray: PixelObject[], newVal: string) => {
     const updatedPixels: PixelStorage = {};
     pixelArray.forEach((pixelProps) =>
-      (updatedPixels[pixelToKey(pixelProps)] = newVal) // idk why he wrote pixelProps.value before. do keep in mind tho.
+      // handleLayerMove calls this to just move the layers towards a certain direction. In that case, newVal will not be provided to the function, and we will make do with the already present values
+      (updatedPixels[pixelToKey(pixelProps)] = pixelProps.value || newVal) // idk why he wrote pixelProps.value before. do keep in mind tho.
       // (updatedPixels[pixelToKey(pixelProps)] = pixelProps.value || newVal)
     );
 
@@ -213,7 +214,7 @@ export default function PixelArtEditor() {
         layer: 0,
         rows: detail.height,
         cols: detail.width,
-        defaultValue: "",
+        defaultValue: "transparent", // TODO: constantize?
       });
 
       updatePixelStorageWithLayer(defaultLayerPixels)
@@ -245,6 +246,7 @@ export default function PixelArtEditor() {
       opacity: 1,
       blendMode: "normal",
       hidden: false,
+      grid: [] // try this first
     })
     // storage.set('layerStorage', layer)
   }, []);
@@ -305,7 +307,7 @@ export default function PixelArtEditor() {
 
     console.log('pixelstochange are: ', pixelsToChange)
 
-    // If fill tool, find neighbour pixels // TODO: fix ts late
+    // If fill tool, find neighbour pixels // TODO: fix ts late  // try this first
     if (tool === Tool.Fill) {
       const currentLayer = layers.find((layer) => layer.id === selected)!;
       pixelsToChange = [
@@ -328,6 +330,9 @@ export default function PixelArtEditor() {
 
   // Move pixels by 1 pixel in detail.direction Direction
   const handleLayerMove = useCallback(({ detail }: { detail: { direction: Direction } }) => {
+
+    console.log('handleLayerMove called with direction as: ', detail.direction)
+
     if (!myPresence?.brush?.color || !pixelStorage || !canvasReady) {
       return;
     }
@@ -339,6 +344,9 @@ export default function PixelArtEditor() {
       selected,
       keyToPixel,
     });
+
+    console.log('With selected layer: ', selected)
+    console.log('the new layer is now: ', movedLayer)
 
     updatePixels(movedLayer, "");
   }, [canvasReady, keyToPixel, myPresence, pixelStorage, updatePixels])

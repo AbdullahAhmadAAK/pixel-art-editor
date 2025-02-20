@@ -8,7 +8,7 @@ export type PixelGrid = Pixel[][];
 
 export type Layer = {
   id: number;
-  grid?: PixelGrid;
+  grid: PixelGrid;  // try this first
   opacity: number;
   // blendMode: string; MixBlendMode TODO: changed this, see if any ripple effect
   blendMode: CSSProperties["mixBlendMode"];

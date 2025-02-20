@@ -19,7 +19,8 @@ export function getMovePixels({
   const pixelKeys = Object.keys(pixelStorage)
     .map((pixelKey) => ({
       ...keyToPixel(pixelKey),
-      value: { color: pixelStorage[pixelKey] }, // note: old developer made an error here
+      // value: { color: pixelStorage[pixelKey] }, // note: old developer made a TS error here. We need this to be a string, and not an object
+      value: pixelStorage[pixelKey],
     }))
     .filter(({ layer }) => layer === selected);
 
@@ -52,7 +53,8 @@ export function getMovePixels({
       .map((_, index) => ({
         col: index,
         row: up ? maxRow : 0,
-        value: { color: "transparent" },
+        // value: { color: "transparent" }, changed from object to string, to follow a consistent TS structure in PixelObject
+        value: "transparent",
         layer: selected // I added this, so that the pixel stays in the same layer it was
       }))
       .forEach((pixel) => newLayer.push(pixel));
@@ -73,7 +75,8 @@ export function getMovePixels({
       .map((_, index) => ({
         col: left ? maxRow : 0,
         row: index,
-        value: { color: "transparent" },
+        // value: { color: "transparent" },
+        value: "transparent", 
         layer: selected // I added this, so that the pixel stays in the same layer it was
       }))
       .forEach((pixel) => newLayer.push(pixel));
