@@ -633,7 +633,7 @@ export default function PixelArtEditorClientComponent() {
       </div>
 
       {/* <!-- App --> */}
-      <div className="relative flex h-full min-h-full bg-white">
+      <div className="relative flex w-full h-full min-h-full bg-white">
 
         {/* <!-- Left panel, containing layers etc --> */}
         <div
@@ -648,8 +648,11 @@ export default function PixelArtEditorClientComponent() {
               ref={panels.toolsPanel}
               onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => handleMouseMove(e, "toolsPanel")}
               onPointerLeave={(handleMouseLeave)}
-              // transition:fade TODO: think of alternative, this is from svelte package
               className="relative top-[-455px] flex h-full min-h-full flex-col md:top-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
             >
               <BrushPanel
                 // on:brushChange={handleBrushChange}
@@ -683,8 +686,11 @@ export default function PixelArtEditorClientComponent() {
           {/* Part 1 conditional segment */}
           {canvasReady && (
             // <!-- Tool bar above canvas -->
-            <div
-              // transition:fade
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
               className="relative z-10 flex w-full flex-shrink-0 flex-grow-0 items-center justify-between border-2 border-t-0 border-gray-100 bg-white p-4"
             >
               {/* <!-- Buttons: left side --> */}
@@ -818,7 +824,7 @@ export default function PixelArtEditorClientComponent() {
                 </SlButtonGroup>
               </div>
 
-            </div>
+            </motion.div>
           )}
 
           {/* <!-- Part 2 Main canvas --> */}
@@ -965,8 +971,11 @@ export default function PixelArtEditorClientComponent() {
         >
           {others && (
             <>
-              <div
-              // transition:fade TODO:
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
               >
                 <div>
                   <div
@@ -1012,16 +1021,19 @@ export default function PixelArtEditorClientComponent() {
 
                 {/* <!-- Share buttons--> */}
                 <SharePanel></SharePanel>
-              </div>
+              </motion.div>
 
 
               {/* // < !--Liveblocks logo --> */}
-              <div
-                // transition:fade TODO:
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
                 className="flex flex-grow items-end"
               >
                 <LinksPanel />
-              </div>
+              </motion.div>
             </>
 
           )}

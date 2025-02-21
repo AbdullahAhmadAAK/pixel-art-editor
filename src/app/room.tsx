@@ -9,7 +9,7 @@ import {
 import { Layer, Tool } from "@/lib/types";
 import { LiveObject } from '@liveblocks/client';
 import { PixelColor, PixelKey } from "./pixel-art-together/page";
-// import { IntroDialog } from "@/components/live-blocks/intro-dialog";
+import { IntroDialog } from "@/components/live-blocks/intro-dialog";
 
 export function Room({ children }: { children: ReactNode }) {
   return (
@@ -43,21 +43,21 @@ export function Room({ children }: { children: ReactNode }) {
 // TODO: maybe this is taking time to be rendered on client, so why not have this from server?
 export function IntroDialogFallback() {
   return (
-    // <div className="absolute inset-0 z-50 flex items-center justify-center">
-    //   <IntroDialog
-    //     // maxPixels={maxPixels}
-    //     maxPixels={0}
-    //     loading={true}
-    //     shouldCreateCanvas={false}
-    //     // on:createCanvas={createCanvas}
-    //     // on:setName={setName}
-    //     createCanvas={() => { }}
-    //     setName={() => { }}
-    //   />
-    // </div>
+    <div className="absolute inset-0 z-50 flex items-center justify-center">
+      <IntroDialog
+        // maxPixels={maxPixels}
+        maxPixels={0}
+        loading={true}
+        shouldCreateCanvas={false}
+        // on:createCanvas={createCanvas}
+        // on:setName={setName}
+        createCanvas={() => { }}
+        setName={() => { }}
+      />
+    </div>
 
     // TODO: this is static content
-    <></>
+    // <></>
 
   );
 }

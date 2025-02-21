@@ -1,7 +1,8 @@
 import { Brush, Tool } from "@/lib/types";
-// import { spring } from "svelte/motion";
 import { contrastingTextColour } from "@/app/pixel-art-together/lib/utils/contrasting-text-colour";
 import { useEffect, useState } from "react";
+import { motion, useSpring, useMotionValue } from "framer-motion";
+
 
 export function Cursor({
   shrink = false,
@@ -19,21 +20,26 @@ export function Cursor({
   y?: number
 }) {
 
-  // Spring animation for cursor
-  // let coords = spring(
-  //   { x, y },
-  //   {
-  //     stiffness: 0.07,
-  //     damping: 0.35,
-  //   }
-  // );
+  // TODO: i already get these from calcCursorPosition, will that work? check soon
+  // const x = useMotionValue(0);
+  // const y = useMotionValue(0);
 
-  // Update spring when x and y change
-  // $: {
-  //   coords.set({ x, y });
-  // }
+  // Framer's `useSpring` replicates Svelte's spring animation
+  const springX = useSpring(x, { stiffness: 70, damping: 35 });
+  const springY = useSpring(y, { stiffness: 70, damping: 35 });
 
-  const coords = { x: x, y: y }
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      x.set(e.clientX);
+      y.set(e.clientY);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [x, y]);
+
+
+  // const coords = { x: x, y: y }
 
   // Should text be black or white on this colour
   const [blackText, setBlackText] = useState<boolean>(true)
@@ -44,9 +50,10 @@ export function Cursor({
 
 
   return (
-    <div
+    <motion.div
       className="absolute -top-4 -left-4"
-      style={{ transform: `translateX(${coords.x}px) translateY(${coords.y}px)` }}
+      // style={{ transform: `translateX(${coords.x}px) translateY(${coords.y}px)` }}
+      style={{ transform: `translateX(${springX}px) translateY(${springX}px)` }}
     >
       <div
         className={`inner-border absolute top-7 left-7 origin-top-left overflow-hidden whitespace-nowrap rounded-full text-sm font-medium drop-shadow-sm transition-transform duration-150 ${shrink
@@ -108,7 +115,7 @@ export function Cursor({
           />
         </svg>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

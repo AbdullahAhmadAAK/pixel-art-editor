@@ -1,6 +1,7 @@
 // import { createEventDispatcher, onMount } from "svelte";
 // import { quintInOut, quintOut } from "svelte/easing";
 // import { slide } from "svelte/transition";
+import { motion } from "framer-motion";
 import Image from 'next/image';
 import { Brush, Tool } from '@/lib/types';
 import { contrastingTextColour } from '../../app/pixel-art-together/lib/utils/contrasting-text-colour';
@@ -54,11 +55,11 @@ export function UserOnline({
   }
 
   return (
-    <div
+    <motion.div
       className="flex h-16 items-center justify-between px-5"
-    // TODO: add these animations soon
-    // in:slide={{ duration: isYou ? 0 : 500, easing: quintInOut }}
-    // out:slide={{ duration: isYou ? 0 : 500, easing: quintOut }}
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0, transition: { duration: isYou ? 0 : 0.5, ease: [0.83, 0, 0.17, 1] } }}
+      exit={{ opacity: 0, x: 50, transition: { duration: isYou ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] } }}
     >
       <div className="flex items-center overflow-hidden">
         {/* <!-- Avatar --> */}
@@ -140,6 +141,6 @@ export function UserOnline({
           </SlTooltip>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

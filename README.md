@@ -14,4 +14,3 @@ Onchain multiplayer pixel art making
 npm install
 npm run dev
 ```
-
