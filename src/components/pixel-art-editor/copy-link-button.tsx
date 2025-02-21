@@ -1,3 +1,5 @@
+'use client'
+
 import { copyUrlToClipboard } from "@/app/pixel-art-together/lib/utils/copy-text";
 import { useState } from "react";
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
