@@ -30,7 +30,7 @@ export function Cursor({
 
   // add explanation for this too
   useEffect(() => {
-    console.log('useEffect in cursor component ran with (x, y) as: ', x, y)
+    console.log('useEffect in cursor component ran with (x, y) as: ', x, y) // this part is working correctly, ibrahim gets set here. but cursor position not updated why?
     motionX.set(x);
     motionY.set(y);
   }, [x, y, motionX, motionY]); // Runs whenever `x` or `y` changes
@@ -61,8 +61,8 @@ export function Cursor({
     <motion.div
       className="absolute -top-4 -left-4"
       // style={{ transform: `translateX(${coords.x}px) translateY(${coords.y}px)` }}
-      // style={{ x: springX, y: springY }} // Use Framer's `x` and `y` instead of transform
-      style={{ transform: `translateX(${springX}px) translateY(${springY}px)` }}
+      style={{ x: springX, y: springY }} // Use Framer's `x` and `y` instead of transform
+    // style={{ transform: `translateX(${springX}px) translateY(${springY}px)` }}
     >
       <div
         className={`inner-border absolute top-7 left-7 origin-top-left overflow-hidden whitespace-nowrap rounded-full text-sm font-medium drop-shadow-sm transition-transform duration-150 ${shrink
