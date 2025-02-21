@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef, useState } from "react";
 // import logo from "/public/liveblocks/logo.svg";
 // import '@shoelace-style/shoelace/dist/shoelace.css'; // Import Shoelace styles
@@ -38,15 +40,30 @@ export function IntroDialog({
     }
   }) => void
 }) {
+
+  useEffect(() => {
+    console.log('identifier max pixels: ', maxPixels)
+
+    console.log('stats in IntroDialog comp: ', { shouldCreateCanvas, loading })
+  }, [shouldCreateCanvas, loading, maxPixels])
   const dialogRef = useRef<SlDialogType | null>(null)
 
   // Min and max width/height for canvas
   const pixelSizeMin: number = 2;
   const pixelSizeMax: number = 48;
 
+  const [name, setLocalName] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocalName(localStorage.getItem("name") || "");
+    }
+  }, []);
+
+
   // Default name and sizes
   // let name: string = localStorage.getItem("name") || "";
-  const [name, setLocalName] = useState<string>(localStorage.getItem("name") || "") // setName is an external function passed as prop, so name of setter is a bit different here
+  // const [name, setLocalName] = useState<string>(window localStorage?.getItem("name") || "") // setName is an external function passed as prop, so name of setter is a bit different here
 
   // let width: number = 16;
   const [width, setWidth] = useState<number>(16)
@@ -77,7 +94,7 @@ export function IntroDialog({
       const detail = { name }
       setName({ detail })
     }
-    localStorage.setItem("name", name);
+    localStorage?.setItem("name", name); // this is done because same component is used in fallback UI (static content)
   }
 
   // Submit dialog when return key pressed in input
@@ -87,19 +104,20 @@ export function IntroDialog({
     }
   }
 
-  // Equivalent of onmount and ondestroy
+  // Equivalent of onmount and ondestroy 
   useEffect(() => {
     const dialogElement = dialogRef.current
 
     // Load components and prevent closing
     const loadComponents = async () => {
-      await import('@shoelace-style/shoelace/dist/components/dialog/dialog.js');
+      // await import('@shoelace-style/shoelace/dist/components/dialog/dialog.js');
 
       if (dialogElement) {
         dialogElement.addEventListener('sl-request-close', cancelClose);
+        dialogElement.show()
       }
 
-      await import('@shoelace-style/shoelace/dist/components/range/range.js');
+      // await import('@shoelace-style/shoelace/dist/components/range/range.js');
     };
 
     loadComponents();
@@ -110,15 +128,19 @@ export function IntroDialog({
         dialogElement.removeEventListener('sl-request-close', cancelClose);
       }
     };
-  })
+  }, [])
 
   return (
     <SlDialog
       ref={dialogRef}
       label="Create a pixel canvas"
       no-header
-      open
-      style={{ '--width': '300px' } as object}
+      style={{
+        '--width': '300px',
+        '--height': 'auto',
+        '--max-height': '600px',
+        '--min-height': '600px'
+      } as object}
     >
       <div className="flex flex-col">
         <h1 className="mt-2.5 text-2xl">

@@ -26,7 +26,7 @@ import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
 
 import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts';
-// import { color } from "framer-motion";
+import { motion } from "framer-motion";
 
 export function LayersPanel({
   layers = [],
@@ -149,7 +149,14 @@ export function LayersPanel({
   }, [])
 
   // Update current layer opacity on change
-  const handleOpacityChange = useMutation(({ storage }, { target }) => {
+  const handleOpacityChange = useMutation(({ storage }, event) => {
+    // event.stopPropagation();
+    // event.preventDefault();
+
+    const target = event.target
+
+
+    console.log('i got fireddddd')
     const layerStorage = storage.get('layerStorage')
 
     if (!myPresence || !layerStorage) {
@@ -270,6 +277,22 @@ export function LayersPanel({
     }
   }
 
+  // The onSlChange={handleOpacityChange} seems to only work in Inspect Element mode. Might be something to do with React's synthetic events. 
+  // useEffect(() => {
+
+  //   const rangeElement = rangeElementRef.current;
+  //   if (rangeElement) {
+  //     rangeElement.addEventListener("sl-change", handleOpacityChange);
+  //   }
+  //   return () => {
+  //     if (rangeElement) {
+  //       rangeElement.removeEventListener("sl-change", handleOpacityChange);
+  //     }
+  //   };
+
+  //   // document.getElementById('opacity-changer')?.addEventListener('sl-change', handleOpacityChange)
+  // }, [handleOpacityChange])
+
   return (
     <>
       <div className="border-t-2 border-gray-100 p-5 text-sm">
@@ -313,7 +336,8 @@ export function LayersPanel({
                   <label htmlFor="opacity-changer" className="sr-only">Change opacity</label>
                   <SlRange
                     id="opacity-changer"
-                    onSlChange={handleOpacityChange}
+                    onInput={handleOpacityChange}
+                    // onSlChange={(e) => handleOpacityChange(e)}
                     ref={rangeElementRef}
                   />
                 </div>
@@ -365,9 +389,12 @@ export function LayersPanel({
             {/* <!-- All layers --> */}
             <div className="flex flex-col-reverse">
               {layers.map(layer => (
-                <div
+                <motion.div
                   key={layer.id}
-                  // transition:slide TODO: how to get this
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.5 }}
                   style={myPresence.selectedLayer === layer.id ?
                     { backgroundColor: `var(--sl-color-primary-600)`, color: '#fff' } : // "background-color: var(--sl-color-primary-600); color: #fff;"
                     {}
@@ -464,7 +491,7 @@ export function LayersPanel({
                       </svg>
                     </button>
                   </SlTooltip>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

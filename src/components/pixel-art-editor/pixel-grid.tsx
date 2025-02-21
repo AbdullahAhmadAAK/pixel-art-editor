@@ -1,3 +1,5 @@
+'use client'
+
 // import { createEventDispatcher, onMount } from "svelte";
 // import { fade } from "svelte/transition"; // TODO: get this working
 // import { useHistory, useMyPresence } from "../lib-liveblocks";
@@ -7,8 +9,11 @@
 // import { Direction } from "../types";
 // import panzoom from "panzoom";
 
+import { motion } from "framer-motion";
+
+
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { useHistory, useMyPresence } from "@liveblocks/react/suspense";
+import { useHistory, useMyPresence } from "@liveblocks/react";
 import { IconButton } from '@/components/pixel-art-editor/icon-button';
 import { Layer, Direction } from "@/lib/types";
 import panzoom from "panzoom"
@@ -225,7 +230,6 @@ export function PixelGrid({
 
   const colsIn100 = 100 / cols
 
-
   return (
     <div
       className="focus-visible-style absolute inset-0 touch-none"
@@ -314,8 +318,11 @@ export function PixelGrid({
 
             {/* <!-- Part 3 Grid overlay --> */}
             {showGrid && (
-              <div
-                // transition:fade={{ duration: 100 }} TODO: animation do
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
                 className="pointer-events-none absolute inset-0 select-none opacity-50 mix-blend-difference"
               >
                 <svg
@@ -351,7 +358,7 @@ export function PixelGrid({
                     className=""
                   />
                 </svg>
-              </div>
+              </motion.div>
             )}
 
             {/* Part 4 */}
@@ -365,9 +372,12 @@ export function PixelGrid({
 
             {/* Part 5 */}
             {showMove && (
-              <div
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
                 className="pointer-events-none absolute -inset-3 lg:-inset-5 flex flex-col items-stretch"
-              // transition:fade={{ duration: 100 }} // TODO: animation
               >
                 {/* 5a */}
                 <div className="pointer-events-auto flex items-center justify-center">
@@ -461,7 +471,7 @@ export function PixelGrid({
                   </IconButton>
                 </div>
 
-              </div>
+              </motion.div>
             )}
           </div>
         </div>

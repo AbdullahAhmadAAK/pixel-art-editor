@@ -7,7 +7,7 @@
 // This is for the styles from shoelace library
 import '@shoelace-style/shoelace/dist/components/color-picker/color-picker.styles.js'
 
-import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react/suspense";
+import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react";
 import { hexToRgb } from "@/app/pixel-art-together/lib/utils/hex-to-rgb";
 import { Brush, Tool } from "@/lib/types";
 import { useCallback, useEffect, useRef, useState } from "react";

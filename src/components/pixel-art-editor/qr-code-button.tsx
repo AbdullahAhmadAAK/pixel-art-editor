@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
@@ -11,7 +13,7 @@ export function QRCodeButton() {
     // <!-- QR Code from current URL -->
     <div className="mx-auto mt-6 block text-center">
       <SlQrCode
-        value={window.location.href}
+        value={'window.location.href'}
         label="Scan this code to visit Shoelace on the web!"
       ></SlQrCode>
     </div>
