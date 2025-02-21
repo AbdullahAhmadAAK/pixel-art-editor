@@ -27,8 +27,8 @@ import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
 import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts';
 import { motion } from "framer-motion";
-import { debounce } from 'lodash';
-import { LiveObject } from '@liveblocks/client';
+// import { debounce } from 'lodash';
+// import { LiveObject } from '@liveblocks/client';
 
 export function LayersPanel({
   layers = [],
