@@ -28,6 +28,13 @@ export function Cursor({
   const springX = useSpring(motionX, { stiffness: 70, damping: 35 });
   const springY = useSpring(motionY, { stiffness: 70, damping: 35 });
 
+  // add explanation for this too
+  useEffect(() => {
+    motionX.set(x);
+    motionY.set(y);
+  }, [x, y, motionX, motionY]); // Runs whenever `x` or `y` changes
+
+
   // useEffect(() => {
   //   const handleMouseMove = (e: MouseEvent) => {
   //     motionX.set(e.clientX);
