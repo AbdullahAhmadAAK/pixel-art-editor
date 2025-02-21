@@ -30,6 +30,7 @@ export function Cursor({
 
   // add explanation for this too
   useEffect(() => {
+    console.log('useEffect in cursor component ran with (x, y) as: ', x, y)
     motionX.set(x);
     motionY.set(y);
   }, [x, y, motionX, motionY]); // Runs whenever `x` or `y` changes

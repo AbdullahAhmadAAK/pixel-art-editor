@@ -459,6 +459,7 @@ export default function PixelArtEditorClientComponent() {
       newY = top + y;
     }
 
+    console.log('some dude ran calculateCursorPosition, with the result as x,y:', newX, newY)
     return { x: newX, y: newY };
   }
 
@@ -616,6 +617,8 @@ export default function PixelArtEditorClientComponent() {
       {/* <!-- Live Cursors --> */}
       <div className="pointer-events-none absolute inset-0 z-50">
         {others?.map(({ presence, info, connectionId }) => {
+
+          console.log('This is the presence name just outside the cursor component: ', presence.name)
 
           return presence?.cursor && presence?.brush ? (
             <Cursor
