@@ -1,7 +1,7 @@
 import { Brush, Tool } from "@/lib/types";
 import { contrastingTextColour } from "@/app/pixel-art-together/lib/utils/contrasting-text-colour";
 import { useEffect, useState } from "react";
-import { motion, useSpring, useMotionValue  } from "framer-motion";
+import { motion, useSpring, useMotionValue } from "framer-motion";
 
 
 export function Cursor({
@@ -28,15 +28,15 @@ export function Cursor({
   const springX = useSpring(motionX, { stiffness: 70, damping: 35 });
   const springY = useSpring(motionY, { stiffness: 70, damping: 35 });
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      motionX.set(e.clientX);
-      motionY.set(e.clientY);
-    };
+  // useEffect(() => {
+  //   const handleMouseMove = (e: MouseEvent) => {
+  //     motionX.set(e.clientX);
+  //     motionY.set(e.clientY);
+  //   };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [motionX, motionY]);
+  //   window.addEventListener("mousemove", handleMouseMove);
+  //   return () => window.removeEventListener("mousemove", handleMouseMove);
+  // }, [motionX, motionY]);
 
 
   // const coords = { x: x, y: y }
