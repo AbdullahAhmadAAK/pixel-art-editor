@@ -27,6 +27,8 @@ import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
 import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts';
 import { motion } from "framer-motion";
+import { debounce } from 'lodash';
+import { LiveObject } from '@liveblocks/client';
 
 export function LayersPanel({
   layers = [],
@@ -154,22 +156,32 @@ export function LayersPanel({
     // event.preventDefault();
 
     const target = event.target
-
-
     console.log('i got fireddddd')
     const layerStorage = storage.get('layerStorage')
-
     if (!myPresence || !layerStorage) {
       return;
     }
+
+    // debouncedSetLayerStorage(layerStorage, target)
 
     const layerStorageObject = layerStorage.toObject()
     const firstIndex = myPresence.selectedLayer;
     const oldLayer = layerStorageObject[firstIndex];
     const newLayer: Layer = { ...oldLayer, opacity: target.value / 100 };
 
+
     layerStorage.set(myPresence.selectedLayer, newLayer)
   }, [myPresence.selectedLayer])
+
+  // const debouncedSetLayerStorage = debounce((layerStorage: LiveObject<Record<number, Layer>>, target: SlRangeType) => {
+  //   const layerStorageObject = layerStorage.toObject()
+  //   const firstIndex = myPresence.selectedLayer;
+  //   const oldLayer = layerStorageObject[firstIndex];
+  //   const newLayer: Layer = { ...oldLayer, opacity: target.value / 100 };
+
+  //   layerStorage.set(myPresence.selectedLayer, newLayer)
+  // }, 100)
+
 
   // Toggle visibility of current layer
   const toggleVisibility = useMutation(({ storage }, layerId: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

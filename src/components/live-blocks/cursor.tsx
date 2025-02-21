@@ -30,7 +30,7 @@ export function Cursor({
 
   // add explanation for this too
   useEffect(() => {
-    console.log('useEffect in cursor component ran with (x, y) as: ', x, y) // this part is working correctly, ibrahim gets set here. but cursor position not updated why?
+    // console.log('useEffect in cursor component ran with (x, y) as: ', x, y) // this part is working correctly, ibrahim gets set here. but cursor position not updated why?
     motionX.set(x);
     motionY.set(y);
   }, [x, y, motionX, motionY]); // Runs whenever `x` or `y` changes

@@ -34,6 +34,7 @@
     "embla-carousel-wheel-gestures": "^8.0.1",
     "framer-motion": "^11.18.2",
     "ioredis": "^5.5.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.473.0",
     "mongodb": "^6.13.0",
     "motion": "^11.18.1",

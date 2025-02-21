@@ -10,7 +10,7 @@
 // import panzoom from "panzoom";
 
 import { motion } from "framer-motion";
-
+import { debounce } from "lodash"
 
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useHistory, useMyPresence } from "@liveblocks/react";
@@ -101,8 +101,21 @@ export function PixelGrid({
   //   true
   // );
   const layerMove = (direction: Direction) => {
-    handleLayerMove({ detail: { direction } })
+
+    debouncedLayerMove(direction)
+    // console.log('in layermove now')
+    // debounce(async () => {
+    //   handleLayerMove({ detail: { direction } })
+    //   // 😕 debounced function never called
+    //   // setCharacters(await search(e.target.value));
+    // }, 2000);
+
+    // handleLayerMove({ detail: { direction } })
   }
+
+  const debouncedLayerMove = debounce((direction: Direction) => {
+    handleLayerMove({ detail: { direction } });
+  }, 100);
 
 
   function handleMouseDown() {
