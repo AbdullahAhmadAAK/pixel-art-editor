@@ -7,17 +7,17 @@ import {
   ClientSideSuspense,
 } from "@liveblocks/react";
 import { Layer, Tool } from "@/lib/types";
-import { createClient, LiveObject } from '@liveblocks/client';
+import { LiveObject } from '@liveblocks/client';
 import { PixelColor, PixelKey } from "./pixel-art-together/page";
 import { IntroDialog } from "@/components/live-blocks/intro-dialog";
 import { createRoomId } from "./pixel-art-together/lib/utils/create-room-id";
-import { Client } from "@liveblocks/client";
+// import { Client } from "@liveblocks/client";
 
 export function Room({ children }: { children: ReactNode }) {
 
   const [roomId, setRoomId] = useState<string | null>(null)
   const [loaded, setLoaded] = useState<boolean>(false)
-  const [client, setClient] = useState<Client | null>(null)
+  // const [client, setClient] = useState<Client | null>(null)
 
   useEffect(() => {
     const generatedRoomId = createRoomId();
@@ -25,10 +25,10 @@ export function Room({ children }: { children: ReactNode }) {
     console.log('this is the gen room ID: ', generatedRoomId)
 
     // TODO: do i even need this?
-    const createdClient = createClient({
-      authEndpoint: '/api/auth'
-    })
-    setClient(createdClient)
+    // const createdClient = createClient({
+    //   authEndpoint: '/api/auth'
+    // })
+    // setClient(createdClient)
 
     setLoaded(true)
   }, [])

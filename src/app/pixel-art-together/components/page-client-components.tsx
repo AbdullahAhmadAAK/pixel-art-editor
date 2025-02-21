@@ -624,7 +624,8 @@ export default function PixelArtEditorClientComponent() {
               shrink={presence.mouseDown}
               brush={presence.brush} // 
               tool={presence.tool}
-              name={presence.name || info?.name} // NaN is a new addition from me, in case presence.name and info.name are falsy
+              // TODO: define IUserInfo somehow
+              name={presence.name || info?.name || 'NaN'} // NaN is a new addition from me, in case presence.name and info.name are falsy
             />
           ) : null
         }
@@ -900,8 +901,8 @@ export default function PixelArtEditorClientComponent() {
                         >
                           {/* TODO: change width etc and alt once info fixed */}
                           <Image
-                            alt={`${presence?.name || info.name}'s avatar`}
-                            src={info.picture}
+                            alt={`${presence?.name || info?.name}'s avatar`}
+                            src={info!.picture as string} // TODO: define IUserInfo somehow
                             // alt='testing'
                             // src={'/testing'}
                             width={44}
@@ -918,8 +919,8 @@ export default function PixelArtEditorClientComponent() {
                     <div className="-my-2 mr-2 hidden flex-grow md:block">
                       <div className="flex-grow-0">
                         <UserOnline
-                          picture={self.info.picture}
-                          name={myPresence.name || self.info.name}
+                          picture={self.info!.picture as string} // TODO: define IUserInfo somehow
+                          name={myPresence.name || self.info!.name as string} // TODO: define IUserInfo somehow
                           // picture={'/test'}
                           // name={'test until info ok'}
                           brush={myPresence.brush}
@@ -937,8 +938,8 @@ export default function PixelArtEditorClientComponent() {
                       className="transparent-bg relative -ml-2 block h-10 w-10 rounded-full ring-4 ring-white md:hidden"
                     >
                       <Image
-                        alt={`${myPresence?.name || self.info.name}'s avatar`}
-                        src={self.info.picture}
+                        alt={`${myPresence?.name || self.info!.name}'s avatar`} // TODO: define IUserInfo somehow
+                        src={self.info!.picture as string} // TODO: define IUserInfo somehow
                         // alt={`test avatar`}
                         // src={'/testpic'}
                         // TODO: better sizes
@@ -988,8 +989,8 @@ export default function PixelArtEditorClientComponent() {
                   {myPresence && self && myPresence.brush && (
                     <UserOnline
                       // TODO: solve info soon with auth.ts changes
-                      picture={self.info.picture}
-                      name={myPresence.name || self.info.name}
+                      picture={self.info!.picture as string}
+                      name={myPresence.name || self.info!.name as string} // TODO: define IUserInfo somehow
                       // picture={"/NaN"}
                       // name={myPresence.name || self?.info?.name || 'NaN'}
                       brush={myPresence.brush}
@@ -1005,8 +1006,8 @@ export default function PixelArtEditorClientComponent() {
                       <UserOnline
                         key={connectionId}
                         // TODO: solve info soon with auth.ts changes
-                        picture={info.picture}
-                        name={presence.name || info.name}
+                        picture={info!.picture as string} // TODO: define IUserInfo somehow
+                        name={presence.name || info!.name as string} // TODO: define IUserInfo somehow
                         // picture={'/NaN'}
                         // name={'NaN'}
                         brush={presence.brush}

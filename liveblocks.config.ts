@@ -32,6 +32,13 @@ declare global {
       pixelStorage: LiveObject<Record<PixelKey, PixelColor>>;
       layerStorage: LiveObject<Record<number, Layer>>;
     };
+    IUserInfo: {
+      id: string
+      info: {
+        name: string;
+        picture: string;
+      }
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 import { Liveblocks } from "@liveblocks/node";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const API_KEY = process.env.LIVEBLOCKS_SECRET_KEY;
 if (!API_KEY) throw new Error("LIVEBLOCKS_SECRET_KEY not set in environment variables");
@@ -8,7 +8,7 @@ const liveblocks = new Liveblocks({
   secret: API_KEY,
 });
 
-export const POST = async (req) => {
+export const POST = async (req: NextRequest) => {
   try {
     const { room } = await req.json(); // Parse request body
 
@@ -34,9 +34,10 @@ export const POST = async (req) => {
     // **Ensure correct token response format**
     // return NextResponse.json({ token: body.token }, { status });
     return NextResponse.json({ token, status });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error(error)
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
