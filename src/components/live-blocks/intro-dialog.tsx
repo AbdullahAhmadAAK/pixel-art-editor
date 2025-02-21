@@ -52,9 +52,18 @@ export function IntroDialog({
   const pixelSizeMin: number = 2;
   const pixelSizeMax: number = 48;
 
+  const [name, setLocalName] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocalName(localStorage.getItem("name") || "");
+    }
+  }, []);
+
+
   // Default name and sizes
   // let name: string = localStorage.getItem("name") || "";
-  const [name, setLocalName] = useState<string>(localStorage.getItem("name") || "") // setName is an external function passed as prop, so name of setter is a bit different here
+  // const [name, setLocalName] = useState<string>(window localStorage?.getItem("name") || "") // setName is an external function passed as prop, so name of setter is a bit different here
 
   // let width: number = 16;
   const [width, setWidth] = useState<number>(16)
@@ -85,7 +94,7 @@ export function IntroDialog({
       const detail = { name }
       setName({ detail })
     }
-    localStorage.setItem("name", name);
+    localStorage?.setItem("name", name); // this is done because same component is used in fallback UI (static content)
   }
 
   // Submit dialog when return key pressed in input

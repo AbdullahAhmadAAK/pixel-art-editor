@@ -1,7 +1,7 @@
 import { Brush, Tool } from "@/lib/types";
 import { contrastingTextColour } from "@/app/pixel-art-together/lib/utils/contrasting-text-colour";
 import { useEffect, useState } from "react";
-import { motion, useSpring, useMotionValue } from "framer-motion";
+import { motion, useSpring, useMotionValue  } from "framer-motion";
 
 
 export function Cursor({
@@ -16,27 +16,27 @@ export function Cursor({
   brush: Brush,  // old developer had named this color, while he meant brush 
   tool: Tool,
   name: string,
-  x?: number,
+  x?: number, // TODO: why is this optional btw? change it if not needed 
   y?: number
 }) {
 
-  // TODO: i already get these from calcCursorPosition, will that work? check soon
-  // const x = useMotionValue(0);
-  // const y = useMotionValue(0);
+  // Initialize motion values
+  const motionX = useMotionValue(x);
+  const motionY = useMotionValue(y);
 
   // Framer's `useSpring` replicates Svelte's spring animation
-  const springX = useSpring(x, { stiffness: 70, damping: 35 });
-  const springY = useSpring(y, { stiffness: 70, damping: 35 });
+  const springX = useSpring(motionX, { stiffness: 70, damping: 35 });
+  const springY = useSpring(motionY, { stiffness: 70, damping: 35 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
+      motionX.set(e.clientX);
+      motionY.set(e.clientY);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [x, y]);
+  }, [motionX, motionY]);
 
 
   // const coords = { x: x, y: y }
@@ -53,7 +53,8 @@ export function Cursor({
     <motion.div
       className="absolute -top-4 -left-4"
       // style={{ transform: `translateX(${coords.x}px) translateY(${coords.y}px)` }}
-      style={{ transform: `translateX(${springX}px) translateY(${springX}px)` }}
+      style={{ x: springX, y: springY }} // Use Framer's `x` and `y` instead of transform
+      // style={{ transform: `translateX(${springX}px) translateY(${springY}px)` }}
     >
       <div
         className={`inner-border absolute top-7 left-7 origin-top-left overflow-hidden whitespace-nowrap rounded-full text-sm font-medium drop-shadow-sm transition-transform duration-150 ${shrink
