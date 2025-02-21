@@ -624,7 +624,7 @@ export default function PixelArtEditorClientComponent() {
               shrink={presence.mouseDown}
               brush={presence.brush} // 
               tool={presence.tool}
-              name={presence.name || info?.name || 'NaN'} // NaN is a new addition from me, in case presence.name and info.name are falsy
+              name={presence.name || info?.name} // NaN is a new addition from me, in case presence.name and info.name are falsy
             />
           ) : null
         }
@@ -900,10 +900,10 @@ export default function PixelArtEditorClientComponent() {
                         >
                           {/* TODO: change width etc and alt once info fixed */}
                           <Image
-                            // alt={`${presence?.name || info.name}'s avatar`}
-                            // src={info.picture}
-                            alt='testing'
-                            src={'/testing'}
+                            alt={`${presence?.name || info.name}'s avatar`}
+                            src={info.picture}
+                            // alt='testing'
+                            // src={'/testing'}
                             width={44}
                             height={44}
                           />
@@ -918,10 +918,10 @@ export default function PixelArtEditorClientComponent() {
                     <div className="-my-2 mr-2 hidden flex-grow md:block">
                       <div className="flex-grow-0">
                         <UserOnline
-                          // picture={self.info.picture}
-                          // name={myPresence.name || self.info.name}
-                          picture={'/test'}
-                          name={'test until info ok'}
+                          picture={self.info.picture}
+                          name={myPresence.name || self.info.name}
+                          // picture={'/test'}
+                          // name={'test until info ok'}
                           brush={myPresence.brush}
                           selectedLayer={myPresence.selectedLayer}
                           tool={myPresence.tool}
@@ -937,10 +937,10 @@ export default function PixelArtEditorClientComponent() {
                       className="transparent-bg relative -ml-2 block h-10 w-10 rounded-full ring-4 ring-white md:hidden"
                     >
                       <Image
-                        // alt={`${myPresence?.name || self.info.name}'s avatar`}
-                        // src={self.info.picture}
-                        alt={`test avatar`}
-                        src={'/testpic'}
+                        alt={`${myPresence?.name || self.info.name}'s avatar`}
+                        src={self.info.picture}
+                        // alt={`test avatar`}
+                        // src={'/testpic'}
                         // TODO: better sizes
                         height={40}
                         width={40}
@@ -988,10 +988,10 @@ export default function PixelArtEditorClientComponent() {
                   {myPresence && self && myPresence.brush && (
                     <UserOnline
                       // TODO: solve info soon with auth.ts changes
-                      // picture={self.info.picture}
-                      // name={myPresence.name || self.info.name}
-                      picture={"/NaN"}
-                      name={myPresence.name || self?.info?.name || 'NaN'}
+                      picture={self.info.picture}
+                      name={myPresence.name || self.info.name}
+                      // picture={"/NaN"}
+                      // name={myPresence.name || self?.info?.name || 'NaN'}
                       brush={myPresence.brush}
                       selectedLayer={myPresence.selectedLayer}
                       tool={myPresence.tool}
@@ -1005,10 +1005,10 @@ export default function PixelArtEditorClientComponent() {
                       <UserOnline
                         key={connectionId}
                         // TODO: solve info soon with auth.ts changes
-                        // picture={info.picture}
-                        // name={presence.name || info.name}
-                        picture={'/NaN'}
-                        name={'NaN'}
+                        picture={info.picture}
+                        name={presence.name || info.name}
+                        // picture={'/NaN'}
+                        // name={'NaN'}
                         brush={presence.brush}
                         selectedLayer={presence.selectedLayer}
                         tool={presence.tool}

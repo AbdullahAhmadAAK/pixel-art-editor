@@ -1,21 +1,49 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   LiveblocksProvider,
   RoomProvider,
   ClientSideSuspense,
 } from "@liveblocks/react";
 import { Layer, Tool } from "@/lib/types";
-import { LiveObject } from '@liveblocks/client';
+import { createClient, LiveObject } from '@liveblocks/client';
 import { PixelColor, PixelKey } from "./pixel-art-together/page";
 import { IntroDialog } from "@/components/live-blocks/intro-dialog";
+import { createRoomId } from "./pixel-art-together/lib/utils/create-room-id";
+import { Client } from "@liveblocks/client";
 
 export function Room({ children }: { children: ReactNode }) {
+
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const [loaded, setLoaded] = useState<boolean>(false)
+  const [client, setClient] = useState<Client | null>(null)
+
+  useEffect(() => {
+    const generatedRoomId = createRoomId();
+    setRoomId(generatedRoomId)
+    console.log('this is the gen room ID: ', generatedRoomId)
+
+    // TODO: do i even need this?
+    const createdClient = createClient({
+      authEndpoint: '/api/auth'
+    })
+    setClient(createdClient)
+
+    setLoaded(true)
+  }, [])
+
+  if (!loaded) return;
+
   return (
-    <LiveblocksProvider publicApiKey={process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!}>
+    <LiveblocksProvider
+      // client={client}
+      authEndpoint={'/api/auth'}
+    // publicApiKey={process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!}
+    >
       <RoomProvider
-        id="your-room-id"
+        id={"sveltekit-pixel-art-" + roomId}
+        // id="your-room-id"
         initialPresence={{
           name: "",
           selectedLayer: 0,
