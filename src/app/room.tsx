@@ -13,7 +13,7 @@ import { PixelColor, PixelKey } from "./pixel-art-together/page";
 
 export function Room({ children }: { children: ReactNode }) {
   return (
-    <LiveblocksProvider publicApiKey={process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY}>
+    <LiveblocksProvider publicApiKey={process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!}>
       <RoomProvider
         id="your-room-id"
         initialPresence={{

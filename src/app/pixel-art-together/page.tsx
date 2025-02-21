@@ -22,11 +22,9 @@ export default function PixelArtEditor() {
   return (
     <>
       <div>hi tina</div>
-
       <Room>
         <PixelArtEditorClientComponent></PixelArtEditorClientComponent>
       </Room>
     </>
-
   );
 }
