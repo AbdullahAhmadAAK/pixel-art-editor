@@ -9,7 +9,7 @@ import {
 import { Layer, Tool } from "@/lib/types";
 import { LiveObject } from '@liveblocks/client';
 import { PixelColor, PixelKey } from "./pixel-art-together/page";
-import { IntroDialog } from "@/components/live-blocks/intro-dialog";
+// import { IntroDialog } from "@/components/live-blocks/intro-dialog";
 import { createRoomId } from "./pixel-art-together/lib/utils/create-room-id";
 // import { Client } from "@liveblocks/client";
 
