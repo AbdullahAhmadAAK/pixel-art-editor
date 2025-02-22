@@ -1,35 +1,21 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import {
-  LiveblocksProvider,
-  RoomProvider,
-  ClientSideSuspense,
-} from "@liveblocks/react";
-import { Layer, Tool } from "@/lib/types";
+import { LiveblocksProvider, RoomProvider, ClientSideSuspense } from "@liveblocks/react";
+import { Layer } from "@/lib/types/pixel-art-editor/layer";
+import { Tool } from "@/lib/types/pixel-art-editor/tool";
+import { PixelColor } from "@/lib/types/pixel-art-editor/pixel-color";
+import { PixelKey } from "@/lib/types/pixel-art-editor/pixel-key";
 import { LiveObject } from '@liveblocks/client';
-import { PixelColor, PixelKey } from "./pixel-art-together/page";
-// import { IntroDialog } from "@/components/live-blocks/intro-dialog";
 import { createRoomId } from "./pixel-art-together/lib/utils/create-room-id";
-// import { Client } from "@liveblocks/client";
 
 export function Room({ children }: { children: ReactNode }) {
-
   const [roomId, setRoomId] = useState<string | null>(null)
   const [loaded, setLoaded] = useState<boolean>(false)
-  // const [client, setClient] = useState<Client | null>(null)
 
   useEffect(() => {
     const generatedRoomId = createRoomId();
     setRoomId(generatedRoomId)
-    console.log('this is the gen room ID: ', generatedRoomId)
-
-    // TODO: do i even need this?
-    // const createdClient = createClient({
-    //   authEndpoint: '/api/auth'
-    // })
-    // setClient(createdClient)
-
     setLoaded(true)
   }, [])
 
@@ -37,13 +23,10 @@ export function Room({ children }: { children: ReactNode }) {
 
   return (
     <LiveblocksProvider
-      // client={client}
       authEndpoint={'/api/auth'}
-    // publicApiKey={process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!}
     >
       <RoomProvider
         id={"sveltekit-pixel-art-" + roomId}
-        // id="your-room-id"
         initialPresence={{
           name: "",
           selectedLayer: 0,
@@ -51,12 +34,10 @@ export function Room({ children }: { children: ReactNode }) {
           tool: Tool.Brush,
           mouseDown: false,
         }}
-
         initialStorage={{
           pixelStorage: new LiveObject<Record<PixelKey, PixelColor>>({}),
           layerStorage: new LiveObject<Record<number, Layer>>({})
         }}
-
       >
         <ClientSideSuspense
           fallback={IntroDialogFallback()}
@@ -68,23 +49,8 @@ export function Room({ children }: { children: ReactNode }) {
   );
 }
 
-// TODO: maybe this is taking time to be rendered on client, so why not have this from server?
 export function IntroDialogFallback() {
   return (
-    // <div className="absolute inset-0 z-50 flex items-center justify-center">
-    //   <IntroDialog
-    //     // maxPixels={maxPixels}
-    //     maxPixels={0}
-    //     loading={true}
-    //     shouldCreateCanvas={false}
-    //     // on:createCanvas={createCanvas}
-    //     // on:setName={setName}
-    //     createCanvas={() => { }}
-    //     setName={() => { }}
-    //   />
-    // </div>
-
-    // TODO: this is static content
     <></>
   );
 }

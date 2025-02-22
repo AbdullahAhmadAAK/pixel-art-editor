@@ -1,21 +1,12 @@
 'use client'
-
-// import { createEventDispatcher, onMount } from "svelte";
-// import { fade } from "svelte/transition"; // TODO: get this working
-// import { useHistory, useMyPresence } from "../lib-liveblocks";
-// import IconButton from "$lib/IconButton.svelte";
-// import { debounce } from "$lib/utils/debounce";
-// import type { Layer } from "../types";
-// import { Direction } from "../types";
-// import panzoom from "panzoom";
-
 import { motion } from "framer-motion";
 import { debounce } from "lodash"
 
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useHistory, useMyPresence } from "@liveblocks/react";
 import { IconButton } from '@/components/pixel-art-editor/icon-button';
-import { Layer, Direction } from "@/lib/types";
+import { Layer } from "@/lib/types/pixel-art-editor/layer";
+import { Direction } from "@/lib/types/pixel-art-editor/direction";
 import panzoom from "panzoom"
 import type { PanZoom } from "panzoom"
 
@@ -37,7 +28,6 @@ export function PixelGrid({
   handleLayerMove
 }: PixelGridProps) {
 
-  // const dispatch = createEventDispatcher();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [myPresence, _] = useMyPresence();
 
@@ -92,7 +82,6 @@ export function PixelGrid({
     // });
   }
 
-  // TODO: debounce needed? parked on sean.
   // const layerMove = debounce(
   //   function (direction: Direction) {
   //     handleLayerMove({ detail: { direction } })
@@ -101,16 +90,7 @@ export function PixelGrid({
   //   true
   // );
   const layerMove = (direction: Direction) => {
-
     debouncedLayerMove(direction)
-    // console.log('in layermove now')
-    // debounce(async () => {
-    //   handleLayerMove({ detail: { direction } })
-    //   // 😕 debounced function never called
-    //   // setCharacters(await search(e.target.value));
-    // }, 2000);
-
-    // handleLayerMove({ detail: { direction } })
   }
 
   const debouncedLayerMove = debounce((direction: Direction) => {
@@ -133,18 +113,13 @@ export function PixelGrid({
     if (!mouseIsDown || previousHoveredPixel === target) {
       return;
     }
-
-    // TODO: can i shift this to useref tho?
     setPreviousHoveredPixel(target)
-    // previousHoveredPixel = target;
-
     pixelChange({ col, row, hex });
   }
 
   // TODO: this function was passed hex, row, col, but here definition was only for hex. will be changing the usage of this function against old dev's way
   // On touch move, take hovered col/row from data-col/data-row and pass to handleMouseMove
   function handleTouchMove(event: React.TouchEvent<HTMLDivElement>, { hex }: { hex: string }) {
-    // event.preventDefault(); // TODO: error coming of passive function, so cant prevent default inside that
     const location =
       event?.touches?.[0] ||
       event?.changedTouches?.[0] ||
@@ -154,10 +129,9 @@ export function PixelGrid({
       location.clientY
     );
 
-    // TODO: see if these ts disables needed. were added by old dev.
-    // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)"
+    // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)". It was added by old dev.
     if (target?.dataset?.col && target?.dataset?.row) {
-      // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)"
+      // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)". It was added by old dev.
       const { col, row } = target.dataset;
 
       const colNumber = Number(col)
@@ -264,13 +238,12 @@ export function PixelGrid({
           <div
             ref={mainPanelElementRef}
             className="absolute inset-0 m-auto max-h-full max-w-full"
-            style={{ aspectRatio: `${rows} / ${cols}` }} // TODO: check this
+            style={{ aspectRatio: `${rows} / ${cols}` }}
           >
             {/* Part 1 */}
             <div
               className="absolute inset-0 grid select-none"
               style={{ gridTemplateColumns: `repeat(${rows}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${cols}, minmax(0, 1fr))`, transform: `translateZ(0)`, gap: `0` }}
-            // style="grid-template-columns: repeat({rows}, minmax(0, 1fr)); grid-template-rows: repeat({cols}, minmax(0, 1fr)); transform: translateZ(0); gap: 0;"
             >
 
               {layersCache[0].grid?.map((row, i) => (
@@ -281,7 +254,6 @@ export function PixelGrid({
                     data-col={j}
                     onClick={() => pixelChange({ col: j, row: i, hex: pixel.color })}
                     onMouseMove={({ target }) => handleMouseMove({ target, col: j, row: i, hex: pixel.color })} // here, target is sent as EventTarget
-                    // onTouchMove={(event) => handleTouchMove(event, { col: j, row: i, hex: pixel.color })} // TODO: do i need to pass col and row tho? func already has it
                     onTouchMove={(event) => handleTouchMove(event, { hex: pixel.color })}
                     className="transparent-bg-pixel relative h-full w-full pt-[100%]"
                   >

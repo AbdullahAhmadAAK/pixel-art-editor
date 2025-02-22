@@ -1,5 +1,4 @@
 export function copyUrlToClipboard() {
-  console.log('flag1')
   copyTextToClipboard(window.location.href);
 }
 
@@ -9,7 +8,7 @@ export function copyTextToClipboard(text: string) {
     return;
   }
   navigator.clipboard.writeText(text).then(
-    () => {},
+    () => { },
     function (err) {
       console.error("Unable to copy", err);
     }

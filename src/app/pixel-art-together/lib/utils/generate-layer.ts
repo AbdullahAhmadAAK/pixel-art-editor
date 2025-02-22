@@ -1,3 +1,6 @@
+import { PixelStorage } from "@/lib/types/pixel-art-editor/pixel-storage";
+
+// Returns a list of pixel keys mapped to color values
 export function generateLayer({
   layer,
   cols,
@@ -8,8 +11,8 @@ export function generateLayer({
   cols: number;
   rows: number;
   defaultValue: string;
-}): { [key: string]: string } { // Define the return type here
-  const storage: { [key: string]: string } = {}; // Correct the type of storage
+}): PixelStorage {
+  const storage: PixelStorage = {};
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       storage[`${layer}_${row}_${col}`] = defaultValue;

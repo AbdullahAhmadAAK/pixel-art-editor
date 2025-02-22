@@ -1,0 +1,1 @@
+export type PanelName = 'multiplayerPanel' | 'mainPanel' | 'toolsPanel'

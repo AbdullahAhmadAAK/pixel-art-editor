@@ -1,24 +1,21 @@
-// import { createEventDispatcher, onMount } from "svelte";
-// import { quintInOut, quintOut } from "svelte/easing";
-// import { slide } from "svelte/transition";
 import { motion } from "framer-motion";
 import Image from 'next/image';
-import { Brush, Tool } from '@/lib/types';
-import { contrastingTextColour } from '../../app/pixel-art-together/lib/utils/contrasting-text-colour';
+import { Tool } from "@/lib/types/pixel-art-editor/tool";
 import ntc from '@/app/pixel-art-together/lib/utils/name-that-color';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
-// import { Brush } from 'lucide-react';
+import { contrastingTextColour } from '@/app/pixel-art-together/lib/utils/contrasting-text-colour';
+import { BrushData } from "@/lib/types/pixel-art-editor/brush-data";
 
 interface UserOnlineProps {
   short?: boolean;
   isYou?: boolean;
-  brush: Brush;
+  brush: BrushData;
   selectedLayer: number;
   name: string;
   picture: string;
   tool: Tool;
-  handleSelectColor?: ({ detail }: { detail: { color: string } }) => void // sveltekit had dispatched events to selectColor from child to parent. we are trying it this way
+  handleSelectColor?: ({ detail }: { detail: { color: string } }) => void
 }
 
 export function UserOnline({
@@ -36,21 +33,22 @@ export function UserOnline({
 
   const [blackText, setBlackText] = useState<boolean | undefined>(undefined)
 
+  const brushOpacity = useMemo(() => brush?.opacity, [brush]);
+  const brushRgb = useMemo(() => brush?.rgb, [brush]);
+
   useEffect(() => {
-    if (brush && brush.opacity) {
-      if (brush.opacity < 35) {
-        setBlackText(true)
+    if (brushOpacity !== undefined) {
+      if (brushOpacity < 35) {
+        setBlackText(true);
       } else {
-        const newIsBlackText = contrastingTextColour(brush.rgb)
-        setBlackText(newIsBlackText)
+        setBlackText(contrastingTextColour(brushRgb));
       }
     }
-  }, [brush]) // TODO: only need to rerender when opacity changes though? can we optimize this
+  }, [brushOpacity, brushRgb]);
 
   function handleColorChange() {
     if (brush?.color && handleSelectColor) {
       handleSelectColor({ detail: { color: brush.color } })
-      // dispatch("selectColor", { color: brush.color });
     }
   }
 
@@ -62,13 +60,11 @@ export function UserOnline({
       exit={{ opacity: 0, x: 50, transition: { duration: isYou ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] } }}
     >
       <div className="flex items-center overflow-hidden">
-        {/* <!-- Avatar --> */}
+        {/* Avatar */}
         <div className="transparent-bg relative h-10 w-10">
-          {/* TODO: choose better width height later */}
           <Image alt={`${name}'s avatar`} src={picture} width={40} height={40} />
         </div>
 
-        {/* <!-- Text --> */}
         <div className="pl-3">
           <div className="mr-3 font-medium">
             {name}
@@ -88,7 +84,7 @@ export function UserOnline({
       </div>
 
       {!short && (
-        // <!-- Copyable color preview -->
+        // Copyable color preview 
         <div className={isYou ? "pointer-events-none" : ""}>
           <SlTooltip content="Use color">
             <button
@@ -98,7 +94,6 @@ export function UserOnline({
               <span
                 className="inner-border mix absolute inset-0 flex items-center justify-center rounded-[4px]"
                 style={{ background: `${brush.color}` }}
-              // style="background: {brush.color};"
               >
                 <span
                   className={`mix-blend-luminosity transition-colors ${blackText

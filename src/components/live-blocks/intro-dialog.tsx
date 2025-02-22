@@ -1,20 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from "react";
-// import logo from "/public/liveblocks/logo.svg";
-// import '@shoelace-style/shoelace/dist/shoelace.css'; // Import Shoelace styles
-// import dialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-
 import type SlDialogType from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.d.ts'
 import SlDialog, { SlRequestCloseEvent } from '@shoelace-style/shoelace/dist/react/dialog/index.js';
-
 import type SlInputType from '@shoelace-style/shoelace/dist/components/input/input.component.d.ts'
 import SlInput, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/input/index.js';
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
-
 import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts'
 import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
-
 import Image from "next/image";
 
 export function IntroDialog({
@@ -27,25 +20,10 @@ export function IntroDialog({
   loading: boolean,
   shouldCreateCanvas: boolean,
   maxPixels: number,
-  createCanvas: ({ detail }: {
-    detail: {
-      name: string;
-      width: number;
-      height: number;
-    };
-  }) => void,
-  setName: ({ detail }: {
-    detail: {
-      name: string
-    }
-  }) => void
+  createCanvas: ({ detail }: { detail: { name: string; width: number; height: number; } }) => void,
+  setName: ({ detail }: { detail: { name: string } }) => void
 }) {
 
-  useEffect(() => {
-    console.log('identifier max pixels: ', maxPixels)
-
-    console.log('stats in IntroDialog comp: ', { shouldCreateCanvas, loading })
-  }, [shouldCreateCanvas, loading, maxPixels])
   const dialogRef = useRef<SlDialogType | null>(null)
 
   // Min and max width/height for canvas
@@ -60,15 +38,7 @@ export function IntroDialog({
     }
   }, []);
 
-
-  // Default name and sizes
-  // let name: string = localStorage.getItem("name") || "";
-  // const [name, setLocalName] = useState<string>(window localStorage?.getItem("name") || "") // setName is an external function passed as prop, so name of setter is a bit different here
-
-  // let width: number = 16;
   const [width, setWidth] = useState<number>(16)
-
-  // let height: number = 16;
   const [height, setHeight] = useState<number>(16)
 
   const [maxLayerCount, setMaxLayerCount] = useState<number>(Math.floor(maxPixels / (width * height)))
@@ -86,11 +56,9 @@ export function IntroDialog({
   // Submit dialog events
   function submitDialog() {
     if (shouldCreateCanvas) {
-      // dispatch("createCanvas", { name, width, height });
       const detail = { name, width, height }
       createCanvas({ detail })
     } else {
-      // dispatch("setName", { name });
       const detail = { name }
       setName({ detail })
     }
@@ -104,20 +72,15 @@ export function IntroDialog({
     }
   }
 
-  // Equivalent of onmount and ondestroy 
   useEffect(() => {
     const dialogElement = dialogRef.current
 
     // Load components and prevent closing
     const loadComponents = async () => {
-      // await import('@shoelace-style/shoelace/dist/components/dialog/dialog.js');
-
       if (dialogElement) {
         dialogElement.addEventListener('sl-request-close', cancelClose);
         dialogElement.show()
       }
-
-      // await import('@shoelace-style/shoelace/dist/components/range/range.js');
     };
 
     loadComponents();

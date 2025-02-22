@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-// I am going to ignore the other errors for now, as the author himself asked to ignore the errors
+// I (AbdullahAhmadAAK) am going to ignore the other errors, as the author of this file himself asked to ignore the errors
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 /*

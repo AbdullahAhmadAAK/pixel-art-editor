@@ -1,5 +1,5 @@
-import { PixelGrid } from "@/lib/types";
-import { PixelObject } from "../../page";
+import { PixelGrid } from "@/lib/types/pixel-art-editor/pixel-grid";
+import { PixelObject } from "@/lib/types/pixel-art-editor/pixel-object";
 
 // Find all neighbours, and neighbours of neighbours, with same color
 export function getFillPixels(initialPixel: PixelObject, grid: PixelGrid) {
@@ -23,7 +23,7 @@ export function getFillPixels(initialPixel: PixelObject, grid: PixelGrid) {
       const pixel = grid?.[neighbour.row]?.[neighbour.col];
       const pixelObj = { row: neighbour.row, col: neighbour.col };
 
-      if (pixel?.color === grid[row][col].color && !alreadyCounted(pixelObj)) {
+      if (pixel && pixel.color === grid[row][col].color && !alreadyCounted(pixelObj)) {
         pixels.push({ ...pixelObj, layer });
         findClosest(pixelObj);
       }

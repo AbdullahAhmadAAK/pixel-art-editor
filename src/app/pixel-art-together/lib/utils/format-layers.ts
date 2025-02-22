@@ -1,3 +1,26 @@
+import { PixelObject } from "@/lib/types/pixel-art-editor/pixel-object";
+import { Layer } from "@/lib/types/pixel-art-editor/layer";
+import { PixelGrid } from "@/lib/types/pixel-art-editor/pixel-grid";
+import { CSSProperties } from "react";
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+
+interface FormatLayersArgs {
+  pixelStorage: {
+    readonly [x: string]: string;
+  }
+  layerStorage: {
+    readonly [x: number]: {
+      readonly id: number;
+      readonly grid: PixelGrid;
+      readonly opacity: number;
+      readonly blendMode: CSSProperties["mixBlendMode"];
+      readonly hidden: boolean;
+    };
+  };
+  keyToPixel: (key: string) => PixelObject;
+  getPixel: (pixelProps: PixelObject) => { color: string };
+}
+
 /**
  * Returns an object containing all layers and pixel grids, for general use
  *
@@ -25,26 +48,6 @@
  *   }
  * ]
  */
-
-import { Layer } from "@/lib/types";
-import { PixelObject, PixelStorage } from "../../page";
-
-// Define Layer type with required properties
-// export interface Layer {
-//   id: number;
-//   opacity: number;
-//   blendMode: string;
-//   grid: Array<Array<{ color: string }>>;
-// }
-
-// Define the shape of the function argument types
-interface FormatLayersArgs {
-  pixelStorage: PixelStorage;
-  layerStorage: object; // Record<string, Layer>;
-  keyToPixel: (key: string) => PixelObject;
-  getPixel: (pixelProps: PixelObject) => { color: string };
-}
-
 export function formatLayers({
   pixelStorage,
   layerStorage,
@@ -55,13 +58,13 @@ export function formatLayers({
 
   if (pixelStorage && layerStorage) {
     // Map the pixelStorage keys to PixelObject
-    const currentPixels = Object.keys(pixelStorage).map((key) => ({
+    const currentPixels: PixelObject[] = Object.keys(pixelStorage).map((key) => ({
       key,
       ...keyToPixel(key),
     }));
 
     layers = Object.values(layerStorage).map((layer) => {
-      const grid: Array<Array<{ color: string }>> = [];
+      const grid: PixelGrid = [];
 
       // Iterate over each pixel
       currentPixels.forEach((pixel) => {
@@ -71,8 +74,8 @@ export function formatLayers({
         // Ensure the grid is properly structured for rows and columns
         if (!grid[pixel.row]) grid[pixel.row] = [];
 
-        // TODO: i dont think this is what was mentioned below
-        // if (!grid[pixel.row][pixel.col]) grid[pixel.row][pixel.col] = { color: 'transparent' }; // Default to transparent if not set
+        // Default to transparent if not set
+        if (!grid[pixel.row][pixel.col]) grid[pixel.row][pixel.col] = { color: DEFAULT_PIXEL_COLOR_NAME };
 
         // Get pixel data from the `getPixel` function
         grid[pixel.row][pixel.col] = getPixel(pixel);
@@ -83,26 +86,5 @@ export function formatLayers({
     });
   }
 
-
-  // if (pixelStorage && layerStorage) {
-  //   const currentPixels = Object.keys(pixelStorage).map((key) => ({
-  //     key,
-  //     ...keyToPixel(key),
-  //   }));
-
-  //   layers = Object.values(layerStorage).map((layer) => {
-  //     const grid: Array<Array<{ color: string }>> = [];
-  //     currentPixels.forEach((pixel) => {
-  //       // @ts-ignore TODO
-  //       if (layer.id !== pixel.layer) return;
-  //       if (!grid[pixel.row]) grid[pixel.row] = [];
-  //       if (!grid[pixel.row][pixel.col]) grid[pixel.row][pixel.col] = [];
-
-  //       grid[pixel.row][pixel.col] = getPixel(pixel);
-  //     });
-  //     // @ts-ignore TODO
-  //     return { ...layer, grid };
-  //   });
-  // }
   return layers;
 }

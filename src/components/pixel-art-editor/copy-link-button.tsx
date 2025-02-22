@@ -6,7 +6,6 @@ import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
 
 import '@shoelace-style/shoelace/dist/components/button/button.styles.js'
 export function CopyLinkButton() {
-
   const [copied, setCopied] = useState<boolean>(false)
 
   function copy() {

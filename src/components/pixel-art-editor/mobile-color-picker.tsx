@@ -5,16 +5,19 @@
 // @ts-nocheck
 
 import './mobile-color-picker.css'
-import { Brush, Tool } from "@/lib/types";
+import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
+import { Tool } from '@/lib/types/pixel-art-editor/tool';
 import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react";
 import { hexToRgb } from "@/app/pixel-art-together/lib/utils/hex-to-rgb";
 import type SlColorPickerType from '@shoelace-style/shoelace/dist/components/color-picker/color-picker.component.d.ts';
 import { useEffect, useRef, useState } from "react";
 import SlColorPicker, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/color-picker/index.js';
+import { DEFAULT_BRUSH_DATA } from '@/app/pixel-art-together/lib/utils/defaults';
+import { Swatch } from '@/app/pixel-art-together/lib/utils/swatch';
 
 interface MobileColorPickerProps {
-  handleBrushChange: ({ detail }: { detail: Brush }) => void,
-  swatch: string[]
+  handleBrushChange: ({ detail }: { detail: BrushData }) => void,
+  swatch: Swatch
 }
 
 export function MobileColorPicker({
@@ -29,14 +32,7 @@ export function MobileColorPicker({
   const colorPickerRef = useRef<SlColorPickerType | null>(null)
   const [colorValue, setColorValue] = useState<string>("")
 
-  const [brush, setBrush] = useState<Brush>({ // Default brush
-    opacity: 100,
-    hue: 0,
-    saturation: 0,
-    color: "#fa3030",
-    lightness: 0,
-    rgb: { r: 255, g: 255, b: 255 },
-  })
+  const [brush, setBrush] = useState<BrushData>(DEFAULT_BRUSH_DATA)
 
   useEffect(() => {
     handleBrushChange({ detail: brush })
@@ -60,8 +56,6 @@ export function MobileColorPicker({
   }, [swatch])
 
   // When color changes, update presence
-
-
   function colorChange(e: SlChangeEvent) {
     const target = e.target as SlColorPickerType
 
@@ -80,15 +74,7 @@ export function MobileColorPicker({
     if (!rgb) return;
 
     // Note: we can ignore the errors "Property 'alpha' is private and only accessible within class 'SlColorPicker'.ts(2341)" and those for saturation and lightness, as the values are accessible
-    setBrush({
-      color: chosenColorValue,
-      opacity: parseInt(target.alpha),
-      hue: parseInt(target.hue),
-      saturation: parseInt(target.saturation),
-      // old developer mistakenly used target.lightness instead of target.brightness. Doesn't seem to be changable within color picker component though. It isn't mentioned in the docs, but is present in the color-picker.component.d.ts file.
-      lightness: parseInt(target.brightness),
-      rgb
-    })
+    setBrush(DEFAULT_BRUSH_DATA)
 
     setColorValue(chosenColorValue)
 

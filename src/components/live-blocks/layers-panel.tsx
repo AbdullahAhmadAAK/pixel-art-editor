@@ -1,34 +1,19 @@
-import type { Layer } from "@/lib/types";
-
-// import { slide } from "svelte/transition"; // TODO find alternative
+import type { Layer } from '@/lib/types/pixel-art-editor/layer';
 import { useStorage, useMyPresence, useUpdateMyPresence, useMutation } from '@liveblocks/react';
-
 import { generateLayer } from "@/app/pixel-art-together/lib/utils/generate-layer";
 import { blendModes } from "@/app/pixel-art-together/lib/utils/blend-modes";
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-// import("@shoelace-style/shoelace/dist/components/menu-item/menu-item.js");
-//     import("@shoelace-style/shoelace/dist/components/menu/menu.js");
-//     import("@shoelace-style/shoelace/dist/components/dropdown/dropdown.js");
-//     await import("@shoelace-style/shoelace/dist/components/range/range.js");
-
 import SlMenu from '@shoelace-style/shoelace/dist/react/menu/index.js';
-
 import SlMenuItem from '@shoelace-style/shoelace/dist/react/menu-item/index.js';
-
 import SlDropdown from '@shoelace-style/shoelace/dist/react/dropdown/index.js';
-
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
-
 import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
-
-
 import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts';
+
 import { motion } from "framer-motion";
-// import { debounce } from 'lodash';
-// import { LiveObject } from '@liveblocks/client';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
 
 export function LayersPanel({
   layers = [],
@@ -42,22 +27,16 @@ export function LayersPanel({
   const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
 
-  // const pixelStorage = useStorage((root) => root.pixelStorage);
   const layerStorage = useStorage((root) => root.layerStorage);
-
-  // const layerPixelCount = layers[0].grid.length * layers[0].grid[0].length;
-  // $: willExceedPixelCount = (layers.length + 1) * layerPixelCount > maxPixels;
 
   const layerPixelCountFinder = (layers: Layer[]) => {
     if (!layers || layers.length == 0 || !layers[0].grid || !layers[0].grid[0] || layers[0].grid[0].length == 0) return 0
     else return layers[0].grid.length * layers[0].grid[0].length
   }
 
-  // const [layerPixelCount, setLayerPixelCount] = useState<number>(layers?.length > 0 ? layers[0].grid.length * layers[0].grid[0].length : 0);
   const [layerPixelCount, setLayerPixelCount] = useState<number>(layerPixelCountFinder(layers));
 
   useEffect(() => {
-    // const newLayerPixelCount = layers[0].grid.length * layers[0].grid[0].length
     const newLayerPixelCount = layerPixelCountFinder(layers)
     setLayerPixelCount(newLayerPixelCount)
   }, [layers])
@@ -67,16 +46,6 @@ export function LayersPanel({
     const newBoolean = (layers.length + 1) * layerPixelCount > maxPixels
     setWillExceedPixelCount(newBoolean)
   }, [layerPixelCount, maxPixels, layers])
-
-
-  // I only need the tooltip formattter part from this
-  // onMount(async () => {
-  //   import("@shoelace-style/shoelace/dist/components/menu-item/menu-item.js");
-  //   import("@shoelace-style/shoelace/dist/components/menu/menu.js");
-  //   import("@shoelace-style/shoelace/dist/components/dropdown/dropdown.js");
-  //   await import("@shoelace-style/shoelace/dist/components/range/range.js");
-  //   rangeElement.tooltipFormatter = (value) => `Opacity: ${value}%`;
-  // });
 
   const rangeElementRef = useRef<SlRangeType | null>(null);
   const blendTextRef = useRef<HTMLSpanElement | null>(null);
@@ -112,24 +81,16 @@ export function LayersPanel({
       myPresence.selectedLayer !== undefined
     ) {
       const currentLayer = myPresence.selectedLayer;
-
-      // TODO: test this part when left panel all done
-      // if (!$layerStorage.get(currentLayer + "") && !addingNewLayer) { sveltekit had this, idk why
       if (!layerStorage[currentLayer] && !addingNewLayer) {
         const tempLayers = Object.values(layerStorage);
         const newLayer = tempLayers[tempLayers.length > 0 ? tempLayers.length - 1 : 0].id;
-        // myPresence.update({ selectedLayer: newLayer });
         updateMyPresence({ selectedLayer: newLayer })
       }
-
-      // TODO: what was  the purpose of this? there is no layerChange function in the entire sveltekit codebase
-      // dispatch("layerChange", $myPresence.selectedLayer);
     }
   }, [addingNewLayer, layerStorage, myPresence, updateMyPresence])
 
 
   // When layers update, make sure a layer is still selected
-  // $: whenLayersUpdate($layerStorage, $myPresence?.selectedLayer);
   useEffect(() => {
     whenLayersUpdate()
   }, [layerStorage, whenLayersUpdate])
@@ -152,36 +113,18 @@ export function LayersPanel({
 
   // Update current layer opacity on change
   const handleOpacityChange = useMutation(({ storage }, event) => {
-    // event.stopPropagation();
-    // event.preventDefault();
-
     const target = event.target
-    console.log('i got fireddddd')
     const layerStorage = storage.get('layerStorage')
     if (!myPresence || !layerStorage) {
       return;
     }
 
-    // debouncedSetLayerStorage(layerStorage, target)
-
     const layerStorageObject = layerStorage.toObject()
     const firstIndex = myPresence.selectedLayer;
     const oldLayer = layerStorageObject[firstIndex];
     const newLayer: Layer = { ...oldLayer, opacity: target.value / 100 };
-
-
     layerStorage.set(myPresence.selectedLayer, newLayer)
   }, [myPresence.selectedLayer])
-
-  // const debouncedSetLayerStorage = debounce((layerStorage: LiveObject<Record<number, Layer>>, target: SlRangeType) => {
-  //   const layerStorageObject = layerStorage.toObject()
-  //   const firstIndex = myPresence.selectedLayer;
-  //   const oldLayer = layerStorageObject[firstIndex];
-  //   const newLayer: Layer = { ...oldLayer, opacity: target.value / 100 };
-
-  //   layerStorage.set(myPresence.selectedLayer, newLayer)
-  // }, 100)
-
 
   // Toggle visibility of current layer
   const toggleVisibility = useMutation(({ storage }, layerId: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -217,7 +160,7 @@ export function LayersPanel({
       layer: newId,
       cols: layers[0].grid[0].length,
       rows: layers[0].grid.length,
-      defaultValue: "transparent", // TODO: constantize
+      defaultValue: DEFAULT_PIXEL_COLOR_NAME,
     });
 
     const pixelStorage = storage.get('pixelStorage')
@@ -225,10 +168,6 @@ export function LayersPanel({
     Object.keys(generatedLayer).forEach(key => {
       pixelStorage.set(key, generatedLayer[key])
     })
-
-    // pixelStorageMutator.update({ ...generatedLayer }) // TODO: will this work the way I expect it to? old ones shouldnt be overwritten
-    // $pixelStorage.update({ ...generatedLayer });
-
 
     layerStorage.set(newId, {
       id: newId,
@@ -279,31 +218,13 @@ export function LayersPanel({
     }
   }
 
-  // selectTopLayer
   // Selects the top layer
   function selectTopLayer() {
     if (layerStorage && myPresence) {
       const firstLayer = Object.values(layerStorage)[0].id;
-      // myPresence?.update({ selectedLayer: firstLayer });
       updateMyPresence({ selectedLayer: firstLayer })
     }
   }
-
-  // The onSlChange={handleOpacityChange} seems to only work in Inspect Element mode. Might be something to do with React's synthetic events. 
-  // useEffect(() => {
-
-  //   const rangeElement = rangeElementRef.current;
-  //   if (rangeElement) {
-  //     rangeElement.addEventListener("sl-change", handleOpacityChange);
-  //   }
-  //   return () => {
-  //     if (rangeElement) {
-  //       rangeElement.removeEventListener("sl-change", handleOpacityChange);
-  //     }
-  //   };
-
-  //   // document.getElementById('opacity-changer')?.addEventListener('sl-change', handleOpacityChange)
-  // }, [handleOpacityChange])
 
   return (
     <>
@@ -349,7 +270,6 @@ export function LayersPanel({
                   <SlRange
                     id="opacity-changer"
                     onInput={handleOpacityChange}
-                    // onSlChange={(e) => handleOpacityChange(e)}
                     ref={rangeElementRef}
                   />
                 </div>
@@ -408,7 +328,7 @@ export function LayersPanel({
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.5 }}
                   style={myPresence.selectedLayer === layer.id ?
-                    { backgroundColor: `var(--sl-color-primary-600)`, color: '#fff' } : // "background-color: var(--sl-color-primary-600); color: #fff;"
+                    { backgroundColor: `var(--sl-color-primary-600)`, color: '#fff' } : 
                     {}
                   }
                   className={`group relative flex cursor-pointer items-center justify-between gap-1 border-t py-0.5 hover:bg-[color:var(--sl-color-primary-50)] ${myPresence?.selectedLayer ===

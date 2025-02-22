@@ -13,21 +13,18 @@ import {
 } from "@liveblocks/react";
 
 import { motion, useSpring } from "framer-motion";
-import { useCallback, useState, useEffect, useRef, RefObject, useMemo } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { formatLayers } from '../lib/utils/format-layers';
-import { Layer } from '@/lib/types';
 import { generateLayer } from '../lib/utils/generate-layer';
-// import { useStorage } from "@liveblocks/react";
-
-// import { ClientSideSuspense, useStorage } from "@liveblocks/react/suspense";
 import { useStorage, useMutation } from "@liveblocks/react";
 
-import { Brush, Direction, Pixel, Tool } from "@/lib/types";
+import { Direction } from '@/lib/types/pixel-art-editor/direction';
+import { Tool } from '@/lib/types/pixel-art-editor/tool';
+import { Layer } from '@/lib/types/pixel-art-editor/layer';
+import { PanelName } from '@/lib/types/pixel-art-editor/panel-name';
 
 import { getFillPixels } from '../lib/utils/get-fill-pixels';
 import { getMovePixels } from '../lib/utils/get-move-pixels';
-
-import { PanelName } from '../../../../liveblocks.config';
 
 import { Cursor } from "@/components/live-blocks/cursor";
 import { IntroDialog } from "@/components/live-blocks/intro-dialog";
@@ -45,28 +42,17 @@ import { IconButton } from '@/components/pixel-art-editor/icon-button';
 import { PixelGrid as PixelGridSegment } from '@/components/pixel-art-editor/pixel-grid';
 import Image from 'next/image';
 import { MobileColorPicker } from '@/components/pixel-art-editor/mobile-color-picker';
-// import { Room } from '../room';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+import { Swatch } from '../lib/utils/swatch';
 
-export type PixelObject = {
-  layer: number;
-  row: number;
-  col: number;
-  value?: string;
-};
-
-// A key for a pixel, e.g. '0_1_2'
-export type PixelKey = string;
-export type PixelColor = string;
-
-export type PixelStorage = {
-  [key: string]: string; // Replace PixelObject with the actual structure if it's different
-};
+import { PixelStorage } from '@/lib/types/pixel-art-editor/pixel-storage';
+import { PixelObject } from '@/lib/types/pixel-art-editor/pixel-object';
+import { PixelKey } from '@/lib/types/pixel-art-editor/pixel-key';
+import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
 
 export default function PixelArtEditorClientComponent() {
-  // This was in onMount on __layout.svelte, which I brought here
   useEffect(() => {
     function onResize() {
-      console.log('onresize got called')
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty("--vh", `${vh}px`);
     }
@@ -113,7 +99,7 @@ export default function PixelArtEditorClientComponent() {
     ({ layer = myPresence.selectedLayer as number, row, col }: PixelObject): PixelKey => {
       return `${layer}_${row}_${col}`;
     },
-    [myPresence.selectedLayer] // Add dependencies if myPresence changes
+    [myPresence.selectedLayer]
   );
 
   // Convert a pixel key into a pixel object
@@ -122,14 +108,13 @@ export default function PixelArtEditorClientComponent() {
     return { layer, row, col };
   }, []);
 
-  // Get the current pixel, using a pixel object
-  // Includes fallback for a previous storage system
+  // Get the current pixel, using a pixel object. Includes fallback for a previous storage system
   const getPixel = useCallback((pixelProps: PixelObject) => {
-    if (!pixelStorage) return { color: "transparent" }; // not sure aboutt this tho
+    if (!pixelStorage) return { color: DEFAULT_PIXEL_COLOR_NAME };
 
     const stored = pixelStorage[pixelToKey(pixelProps)];
     if (!stored) {
-      return { color: "transparent" };
+      return { color: DEFAULT_PIXEL_COLOR_NAME };
     }
     if (typeof stored === "string") {
       return { color: stored };
@@ -137,24 +122,12 @@ export default function PixelArtEditorClientComponent() {
     return stored;
   }, [pixelStorage, pixelToKey]);
 
-  // const updatePixels = (pixelArray: PixelObject[], newVal) => {
-  //   const updatedPixels: PixelStorage = {};
-  //   pixelArray.forEach(
-  //     (pixelProps) =>
-  //       (updatedPixels[pixelToKey(pixelProps)] = pixelProps.value || newVal)
-  //   );
-  //   // setPixelStorage(updatedPixels)
-  //   // return $pixelStorage.update(updatedPixels);
-  // };
-
-  // Update an array of pixels, with the pixelArray.value object, or newObj if none set
-  // newVal is either brush.color, which seems to be a string, or it is "". In either case, it's string.
+  // Update an array of pixels, with the pixelArray.value object, or newObj if none set. newVal is either brush.color, which seems to be a string, or it is "". In either case, it's string.
   const updatePixels = useMutation(({ storage }, pixelArray: PixelObject[], newVal: string) => {
     const updatedPixels: PixelStorage = {};
     pixelArray.forEach((pixelProps) =>
       // handleLayerMove calls this to just move the layers towards a certain direction. In that case, newVal will not be provided to the function, and we will make do with the already present values
-      (updatedPixels[pixelToKey(pixelProps)] = pixelProps.value || newVal) // idk why he wrote pixelProps.value before. do keep in mind tho.
-      // (updatedPixels[pixelToKey(pixelProps)] = pixelProps.value || newVal)
+      (updatedPixels[pixelToKey(pixelProps)] = pixelProps.value || newVal)
     );
 
     // Note: need to only update the new pixels, and keep the rest the same
@@ -172,8 +145,8 @@ export default function PixelArtEditorClientComponent() {
   useEffect(() => {
     if (layerStorage && pixelStorage) {
       const formattedLayers = formatLayers({
-        pixelStorage: pixelStorage,
-        layerStorage: layerStorage,
+        pixelStorage,
+        layerStorage,
         keyToPixel,
         getPixel,
       });
@@ -191,7 +164,7 @@ export default function PixelArtEditorClientComponent() {
     const newCanvasReady = pixelStorage ? Object.keys(pixelStorage).length > 0 : false
     setCanvasReady(newCanvasReady)
 
-    // NOTE: we keep this here instead of directly with pxielStorage to loading, so that both are sent at the same time. Will rpevent jittetrs.
+    // We keep this here instead of directly with pixelStorage to loading, so that both are sent at the same time. Will prevent jitters.
     if (pixelStorage) {
       setIsDataLoading(false)
     }
@@ -202,12 +175,6 @@ export default function PixelArtEditorClientComponent() {
   // INTRO DIALOG
 
   const [nameSet, setNameSet] = useState<boolean>(false)
-
-  // Set name inside presence
-  // function setName({ detail }: { detail: { name: string } }) {
-  //   updateMyPresence({ name: detail.name })
-  //   setNameSet(true)
-  // }
 
   const setName = useCallback(({ detail }: { detail: { name: string } }) => {
     updateMyPresence({ name: detail.name });
@@ -223,47 +190,15 @@ export default function PixelArtEditorClientComponent() {
     })
   }, []);
 
-  // Create canvas with dialog settings and default color TODO: needs to be fixed
-  // function createCanvas({ detail }: { detail: { name: string, width: number, height: number } }) {
-  //   if (layerStorage) {
-  //     const defaultLayerPixels = generateLayer({
-  //       layer: 0,
-  //       rows: detail.height,
-  //       cols: detail.width,
-  //       defaultValue: "transparent", // TODO: constantize?
-  //     });
-
-  //     updatePixelStorageWithLayer(defaultLayerPixels)
-  //     // $pixelStorage.update(defaultLayer);
-
-  //     // layerStorage.set(0, {
-  //     //   id: 0,
-  //     //   opacity: 1,
-  //     //   blendMode: "normal",
-  //     //   hidden: false,
-  //     // });
-  //     updateLayerStorageWithLayer(0, {
-  //       id: 0,
-  //       opacity: 1,
-  //       blendMode: "normal",
-  //       hidden: false,
-  //     })
-
-  //     setName({ detail });
-  //   }
-  // }
-
   const updateLayerStorageWithLayer = useMutation(({ storage }, layerKey, layer) => {
-    const layerStorageTester = storage.get('layerStorage')
-
-    layerStorageTester.set(0, {
+    const layerStorage = storage.get('layerStorage')
+    layerStorage.set(0, {
       id: 0,
       opacity: 1,
       blendMode: "normal",
       hidden: false,
-      grid: [] // try this first
+      grid: []
     })
-    // storage.set('layerStorage', layer)
   }, []);
 
   const createCanvas = useCallback(
@@ -273,18 +208,10 @@ export default function PixelArtEditorClientComponent() {
           layer: 0,
           rows: detail.height,
           cols: detail.width,
-          defaultValue: "transparent", // TODO: constantize?
+          defaultValue: DEFAULT_PIXEL_COLOR_NAME,
         });
 
         updatePixelStorageWithLayer(defaultLayerPixels);
-        // $pixelStorage.update(defaultLayer);
-
-        // layerStorage.set(0, {
-        //   id: 0,
-        //   opacity: 1,
-        //   blendMode: "normal",
-        //   hidden: false,
-        // });
         updateLayerStorageWithLayer(0, {
           id: 0,
           opacity: 1,
@@ -320,16 +247,11 @@ export default function PixelArtEditorClientComponent() {
     setColorValue(hex)
   }, [])
 
-  // const [updateBrushColor, setUpdateBrushColor] = useState()
-
   // Recently used colors to be passed to the swatch
-  // const recentColors = useMemo(() => new Array(16).fill("#ffffffff"))
-  // let recentColors = new Array(16).fill("#ffffffff");
-  // const recentColors = useMemo(() => new Array(16).fill("#ffffffff"), []);
-  const [recentColors, setRecentColors] = useState(new Array(16).fill("#ffffffff"))
+  const [recentColors, setRecentColors] = useState<Swatch>(new Array(16).fill("#ffffffff"))
 
-  // On brush component change, update presence with new brush TODO: usecallback
-  const handleBrushChange = useCallback(({ detail }: { detail: Brush }) => {
+  // On brush component change, update presence with new brush
+  const handleBrushChange = useCallback(({ detail }: { detail: BrushData }) => {
     updateMyPresence({ brush: detail })
   }, [updateMyPresence])
 
@@ -367,7 +289,6 @@ export default function PixelArtEditorClientComponent() {
       const a = recentColors;
       a.pop();
       a.unshift(color);
-      // recentColors = a;
       setRecentColors(a)
     }
   }
@@ -399,13 +320,7 @@ export default function PixelArtEditorClientComponent() {
    * corner.
    */
 
-  // The different panels TODO: add ts here soon
-  // const panels: Record<PanelName, RefObject(HTMLElement | null)> = {
-  //   multiplayerPanel: useRef(null),
-  //   mainPanel: useRef(null),
-  //   toolsPanel: useRef(null),
-  // };
-
+  // The different panels
   const panels: Record<PanelName, React.RefObject<HTMLDivElement | null>> = {
     multiplayerPanel: useRef<HTMLDivElement | null>(null),
     mainPanel: useRef<HTMLDivElement | null>(null),
@@ -431,12 +346,7 @@ export default function PixelArtEditorClientComponent() {
       y = y / height;
     }
 
-    updateMyPresence({
-      cursor: { x, y, area }
-    })
-    // myPresence.update({
-    //   cursor: { x, y, area },
-    // });
+    updateMyPresence({ cursor: { x, y, area } })
   }
 
   // Reverse of above, find location of cursor according to coords and panel
@@ -458,44 +368,28 @@ export default function PixelArtEditorClientComponent() {
       newX = left + x;
       newY = top + y;
     }
-
-    console.log('some dude ran calculateCursorPosition, with the result as x,y:', newX, newY)
     return { x: newX, y: newY };
   }
 
   // When the mouse leaves the page, set cursor presence to null
   function handleMouseLeave() {
-    updateMyPresence({
-      cursor: null
-    })
-    // myPresence.update({
-    //   cursor: null,
-    // });
+    updateMyPresence({ cursor: null })
   }
 
   // ================================================================================
-  // MOBILE MENU TODO: needs to be checked tho
+  // MOBILE MENU 
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Spring animation for mobile menu
 
-  const [mobileMenuTransform, setMobileMenuTransform] = useState(useSpring(0, {
-    stiffness: 70, // Similar to Svelte's stiffness
-    damping: 10,   // Similar to Svelte's damping
-  }))
-
-  // let mobileMenuTransform = spring(0, {
-  //   stiffness: 0.07,
-  //   damping: 0.4,
-  // });
+  const [mobileMenuTransform, setMobileMenuTransform] = useState(useSpring(0, { stiffness: 70, damping: 10, }))
 
   useEffect(() => {
     mobileMenuTransform.set(mobileMenuOpen ? 100 : 0);
   }, [mobileMenuOpen, mobileMenuTransform])
 
   // When `mobileMenuOpen` changes, set spring value
-  // $: mobileMenuTransform.set(mobileMenuOpen ? 100 : 0);
 
   // ================================================================================
   // KEYBOARD SHORTCUTS
@@ -505,8 +399,6 @@ export default function PixelArtEditorClientComponent() {
   // Ctrl+Z for undo. Ctrl+Shift+Z and Ctrl+Y for redo.
   // Handle keydown event
 
-  // showMove, showGrid issue to be fixed:
-  // TODO: Assignments to the 'showGrid' variable from inside React Hook useCallback will be lost after each render. To preserve the value over time, store it in a useRef Hook and keep the mutable value in the '.current' property. Otherwise, you can move this variable directly inside useCallback.eslintreact-hooks/exhaustive-deps
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!event.ctrlKey && !event.metaKey) {
       if (event.key === "g") {
@@ -585,29 +477,15 @@ export default function PixelArtEditorClientComponent() {
     };
   }, [handlePointerDown, handlePointerUp, handleKeyDown]);
 
-
-
-
-
-
   return (
     <>
-
-
-      {/* <!-- Intro dialog --> */}
+      {/* Intro dialog */}
       {!nameSet && (
         <div className="absolute inset-0 z-50 flex items-center justify-center">
           <IntroDialog
             maxPixels={maxPixels}
-            // loading={!pixelStorage}
             loading={isDataLoading}
-
             shouldCreateCanvas={!canvasReady}
-            // loading={true}
-            // shouldCreateCanvas={true}
-
-            // on:createCanvas={createCanvas}
-            // on:setName={setName}
             createCanvas={createCanvas}
             setName={setName}
           />
@@ -622,10 +500,9 @@ export default function PixelArtEditorClientComponent() {
               key={connectionId}
               {...calculateCursorPosition(presence.cursor)}
               shrink={presence.mouseDown}
-              brush={presence.brush} // 
+              brush={presence.brush}
               tool={presence.tool}
-              // TODO: define IUserInfo somehow
-              name={presence.name || info?.name || 'NaN'} // NaN is a new addition from me, in case presence.name and info.name are falsy
+              name={presence.name || info.name}
             />
           ) : null
         }
@@ -656,11 +533,9 @@ export default function PixelArtEditorClientComponent() {
               transition={{ duration: 0.5 }}
             >
               <BrushPanel
-                // on:brushChange={handleBrushChange}
                 handleBrushChange={handleBrushChange}
-                // bind:updateColor={updateBrushColor}
                 updateColor={updateBrushColor}
-                colorValue={colorValue}  // added by me only
+                colorValue={colorValue}
                 setColorValue={setColorValue}
                 swatch={recentColors}
               />
@@ -684,9 +559,8 @@ export default function PixelArtEditorClientComponent() {
           onPointerLeave={handleMouseLeave}
           onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => handleMouseMove(e, "mainPanel")}
         >
-          {/* Part 1 conditional segment */}
+          {/* Toolbar above canvas */}
           {canvasReady && (
-            // <!-- Tool bar above canvas -->
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -703,7 +577,6 @@ export default function PixelArtEditorClientComponent() {
                     toggled={myPresence.tool === Tool.Brush}
                     handleClick={() => {
                       updateMyPresence({ tool: Tool.Brush })
-                      // myPresence.update({ tool: "brush" })
                     }}
                   >
                     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -720,7 +593,6 @@ export default function PixelArtEditorClientComponent() {
                     toggled={myPresence.tool === Tool.Eraser}
                     handleClick={() => {
                       updateMyPresence({ tool: Tool.Eraser })
-                      // myPresence.update({ tool: "eraser" })
                     }}
                   >
                     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -828,7 +700,7 @@ export default function PixelArtEditorClientComponent() {
             </motion.div>
           )}
 
-          {/* <!-- Part 2 Main canvas --> */}
+          {/* Main canvas */}
           <div className="relative flex-shrink flex-grow">
             {canvasReady && layers?.[0]?.grid?.length && (
               <PixelGridSegment
@@ -842,12 +714,12 @@ export default function PixelArtEditorClientComponent() {
             )}
           </div>
 
-          {/* Part 3 Mobile menu bar at bottom */}
+          {/* Mobile menu bar at bottom */}
           <div
             className="relative z-30 w-full flex-shrink-0 flex-grow-0 border-2 border-gray-100 bg-white py-3 pr-4 xl:hidden"
           >
             <div className="flex items-center justify-between">
-              {/* <!-- Open mobile menu button --> */}
+              {/* Open mobile menu button */}
               <div className="flex md:hidden">
                 <button
                   className="px-4 py-2"
@@ -899,14 +771,11 @@ export default function PixelArtEditorClientComponent() {
                           key={connectionId}
                           className="transparent-bg relative -ml-2 h-10 w-10 rounded-full ring-4 ring-white"
                         >
-                          {/* TODO: change width etc and alt once info fixed */}
                           <Image
-                            alt={`${presence?.name || info?.name}'s avatar`}
-                            src={info!.picture as string} // TODO: define IUserInfo somehow
-                            // alt='testing'
-                            // src={'/testing'}
-                            width={44}
-                            height={44}
+                            alt={`${presence?.name || info.name}'s avatar`}
+                            src={info.picture as string}
+                            width={40}
+                            height={40}
                           />
                         </div>
                       ) : null
@@ -919,10 +788,8 @@ export default function PixelArtEditorClientComponent() {
                     <div className="-my-2 mr-2 hidden flex-grow md:block">
                       <div className="flex-grow-0">
                         <UserOnline
-                          picture={self.info!.picture as string} // TODO: define IUserInfo somehow
-                          name={myPresence.name || self.info!.name as string} // TODO: define IUserInfo somehow
-                          // picture={'/test'}
-                          // name={'test until info ok'}
+                          picture={self.info.picture}
+                          name={myPresence.name || self.info.name}
                           brush={myPresence.brush}
                           selectedLayer={myPresence.selectedLayer}
                           tool={myPresence.tool}
@@ -938,11 +805,8 @@ export default function PixelArtEditorClientComponent() {
                       className="transparent-bg relative -ml-2 block h-10 w-10 rounded-full ring-4 ring-white md:hidden"
                     >
                       <Image
-                        alt={`${myPresence?.name || self.info!.name}'s avatar`} // TODO: define IUserInfo somehow
-                        src={self.info!.picture as string} // TODO: define IUserInfo somehow
-                        // alt={`test avatar`}
-                        // src={'/testpic'}
-                        // TODO: better sizes
+                        alt={`${myPresence?.name || self.info.name}'s avatar`}
+                        src={self.info!.picture}
                         height={40}
                         width={40}
                       />
@@ -951,7 +815,7 @@ export default function PixelArtEditorClientComponent() {
                 )}
               </div>
 
-              {/* <!-- Mobile color picker TODO: in progress--> */}
+              {/* Mobile color picker */}
               <div className="flex md:hidden">
                 <MobileColorPicker
                   handleBrushChange={handleBrushChange}
@@ -988,11 +852,8 @@ export default function PixelArtEditorClientComponent() {
                   {/* <!-- You --> */}
                   {myPresence && self && myPresence.brush && (
                     <UserOnline
-                      // TODO: solve info soon with auth.ts changes
-                      picture={self.info!.picture as string}
-                      name={myPresence.name || self.info!.name as string} // TODO: define IUserInfo somehow
-                      // picture={"/NaN"}
-                      // name={myPresence.name || self?.info?.name || 'NaN'}
+                      picture={self.info.picture as string}
+                      name={myPresence.name || self.info.name}
                       brush={myPresence.brush}
                       selectedLayer={myPresence.selectedLayer}
                       tool={myPresence.tool}
@@ -1005,11 +866,8 @@ export default function PixelArtEditorClientComponent() {
                     if (presence?.brush?.color) return (
                       <UserOnline
                         key={connectionId}
-                        // TODO: solve info soon with auth.ts changes
-                        picture={info!.picture as string} // TODO: define IUserInfo somehow
-                        name={presence.name || info!.name as string} // TODO: define IUserInfo somehow
-                        // picture={'/NaN'}
-                        // name={'NaN'}
+                        picture={info.picture}
+                        name={presence.name || info.name}
                         brush={presence.brush}
                         selectedLayer={presence.selectedLayer}
                         tool={presence.tool}
@@ -1020,12 +878,12 @@ export default function PixelArtEditorClientComponent() {
                   })}
                 </div>
 
-                {/* <!-- Share buttons--> */}
+                {/* Share buttons */}
                 <SharePanel></SharePanel>
               </motion.div>
 
 
-              {/* // < !--Liveblocks logo --> */}
+              {/* < !--Liveblocks logo --> */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

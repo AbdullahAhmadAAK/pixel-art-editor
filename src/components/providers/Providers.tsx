@@ -24,18 +24,7 @@ const config = createConfig({
   },
 });
 
-// import { LiveblocksProvider, RoomProvider } from "@liveblocks/react";
-// import { ClientSideSuspense } from "@liveblocks/react/suspense";
-// import { LiveObject } from '@liveblocks/client';
-// import { PixelColor, PixelKey } from "@/app/pixel-art-together/page";
-// import { Layer, Tool } from "@/lib/types";
-// import { Layer } from "@/lib/types";
-// import { PixelColor, PixelKey } from "@/app/pixel-art-together/page";
-
 export function Providers({ children }: ProvidersProps) {
-
-  if (!process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY) throw new Error("NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY not found in .env file")
-
   return (
     <NextThemesProvider
       attribute="class"
@@ -82,30 +71,7 @@ export function Providers({ children }: ProvidersProps) {
       >
         <QueryClientProvider client={queryClient}>
           <WagmiProvider config={config}>
-            {/* <LiveblocksProvider publicApiKey={process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY}>
-              <RoomProvider
-                id="your-room-id"
-                initialPresence={{
-                  name: "",
-                  selectedLayer: 0,
-                  cursor: null,
-                  tool: Tool.Brush,
-                  mouseDown: false,
-                }}
-
-                initialStorage={{
-                  pixelStorage: new LiveObject<Record<PixelKey, PixelColor>>({}),
-                  layerStorage: new LiveObject<Record<number, Layer>>({})
-                }}
-
-              >
-                <ClientSideSuspense
-                  fallback={<div></div>}
-                > */}
             {children}
-            {/* </ClientSideSuspense>
-              </RoomProvider>
-            </LiveblocksProvider> */}
           </WagmiProvider>
         </QueryClientProvider>
       </PrivyProvider>

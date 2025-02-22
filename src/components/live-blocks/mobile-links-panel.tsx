@@ -10,6 +10,5 @@ export function MobileLinksPanel() {
         <LinksPanel />
       </div>
     </div>
-
   );
 }

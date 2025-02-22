@@ -1,4 +1,6 @@
-export const blendModes = [
+import { BlendMode } from "@/lib/types/pixel-art-editor/blend-mode";
+
+export const blendModes: BlendMode[] = [
   {
     name: "normal",
     label: "Normal",

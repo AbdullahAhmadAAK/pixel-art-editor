@@ -9,11 +9,15 @@ import '@shoelace-style/shoelace/dist/components/color-picker/color-picker.style
 
 import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react";
 import { hexToRgb } from "@/app/pixel-art-together/lib/utils/hex-to-rgb";
-import { Brush, Tool } from "@/lib/types";
+import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
+import { Tool } from '@/lib/types/pixel-art-editor/tool';
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import SlColorPicker, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/color-picker/index.js';
 import type SlColorPickerType from "@shoelace-style/shoelace/dist/components/color-picker/color-picker.component.d.ts";
+import { DEFAULT_BRUSH_DATA } from '@/app/pixel-art-together/lib/utils/defaults';
+import { Swatch } from '@/app/pixel-art-together/lib/utils/swatch';
 
 export function BrushPanel({
   handleBrushChange,
@@ -22,30 +26,20 @@ export function BrushPanel({
   setColorValue,
   swatch = []
 }: {
-  handleBrushChange: ({ detail }: { detail: Brush }) => void;
+  handleBrushChange: ({ detail }: { detail: BrushData }) => void;
   updateColor: (hex: string) => void; // this will allow the color value to be set from within the component, as well as outside of it
   colorValue: string;
   setColorValue: (colorValue: string) => void;
-  swatch: string[]
+  swatch: Swatch
 }) {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
 
-  // let colorPicker: { getFormattedValue; swatches };
   const colorPickerRef = useRef<SlColorPickerType | null>(null)
+  const [brush, setBrush] = useState<BrushData>(DEFAULT_BRUSH_DATA)
 
-  const [brush, setBrush] = useState<Brush>({ // Default brush
-    opacity: 100,
-    hue: 0,
-    saturation: 0,
-    color: "#fa3030",
-    lightness: 0,
-    rgb: { r: 255, g: 255, b: 255 },
-  })
-
-  // $: dispatch("brushChange", brush);
   useEffect(() => {
     handleBrushChange({ detail: brush })
   }, [brush, handleBrushChange])
@@ -65,21 +59,11 @@ export function BrushPanel({
     host.swatches = swatch;
   }, [swatch])
 
-  // onMount(async () => {
-  //   dispatch("brushChange", brush);
-  //   await import(
-  //     "@shoelace-style/shoelace/dist/components/color-picker/color-picker.js"
-  //   );
-  //   colorValue = '#fa3030';
-  //   applyCustomStyles(colorPicker);
-  // });
   useEffect(() => {
     if (setColorValue) {
       const applyPostmountLogic = async () => {
-        // await import("@shoelace-style/shoelace/dist/components/color-picker/color-picker.js");
-        // colorValue = '#fa3030';
         setColorValue("#fa3030")
-        applyCustomStyles(colorPickerRef.current!); // TODO: ts am i sure about this though
+        applyCustomStyles(colorPickerRef.current!);
       }
 
       applyPostmountLogic()
@@ -87,15 +71,11 @@ export function BrushPanel({
 
   }, [setColorValue, applyCustomStyles])
 
-  // $: if (colorPicker) {
-  //   colorPicker.swatches = swatch;
-  // }
   useEffect(() => {
     if (colorPickerRef.current) {
       colorPickerRef.current.swatches = swatch
     }
   }, [swatch])
-
 
   // When color changes, update presence
   function colorChange(e: SlChangeEvent) {
@@ -121,7 +101,6 @@ export function BrushPanel({
       opacity: parseInt(target.alpha),
       hue: parseInt(target.hue),
       saturation: parseInt(target.saturation),
-      // old developer mistakenly used target.lightness instead of target.brightness. Doesn't seem to be changable within color picker component though. It isn't mentioned in the docs, but is present in the color-picker.component.d.ts file.
       lightness: parseInt(target.brightness),
       rgb
     })
@@ -129,7 +108,6 @@ export function BrushPanel({
     updateColor(chosenColorValue)
 
     if (myPresence.tool === "eraser") {
-      // myPresence.update({ tool: "brush" });
       updateMyPresence({ tool: Tool.Brush })
     }
   }

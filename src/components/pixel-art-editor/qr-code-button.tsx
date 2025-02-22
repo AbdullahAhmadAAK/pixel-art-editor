@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from "react";
-
 import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
 import SlQrCode from '@shoelace-style/shoelace/dist/react/qr-code/index.js';
 
 export function QRCodeButton() {
-
   const [clicked, setClicked] = useState<boolean>(false)
 
   if (clicked) return (

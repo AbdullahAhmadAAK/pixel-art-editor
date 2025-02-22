@@ -1,4 +1,4 @@
-import { RGB } from "@/lib/types";
+import { RGB } from "@/lib/types/pixel-art-editor/rgb";
 
 // "#00ff00" => { r: 0, g: 255, b: 0 }
 export function hexToRgb(hex: string): RGB | null {

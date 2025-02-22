@@ -15,13 +15,10 @@ export function ExportsPanel({
   // Creates file from SVG and starts download
   function handleSaveSvg() {
     const queryResult = document.querySelector("#svg-image")
-
     if (!queryResult) return;
 
     const svgContent = queryResult.outerHTML;
-    const file = new File([svgContent], "pixelart.svg", {
-      type: "image/svg+xml",
-    });
+    const file = new File([svgContent], "pixelart.svg", { type: "image/svg+xml", });
     downloadFile(file);
   }
 
@@ -66,7 +63,6 @@ export function ExportsPanel({
       link.parentNode?.removeChild(link);
     }, 0);
   }
-
 
   return (
     <>
