@@ -26,22 +26,22 @@ import { PanelName } from '@/lib/types/pixel-art-editor/panel-name';
 import { getFillPixels } from '../lib/utils/get-fill-pixels';
 import { getMovePixels } from '../lib/utils/get-move-pixels';
 
-import { Cursor } from "@/components/live-blocks/cursor";
-import { IntroDialog } from "@/components/live-blocks/intro-dialog";
-import { BrushPanel } from "@/components/live-blocks/brush-panel";
-import { LayersPanel } from '@/components/live-blocks/layers-panel';
+import { Cursor } from "@/app/pixel-art-together/components/cursor";
+import { IntroDialog } from "@/app/pixel-art-together/components/intro-dialog";
+import { BrushPanel } from "@/app/pixel-art-together/components/brush-panel";
+import { LayersPanel } from '@/app/pixel-art-together/components/layers-panel';
 
 // Import CSS
 import '../pixel-art-styles.css'
-import { ExportsPanel } from "@/components/live-blocks/exports-panel";
-import { SharePanel } from "@/components/live-blocks/share-panel";
-import { MobileLinksPanel } from "@/components/live-blocks/mobile-links-panel";
-import { LinksPanel } from "@/components/live-blocks/links-panel";
-import { UserOnline } from '@/components/pixel-art-editor/user-online';
-import { IconButton } from '@/components/pixel-art-editor/icon-button';
-import { PixelGrid as PixelGridSegment } from '@/components/pixel-art-editor/pixel-grid';
+import { ExportsPanel } from "@/app/pixel-art-together/components/exports-panel";
+import { SharePanel } from "@/app/pixel-art-together/components/share-panel";
+import { MobileLinksPanel } from "@/app/pixel-art-together/components/mobile-links-panel";
+import { LinksPanel } from "@/app/pixel-art-together/components/links-panel";
+import { UserOnline } from '@/app/pixel-art-together/components/user-online';
+import { IconButton } from '@/app/pixel-art-together/components/icon-button';
+import { PixelGrid as PixelGridSegment } from '@/app/pixel-art-together/components/pixel-grid';
 import Image from 'next/image';
-import { MobileColorPicker } from '@/components/pixel-art-editor/mobile-color-picker';
+import { MobileColorPicker } from '@/app/pixel-art-together/components/mobile-color-picker';
 import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
 import { Swatch } from '../lib/utils/swatch';
 

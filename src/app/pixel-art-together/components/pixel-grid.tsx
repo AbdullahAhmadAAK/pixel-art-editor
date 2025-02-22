@@ -4,7 +4,7 @@ import { debounce } from "lodash"
 
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useHistory, useMyPresence } from "@liveblocks/react";
-import { IconButton } from '@/components/pixel-art-editor/icon-button';
+import { IconButton } from '@/app/pixel-art-together/components/icon-button';
 import { Layer } from "@/lib/types/pixel-art-editor/layer";
 import { Direction } from "@/lib/types/pixel-art-editor/direction";
 import panzoom from "panzoom"
