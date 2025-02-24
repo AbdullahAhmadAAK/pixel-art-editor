@@ -1,5 +1,5 @@
-import { CopyLinkButton } from "../pixel-art-editor/copy-link-button";
-import { QRCodeButton } from "../pixel-art-editor/qr-code-button";
+import { CopyLinkButton } from "./copy-link-button";
+import { QRCodeButton } from "./qr-code-button";
 
 export function SharePanel() {
   return (
