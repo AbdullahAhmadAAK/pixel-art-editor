@@ -14,6 +14,12 @@ import { Tool } from '@/lib/types/pixel-art-editor/tool';
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { RgbaColorPicker } from "react-colorful";
+import { ChromePicker } from 'react-color'
+// import { rgbaToHex, rgbaToRgb, rgbaToHsl, rgbaToHsv } from "@uiw/color-convert";
+import { colord } from "colord";
+
+
 import SlColorPicker, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/color-picker/index.js';
 import type SlColorPickerType from "@shoelace-style/shoelace/dist/components/color-picker/color-picker.component.d.ts";
 import { DEFAULT_BRUSH_DATA } from '@/app/pixel-art-together/lib/utils/defaults';
@@ -112,18 +118,121 @@ export function BrushPanel({
     }
   }
 
+  const [colorTest, setColorTest] = useState(null); // Default RGBA
+
+  function colorChangeTest(colorValueObject) {
+
+    console.log('This is the colorValueObject: ', colorValueObject)
+
+    // This is in rgba of course
+
+    // const colorObj = colord({
+    //   r: selectedColor.r,
+    //   g: selectedColor.g,
+    //   b: selectedColor.b,
+    //   a: selectedColor.a,
+    // });
+
+    // setColorTest(colorObj)
+
+    setColorColorful(colorValueObject)
+
+    // const chosenColorValue = colorValueObject.hex
+    // const rgb = colorValueObject.rgb
+
+
+    // updateColor(rgb)
+
+    // // const chosenOpacity = rgb.a * 100
+    // const chosenOpacity = Math.round(rgb.a * 255); // Convert opacity to 0-255 range
+    // delete rgb.a
+
+    // const rgbaHexValue = `${chosenColorValue}${chosenOpacity.toString(16).padStart(2, '0')}`;
+
+    // console.log('rgbaHex is this: ', rgbaHexValue)
+
+    // setBrush({
+    //   color: rgbaHexValue,
+    //   opacity: chosenOpacity,
+    //   hue: 1,
+    //   saturation: 1,
+    //   lightness: 1,
+    //   rgb
+    // })
+
+
+
+    // if (myPresence.tool === "eraser") {
+    //   updateMyPresence({ tool: Tool.Brush })
+    // }
+  }
+
+  const [colorColorful, setColorColorful] = useState({ r: 255, g: 0, b: 0, a: 1 });
+  const [colorObjColorful, setColorObjColorful] = useState(null)
+
+  useEffect(() => {
+    // const colorObjData = colord({
+    //   r: colorColorful.r,
+    //   g: colorColorful.g,
+    //   b: colorColorful.b,
+    //   a: colorColorful.a,
+    // });
+
+    const colorObjData2 = colord(`rgba(${colorColorful.r}, ${colorColorful.g}, ${colorColorful.b}, ${colorColorful.a})`)
+
+    // {colorObjColorful && (
+    //   <div className="text-sm text-center mt-2">
+    //     <p><strong>HEX:</strong> {colorObjColorful.toHex()}</p>
+    //     <p><strong>RGB:</strong> {colorObjColorful.toRgbString()}</p>
+    //     <p><strong>HSL:</strong> {colorObjColorful.toHslString()}</p>
+    //     <p><strong>HSV:</strong> {colorObjColorful.toHsvString()}</p>
+    //   </div>
+    // )}
+
+    // console.log('data hsv: ', colorObjColorful.toHsv())
+
+    setColorObjColorful(colorObjData2)
+  }, [colorColorful])
+
+  // this isn't provided by colord, so we made our own
+  function hsvaToReadable(hsva) {
+    const { h, s, v, a } = hsva;
+    return `hsva(${h}, ${s}%, ${v}%, ${a.toFixed(2)})`;
+  }
+
+
   return (
     <div className="p-5 pb-2">
       <div className="pb-3 text-sm font-semibold text-gray-500">Colour</div>
       <div>
         <SlColorPicker
-          // bind:this={colorPicker}
           ref={colorPickerRef}
           inline
           onSlChange={colorChange}
           opacity
           value={colorValue}
         />
+
+        {/* <ChromePicker
+          value={colorValue}
+          onChange={colorChangeTest}
+        /> */}
+
+        <RgbaColorPicker
+          color={colorColorful}
+          onChange={(newVal) => colorChangeTest(newVal)}
+        />
+
+
+        {colorObjColorful && (
+          <div className="text-sm text-center mt-2">
+            <p><strong>HEX:</strong> {colorObjColorful.toHex()}</p>
+            <p><strong>RGB:</strong> {colorObjColorful.toRgbString()}</p>
+            <p><strong>HSL:</strong> {colorObjColorful.toHslString()}</p>
+            <p><strong>HSV:</strong> {hsvaToReadable(colorObjColorful.toHsv())}</p>
+          </div>
+        )}
+
       </div>
     </div>
 
