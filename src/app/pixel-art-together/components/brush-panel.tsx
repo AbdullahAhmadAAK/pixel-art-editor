@@ -121,20 +121,6 @@ export function BrushPanel({
   const [colorTest, setColorTest] = useState(null); // Default RGBA
 
   function colorChangeTest(colorValueObject) {
-
-    console.log('This is the colorValueObject: ', colorValueObject)
-
-    // This is in rgba of course
-
-    // const colorObj = colord({
-    //   r: selectedColor.r,
-    //   g: selectedColor.g,
-    //   b: selectedColor.b,
-    //   a: selectedColor.a,
-    // });
-
-    // setColorTest(colorObj)
-
     setColorColorful(colorValueObject)
 
     // const chosenColorValue = colorValueObject.hex
@@ -151,6 +137,8 @@ export function BrushPanel({
 
     // console.log('rgbaHex is this: ', rgbaHexValue)
 
+    // updateColor(rgb)
+
     // setBrush({
     //   color: rgbaHexValue,
     //   opacity: chosenOpacity,
@@ -162,36 +150,33 @@ export function BrushPanel({
 
 
 
-    // if (myPresence.tool === "eraser") {
-    //   updateMyPresence({ tool: Tool.Brush })
-    // }
+    if (myPresence.tool === "eraser") {
+      updateMyPresence({ tool: Tool.Brush })
+    }
   }
 
   const [colorColorful, setColorColorful] = useState({ r: 255, g: 0, b: 0, a: 1 });
   const [colorObjColorful, setColorObjColorful] = useState(null)
 
   useEffect(() => {
-    // const colorObjData = colord({
-    //   r: colorColorful.r,
-    //   g: colorColorful.g,
-    //   b: colorColorful.b,
-    //   a: colorColorful.a,
-    // });
-
     const colorObjData2 = colord(`rgba(${colorColorful.r}, ${colorColorful.g}, ${colorColorful.b}, ${colorColorful.a})`)
-
-    // {colorObjColorful && (
-    //   <div className="text-sm text-center mt-2">
-    //     <p><strong>HEX:</strong> {colorObjColorful.toHex()}</p>
-    //     <p><strong>RGB:</strong> {colorObjColorful.toRgbString()}</p>
-    //     <p><strong>HSL:</strong> {colorObjColorful.toHslString()}</p>
-    //     <p><strong>HSV:</strong> {colorObjColorful.toHsvString()}</p>
-    //   </div>
-    // )}
-
-    // console.log('data hsv: ', colorObjColorful.toHsv())
-
     setColorObjColorful(colorObjData2)
+
+    updateColor(colorObjData2.toHex())
+
+    const chosenOpacity = colorObjData2.toHex().a
+    const rgb = colorObjData2.toRgb()
+    delete rgb.a
+
+    setBrush({
+      color: colorObjData2.toHex(),
+      opacity: chosenOpacity,
+      hue: 1,
+      saturation: 1,
+      lightness: 1,
+      rgb
+    })
+
   }, [colorColorful])
 
   // this isn't provided by colord, so we made our own
