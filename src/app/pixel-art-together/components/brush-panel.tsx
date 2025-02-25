@@ -185,6 +185,15 @@ export function BrushPanel({
     return `hsva(${h}, ${s}%, ${v}%, ${a.toFixed(2)})`;
   }
 
+  const possibleFormats = ["hex", "rgba", "hsl", "hsv"] as const;
+  const [format, setFormat] = useState<(typeof possibleFormats)[number]>("hex");
+
+  const toggleFormat = () => {
+    setFormat((prev) => {
+      const currentIndex = possibleFormats.indexOf(prev);
+      return possibleFormats[(currentIndex + 1) % possibleFormats.length];
+    });
+  };
 
   return (
     <div className="p-5 pb-2">
@@ -211,12 +220,19 @@ export function BrushPanel({
 
         {colorObjColorful && (
           <div className="text-sm text-center mt-2">
-            <p><strong>HEX:</strong> {colorObjColorful.toHex()}</p>
-            <p><strong>RGB:</strong> {colorObjColorful.toRgbString()}</p>
-            <p><strong>HSL:</strong> {colorObjColorful.toHslString()}</p>
-            <p><strong>HSV:</strong> {hsvaToReadable(colorObjColorful.toHsv())}</p>
+            {format === "hex" && <p><strong>HEX:</strong> {colorObjColorful.toHex()}</p>}
+            {format === "rgba" && <p><strong>RGB:</strong> {colorObjColorful.toRgbString()}</p>}
+            {format === "hsl" && <p><strong>HSL:</strong> {colorObjColorful.toHslString()}</p>}
+            {format === "hsv" && <p><strong>HSV:</strong> {hsvaToReadable(colorObjColorful.toHsv())}</p>}
           </div>
         )}
+
+        <button
+          onClick={toggleFormat}
+          className='border-gray-200 border-2'
+        >
+          {format}
+        </button>
 
       </div>
     </div>
