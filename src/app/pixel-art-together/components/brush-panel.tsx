@@ -1,8 +1,8 @@
 // Note: we used these two lines, due to an error within the shoelace library
 // alpha, saturation, brightness, and hue are all accessible values, but the TS error states that they are private and can't be accessed outside of the class.
 // Since there was no way to resolve them, I disabled typescript checking for this file.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
+// aaaa eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// aaaa @ts-n ocheck
 
 // This is for the styles from shoelace library
 import '@shoelace-style/shoelace/dist/components/color-picker/color-picker.styles.js'
@@ -18,12 +18,29 @@ import { RgbaColorPicker } from "react-colorful";
 import { ChromePicker } from 'react-color'
 // import { rgbaToHex, rgbaToRgb, rgbaToHsl, rgbaToHsv } from "@uiw/color-convert";
 import { colord } from "colord";
+import { EyeDropper, OnChangeEyedrop, useEyeDrop } from 'react-eyedrop'
 
+// Define the EyeDropper API properly
+interface EyeDropperResult {
+  sRGBHex: string;
+}
+
+interface EyeDropperAPI {
+  open: () => Promise<EyeDropperResult>;
+}
+
+// Ensure TypeScript recognizes the EyeDropper API
+declare global {
+  interface Window {
+    EyeDropper?: new () => EyeDropperAPI;
+  }
+}
 
 import SlColorPicker, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/color-picker/index.js';
 import type SlColorPickerType from "@shoelace-style/shoelace/dist/components/color-picker/color-picker.component.d.ts";
 import { DEFAULT_BRUSH_DATA } from '@/app/pixel-art-together/lib/utils/defaults';
 import { Swatch } from '@/app/pixel-art-together/lib/utils/swatch';
+import { hexToRgba } from '../utils/hex-to-rgb';
 
 export function BrushPanel({
   handleBrushChange,
@@ -79,16 +96,37 @@ export function BrushPanel({
     //  applyCustomStyles
   ])
 
-  console.log('swatch being passed is this: ', swatch)
+  // console.log('swatch being passed is this: ', swatch)
 
   useEffect(() => {
     // if (colorPickerRef.current) {
     //   colorPickerRef.current.swatches = swatch
     // }
 
-    console.log('Swatch changed!: ', swatch)
+    // console.log('Swatch changed!: ', swatch)
   }, [swatch])
 
+
+
+
+  const pickColor = async () => {
+    if (!window.EyeDropper) {
+      alert("Your browser does not support the EyeDropper API.");
+      return;
+    }
+
+    try {
+      const eyeDropper = new window.EyeDropper();
+      const result = await eyeDropper.open();
+      // setSelectedColor(result.sRGBHex);
+      console.log('this is the color: ', result.sRGBHex)
+
+      const colorInRgba = hexToRgba(result.sRGBHex)
+      setColorColorful(colorInRgba)
+    } catch (error) {
+      console.error("Eyedropper error:", error);
+    }
+  };
   // When color changes, update presence
   function colorChange(e: SlChangeEvent) {
     const target = e.target as SlColorPickerType
@@ -127,6 +165,9 @@ export function BrushPanel({
   const [colorTest, setColorTest] = useState(null); // Default RGBA
 
   function colorChangeTest(colorValueObject) {
+
+    console.log('This is the color value object: ', colorValueObject)
+
     setColorColorful(colorValueObject)
 
     // const chosenColorValue = colorValueObject.hex
@@ -239,7 +280,7 @@ export function BrushPanel({
         >
           {format}
         </button>
-        
+
 
         <div className="grid grid-cols-8 gap-2 p-4">
           {swatch.map((color, index) => (
@@ -250,6 +291,30 @@ export function BrushPanel({
               title={color}
             />
           ))}
+        </div>
+
+        {/* <EyeDropper once={(val) => { console.log(val) }} onPickEnd={(val) => console.log(val)}>
+          Pick Color
+        </EyeDropper> */}
+
+
+        <div className="flex flex-col items-center gap-4">
+          <button
+            onClick={pickColor}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+          >
+            Pick Color
+          </button>
+
+          {colorValue && (
+            <div className="flex items-center gap-2">
+              <div
+                className="w-10 h-10 border"
+                style={{ backgroundColor: colorValue }}
+              ></div>
+              <p>{colorValue}</p>
+            </div>
+          )}
         </div>
 
       </div>
