@@ -1,31 +1,33 @@
-import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
-import SlButtonGroup from '@shoelace-style/shoelace/dist/react/button-group/index.js';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Canvg } from "canvg";
+import { useState } from "react";
 
 export function ExportsPanel({
   width = 2000,
-  ratio = 1
+  ratio = 1,
 }: {
-  width?: number,
-  ratio?: number
+  width?: number;
+  ratio?: number;
 }) {
-
   let renderer;
+  const [selected, setSelected] = useState("svg");
 
-  // Creates file from SVG and starts download
   function handleSaveSvg() {
-    const queryResult = document.querySelector("#svg-image")
+    const queryResult = document.querySelector("#svg-image");
     if (!queryResult) return;
 
     const svgContent = queryResult.outerHTML;
-    const file = new File([svgContent], "pixelart.svg", { type: "image/svg+xml", });
+    const file = new File([svgContent], "pixelart.svg", {
+      type: "image/svg+xml",
+    });
     downloadFile(file);
   }
 
-  // Creates file by adding SVG to canvas, converts to base64 png, and starts download
   async function handleSavePng() {
-    const svgQueryResult = document.querySelector("#svg-image")
-    const canvasQueryResult = document.querySelector("#export-canvas") as HTMLCanvasElement
+    const svgQueryResult = document.querySelector("#svg-image");
+    const canvasQueryResult = document.querySelector(
+      "#export-canvas"
+    ) as HTMLCanvasElement;
 
     if (!svgQueryResult || !canvasQueryResult) return;
 
@@ -48,7 +50,6 @@ export function ExportsPanel({
     });
   }
 
-  // Downloads a file object
   function downloadFile(file: File) {
     const link = document.createElement("a");
     link.style.display = "none";
@@ -66,19 +67,37 @@ export function ExportsPanel({
 
   return (
     <>
-      <canvas className="hidden" height={width * ratio} id="export-canvas" width={width}></canvas>
+      <canvas
+        className="hidden"
+        height={width * ratio}
+        id="export-canvas"
+        width={width}
+      ></canvas>
 
       <div className="border-t-2 border-gray-100 p-5">
         <div className="pb-3 text-sm font-semibold text-gray-500">Exports</div>
         <div className="flex gap-3">
-          <SlButtonGroup style={{ width: '100%' }} >
-            <SlButton onClick={handleSaveSvg} style={{ width: '50%' }} >
+          <ToggleGroup
+            type="single"
+            value={selected}
+            onValueChange={(value) => value && setSelected(value)}
+            className="w-full"
+          >
+            <ToggleGroupItem
+              value="svg"
+              onClick={handleSaveSvg}
+              className="w-1/2"
+            >
               Download SVG
-            </SlButton>
-            <SlButton onClick={handleSavePng} style={{ width: '50%' }} >
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="png"
+              onClick={handleSavePng}
+              className="w-1/2"
+            >
               Download PNG
-            </SlButton>
-          </SlButtonGroup>
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
       </div>
     </>

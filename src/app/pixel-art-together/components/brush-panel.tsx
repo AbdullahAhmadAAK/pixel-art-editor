@@ -1,12 +1,3 @@
-// Note: we used these two lines, due to an error within the shoelace library
-// alpha, saturation, brightness, and hue are all accessible values, but the TS error states that they are private and can't be accessed outside of the class.
-// Since there was no way to resolve them, I disabled typescript checking for this file.
-// aaaa eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// aaaa @ts-n ocheck
-
-// This is for the styles from shoelace library
-import '@shoelace-style/shoelace/dist/components/color-picker/color-picker.styles.js'
-
 import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react";
 import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
 import { Tool } from '@/lib/types/pixel-art-editor/tool';
