@@ -52,35 +52,41 @@ export function BrushPanel({
 
 
   // Workaround for custom elements
-  const applyCustomStyles = useCallback((host: SlColorPickerType) => {
-    const style = document.createElement("style");
-    style.innerHTML = `
-      .color-picker__controls, .color-picker__user-input, .color-picker__swatches { padding-left: 0 !important; padding-right: 0 !important; }
-      .color-picker__grid { border-radius: 4px !important; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); }
-      div.color-picker__swatches { border-top: 0; padding-top: 2px; margin-left: -2px; margin-right: -2px; }
-    `;
-    if (host.shadowRoot) {
-      host.shadowRoot.appendChild(style);
-    }
-    host.swatches = swatch;
-  }, [swatch])
+  // const applyCustomStyles = useCallback((host: SlColorPickerType) => {
+  //   const style = document.createElement("style");
+  //   style.innerHTML = `
+  //     .color-picker__controls, .color-picker__user-input, .color-picker__swatches { padding-left: 0 !important; padding-right: 0 !important; }
+  //     .color-picker__grid { border-radius: 4px !important; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); }
+  //     div.color-picker__swatches { border-top: 0; padding-top: 2px; margin-left: -2px; margin-right: -2px; }
+  //   `;
+  //   if (host.shadowRoot) {
+  //     host.shadowRoot.appendChild(style);
+  //   }
+  //   host.swatches = swatch;
+  // }, [swatch])
 
   useEffect(() => {
     if (setColorValue) {
       const applyPostmountLogic = async () => {
         setColorValue("#fa3030")
-        applyCustomStyles(colorPickerRef.current!);
+        // applyCustomStyles(colorPickerRef.current!);
       }
 
       applyPostmountLogic()
     }
 
-  }, [setColorValue, applyCustomStyles])
+  }, [setColorValue,
+    //  applyCustomStyles
+  ])
+
+  console.log('swatch being passed is this: ', swatch)
 
   useEffect(() => {
-    if (colorPickerRef.current) {
-      colorPickerRef.current.swatches = swatch
-    }
+    // if (colorPickerRef.current) {
+    //   colorPickerRef.current.swatches = swatch
+    // }
+
+    console.log('Swatch changed!: ', swatch)
   }, [swatch])
 
   // When color changes, update presence
@@ -233,6 +239,18 @@ export function BrushPanel({
         >
           {format}
         </button>
+        
+
+        <div className="grid grid-cols-8 gap-2 p-4">
+          {swatch.map((color, index) => (
+            <div
+              key={index}
+              className="w-6 h-6 rounded shadow"
+              style={{ backgroundColor: color }}
+              title={color}
+            />
+          ))}
+        </div>
 
       </div>
     </div>

@@ -290,6 +290,8 @@ export default function PixelArtEditorClientComponent() {
       a.pop();
       a.unshift(color);
       setRecentColors(a)
+
+      console.log('recent colors are now: ', a)
     }
   }
 
