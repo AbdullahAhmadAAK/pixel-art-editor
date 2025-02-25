@@ -15,10 +15,7 @@ import { Tool } from '@/lib/types/pixel-art-editor/tool';
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { RgbaColorPicker } from "react-colorful";
-import { ChromePicker } from 'react-color'
-// import { rgbaToHex, rgbaToRgb, rgbaToHsl, rgbaToHsv } from "@uiw/color-convert";
 import { colord } from "colord";
-import { EyeDropper, OnChangeEyedrop, useEyeDrop } from 'react-eyedrop'
 
 // Define the EyeDropper API properly
 interface EyeDropperResult {
