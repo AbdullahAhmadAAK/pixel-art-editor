@@ -382,8 +382,8 @@ export default function PixelArtEditorClientComponent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Spring animation for mobile menu
-  const [panelWidth, setPanelWidth] = useState(0);
-  const mobileMenuTransform = useSpring(-panelWidth, { stiffness: 120, damping: 15 });
+  const [panelWidth, setPanelWidth] = useState(() => window.innerWidth);
+  const mobileMenuTransform = useSpring(mobileMenuOpen ? 0 : -panelWidth, { stiffness: 120, damping: 15 });
 
   useEffect(() => {
     function updatePanelWidth() {
@@ -398,8 +398,11 @@ export default function PixelArtEditorClientComponent() {
 
   // When `mobileMenuOpen` changes, set spring value
   useEffect(() => {
-    mobileMenuTransform.set(mobileMenuOpen ? 0 : -panelWidth); // Move fully in/out
-  }, [mobileMenuOpen, mobileMenuTransform])
+    if (panelWidth > 0) { // panelWidth is 0 at initialization. Setting transform to -0 will mean that on mount, the page will have the mobile-mode layers' panel being shown, thus we added this condition
+      mobileMenuTransform.set(mobileMenuOpen ? 0 : -panelWidth); // Move fully in/out
+    }
+
+  }, [mobileMenuOpen, mobileMenuTransform, panelWidth])
 
 
   // ================================================================================
