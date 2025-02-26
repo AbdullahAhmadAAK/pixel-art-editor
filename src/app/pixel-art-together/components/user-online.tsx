@@ -135,7 +135,7 @@ export function UserOnline({
                 </span>
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top">
+            <TooltipContent side="top" className="text-black">
               Use color
             </TooltipContent>
           </Tooltip>

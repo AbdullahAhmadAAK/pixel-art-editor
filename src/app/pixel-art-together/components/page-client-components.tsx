@@ -596,7 +596,7 @@ export default function PixelArtEditorClientComponent() {
                         </svg>
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent>Brush tool (B)</TooltipContent>
+                    <TooltipContent className="text-black">Brush tool (B)</TooltipContent>
                   </Tooltip>
 
                   {/* Eraser Tool */}
@@ -614,7 +614,7 @@ export default function PixelArtEditorClientComponent() {
                         </svg>
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent>Eraser tool (E)</TooltipContent>
+                    <TooltipContent className="text-black">Eraser tool (E)</TooltipContent>
                   </Tooltip>
 
                   {/* Fill Tool */}
@@ -632,7 +632,7 @@ export default function PixelArtEditorClientComponent() {
                         </svg>
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent>Fill tool (F)</TooltipContent>
+                    <TooltipContent className="text-black">Fill tool (F)</TooltipContent>
                   </Tooltip>
                 </div>
 
@@ -657,7 +657,7 @@ export default function PixelArtEditorClientComponent() {
                         </svg>
                       </Toggle>
                     </TooltipTrigger>
-                    <TooltipContent>Toggle grid (G)</TooltipContent>
+                    <TooltipContent className="text-black">Toggle grid (G)</TooltipContent>
                   </Tooltip>
 
                   {/* Toggle move button with tooltip */}
@@ -685,7 +685,7 @@ export default function PixelArtEditorClientComponent() {
                         </svg>
                       </Toggle>
                     </TooltipTrigger>
-                    <TooltipContent>Toggle move (M)</TooltipContent>
+                    <TooltipContent className="text-black">Toggle move (M)</TooltipContent>
                   </Tooltip>
                 </div>
 
@@ -717,7 +717,7 @@ export default function PixelArtEditorClientComponent() {
                         </svg>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Undo</TooltipContent>
+                    <TooltipContent className="text-black">Undo</TooltipContent>
                   </Tooltip>
 
                   {/* Redo Button */}
@@ -742,7 +742,7 @@ export default function PixelArtEditorClientComponent() {
                         </svg>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Redo</TooltipContent>
+                    <TooltipContent className="text-black">Redo</TooltipContent>
                   </Tooltip>
                 </div>
               </div>

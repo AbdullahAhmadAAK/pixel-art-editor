@@ -40,7 +40,7 @@ export function QRCodeButton() {
               Generate QR code
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Click to generate a QR code</TooltipContent>
+          <TooltipContent className="text-black">Click to generate a QR code</TooltipContent>
         </Tooltip>
       )}
     </div>
