@@ -381,14 +381,25 @@ export default function PixelArtEditorClientComponent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Spring animation for mobile menu
-
-  const [mobileMenuTransform, setMobileMenuTransform] = useState(useSpring(0, { stiffness: 70, damping: 10, }))
+  const [panelWidth, setPanelWidth] = useState(0);
+  const mobileMenuTransform = useSpring(-panelWidth, { stiffness: 120, damping: 15 });
 
   useEffect(() => {
-    mobileMenuTransform.set(mobileMenuOpen ? 100 : 0);
-  }, [mobileMenuOpen, mobileMenuTransform])
+    function updatePanelWidth() {
+      setPanelWidth(window.innerWidth); // Store full viewport width
+    }
+
+    updatePanelWidth();
+    window.addEventListener("resize", updatePanelWidth);
+
+    return () => window.removeEventListener("resize", updatePanelWidth);
+  }, []);
 
   // When `mobileMenuOpen` changes, set spring value
+  useEffect(() => {
+    mobileMenuTransform.set(mobileMenuOpen ? 0 : -panelWidth); // Move fully in/out
+  }, [mobileMenuOpen, mobileMenuTransform])
+
 
   // ================================================================================
   // KEYBOARD SHORTCUTS
@@ -510,22 +521,22 @@ export default function PixelArtEditorClientComponent() {
       </div>
 
       {/* <!-- App --> */}
-      <div className="relative flex w-full h-full min-h-full bg-white">
+      <div className=" flex w-full h-full min-h-full bg-white">
 
         {/* <!-- Left panel, containing layers etc --> */}
-        <div
-          className={`side-panel fixed right-full z-20 h-full w-auto flex-shrink-0 flex-grow-0 overflow-y-auto overflow-x-hidden border-gray-100 bg-white md:!relative md:right-auto md:z-10 md:!w-auto md:min-w-[320px] md:!translate-x-0 ${mobileMenuOpen
+        <motion.div
+          className={`side-panel fixed z-20 h-full w-[100vw] md:w-auto flex-shrink-0 flex-grow-0 overflow-y-auto overflow-x-hidden border-gray-100 bg-white md:!relative md:right-auto md:z-10 md:!w-auto md:min-w-[320px] md:!translate-x-0 ${mobileMenuOpen
             ? 'border-r-2 drop-shadow-xl'
             : ''}`}
           id="tools-panel"
-          style={{ transform: `translateX(${mobileMenuTransform}%)` }}
+          style={{ x: mobileMenuTransform }}
         >
           {layers && canvasReady && (
             <motion.div
               ref={panels.toolsPanel}
               onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => handleMouseMove(e, "toolsPanel")}
               onPointerLeave={(handleMouseLeave)}
-              className="relative top-[-455px] flex h-full min-h-full flex-col md:top-0"
+              className="relative flex h-full min-h-full flex-col top-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -546,7 +557,7 @@ export default function PixelArtEditorClientComponent() {
               <MobileLinksPanel />
             </motion.div>
           )}
-        </div>
+        </motion.div>
 
 
 
@@ -775,7 +786,6 @@ export default function PixelArtEditorClientComponent() {
                     >
                       <path
                         strokeLinecap="round"
-                        strokeLinejoin-linejoin="round"
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>

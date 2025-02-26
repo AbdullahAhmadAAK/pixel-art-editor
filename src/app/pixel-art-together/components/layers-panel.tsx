@@ -12,6 +12,11 @@ import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
 import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
 import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts';
 
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Slider } from "@/components/ui/slider";
+
 import { motion } from "framer-motion";
 import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
 

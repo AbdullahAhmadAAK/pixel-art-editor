@@ -118,7 +118,7 @@ export function BrushPanel({
   };
 
   return (
-    <div className="p-5 pb-2">
+    <div className="p-5 pb-2 md:block hidden">
       <div className="pb-3 text-sm font-semibold text-gray-500">Colour</div>
       <div>
         <RgbaColorPicker
