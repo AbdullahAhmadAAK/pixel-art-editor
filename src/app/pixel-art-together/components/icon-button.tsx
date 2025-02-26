@@ -1,6 +1,6 @@
 "use client";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 
@@ -22,24 +22,22 @@ export function IconButton({
   children,
 }: IconButtonProps) {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            className={`relative flex h-10 w-10 items-center justify-center ${classes}`}
-            onClick={(e) => handleClick?.(e)}
-            variant={toggled ? "default" : "outline"} // Adjusted variants
-          >
-            <span className="sr-only">{screenReader}</span>
-            <div className="absolute inset-0 flex items-center justify-center">
-              {children}
-            </div>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="top" className={tooltipClasses}>
-          {screenReader}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          className={`relative flex h-10 w-10 items-center justify-center ${classes}`}
+          onClick={(e) => handleClick?.(e)}
+          variant={toggled ? "default" : "outline"} // Adjusted variants
+        >
+          <span className="sr-only">{screenReader}</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            {children}
+          </div>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className={tooltipClasses}>
+        {screenReader}
+      </TooltipContent>
+    </Tooltip>
   );
 }

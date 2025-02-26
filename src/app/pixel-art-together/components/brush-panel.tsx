@@ -5,7 +5,8 @@ import { Tool } from '@/lib/types/pixel-art-editor/tool';
 import { useEffect, useState } from "react";
 
 import { RgbaColorPicker } from "react-colorful";
-import { Colord, colord, HsvaColor, RgbaColor } from "colord";
+import { Colord, colord, RgbaColor } from "colord";
+import { hsvaToReadable } from "../lib/utils/hsva-to-readable";
 
 import { DEFAULT_BRUSH_DATA } from '@/app/pixel-art-together/lib/utils/defaults';
 import { Swatch } from '@/app/pixel-art-together/lib/utils/swatch';
@@ -105,18 +106,6 @@ export function BrushPanel({
 
   }, [colorRgbaObject])
 
-  /**
-   * This function converts HsvaColor objects of the Colord package, to a readable human-friendly format.
-   * Example input: { h: 1, s: 1, v: 1, a: 0.3 }
-   * Example output: hsva(1, 1, 1, 0.3)
-   * This isn't provided by the Colord package, so we made our own.
-   * @param hsva 
-   * @returns 
-   */
-  function hsvaToReadable(hsva: HsvaColor) {
-    const { h, s, v, a } = hsva;
-    return `hsva(${h}, ${s}%, ${v}%, ${a.toFixed(2)})`;
-  }
 
   const possibleFormats = ["hex", "rgba", "hsl", "hsv"] as const;
   const [format, setFormat] = useState<(typeof possibleFormats)[number]>("hex");

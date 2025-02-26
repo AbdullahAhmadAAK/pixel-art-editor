@@ -4,6 +4,7 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider, createConfig } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { type ReactNode } from "react";
 import { mainnet, sepolia } from "viem/chains";
 import { http } from "wagmi";
@@ -71,7 +72,9 @@ export function Providers({ children }: ProvidersProps) {
       >
         <QueryClientProvider client={queryClient}>
           <WagmiProvider config={config}>
-            {children}
+            <TooltipProvider>
+              {children}
+            </TooltipProvider>
           </WagmiProvider>
         </QueryClientProvider>
       </PrivyProvider>
