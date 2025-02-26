@@ -73,7 +73,6 @@ export function LayersPanel({
     }
   }, [addingNewLayer, layerStorage, myPresence, updateMyPresence])
 
-
   // When layers update, make sure a layer is still selected
   useEffect(() => {
     whenLayersUpdate()
@@ -94,14 +93,7 @@ export function LayersPanel({
 
     layerStorage.set(myPresence.selectedLayer, newLayer)
     blendTextRef.current.innerText = newBlendModeValue;
-  }, [])
-
-  // console.log('checkgayy meee:', layerStorage)
-  // console.log('seld layer: ', myPresence.selectedLayer);
-
-  // console.log('step 3 access layet: ', layerStorage[myPresence.selectedLayer]);
-
-  // console.log('check meee:', layerStorage, layerStorage[myPresence.selectedLayer].opacity)
+  }, [myPresence.selectedLayer])
 
   // Update current layer opacity on change
   // newOpacity will be between 0 and 100, as that's what we've set up the Slider component to be
