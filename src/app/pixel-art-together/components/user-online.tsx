@@ -5,7 +5,7 @@ import ntc from '@/app/pixel-art-together/lib/utils/name-that-color';
 import { useEffect, useMemo, useState } from 'react';
 import { contrastingTextColour } from '@/app/pixel-art-together/lib/utils/contrasting-text-colour';
 import { BrushData } from "@/lib/types/pixel-art-editor/brush-data";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { CustomTooltip } from "@/components/custom-tooltip";
 
 interface UserOnlineProps {
   short?: boolean;
@@ -86,59 +86,54 @@ export function UserOnline({
       {!short && (
         // Copyable color preview 
         <div className={isYou ? "pointer-events-none" : ""}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={handleColorChange}
-                className="focus-visible-style transparent-bg group relative h-[40px] w-[40px] rounded-[4px]"
+          <CustomTooltip tooltipContent="Use color">
+            <button
+              onClick={handleColorChange}
+              className="focus-visible-style transparent-bg group relative h-[40px] w-[40px] rounded-[4px]"
+            >
+              <span
+                className="inner-border mix absolute inset-0 flex items-center justify-center rounded-[4px]"
+                style={{ background: `${brush.color}` }}
               >
                 <span
-                  className="inner-border mix absolute inset-0 flex items-center justify-center rounded-[4px]"
-                  style={{ background: `${brush.color}` }}
+                  className={`mix-blend-luminosity transition-colors ${blackText
+                    ? 'text-gray-500 group-hover:text-black group-active:text-gray-500'
+                    : 'text-gray-300 group-hover:text-white group-active:text-gray-300'}`}
                 >
-                  <span
-                    className={`mix-blend-luminosity transition-colors ${blackText
-                      ? 'text-gray-500 group-hover:text-black group-active:text-gray-500'
-                      : 'text-gray-300 group-hover:text-white group-active:text-gray-300'}`}
-                  >
-                    {tool === Tool.Brush && (
-                      <svg className="h-5 w-5" viewBox="0 0 24 24">
-                        <path
-                          fill="currentColor"
-                          d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z"
-                        />
-                      </svg>
-                    )}
+                  {tool === Tool.Brush && (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z"
+                      />
+                    </svg>
+                  )}
 
-                    {tool === Tool.Eraser && (
-                      <svg className="h-5 w-5" viewBox="0 0 24 24">
-                        <path
-                          fill="currentColor"
-                          d="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"
-                        />
-                      </svg>
-                    )}
+                  {tool === Tool.Eraser && (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"
+                      />
+                    </svg>
+                  )}
 
-                    {tool === Tool.Fill && (
-                      <svg
-                        className="mt-1.5 ml-0.5 h-6 w-6 scale-x-[-1]"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M19,11.5C19,11.5 17,13.67 17,15A2,2 0 0,0 19,17A2,2 0 0,0 21,15C21,13.67 19,11.5 19,11.5M5.21,10L10,5.21L14.79,10M16.56,8.94L7.62,0L6.21,1.41L8.59,3.79L3.44,8.94C2.85,9.5 2.85,10.47 3.44,11.06L8.94,16.56C9.23,16.85 9.62,17 10,17C10.38,17 10.77,16.85 11.06,16.56L16.56,11.06C17.15,10.47 17.15,9.5 16.56,8.94Z"
-                        />
-                      </svg>
-                    )}
-                  </span>
-
+                  {tool === Tool.Fill && (
+                    <svg
+                      className="mt-1.5 ml-0.5 h-6 w-6 scale-x-[-1]"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M19,11.5C19,11.5 17,13.67 17,15A2,2 0 0,0 19,17A2,2 0 0,0 21,15C21,13.67 19,11.5 19,11.5M5.21,10L10,5.21L14.79,10M16.56,8.94L7.62,0L6.21,1.41L8.59,3.79L3.44,8.94C2.85,9.5 2.85,10.47 3.44,11.06L8.94,16.56C9.23,16.85 9.62,17 10,17C10.38,17 10.77,16.85 11.06,16.56L16.56,11.06C17.15,10.47 17.15,9.5 16.56,8.94Z"
+                      />
+                    </svg>
+                  )}
                 </span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="text-black">
-              Use color
-            </TooltipContent>
-          </Tooltip>
+
+              </span>
+            </button>
+          </CustomTooltip>
         </div>
       )}
     </motion.div>

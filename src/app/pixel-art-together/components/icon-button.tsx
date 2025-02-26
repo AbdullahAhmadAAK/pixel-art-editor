@@ -3,6 +3,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
+import { CustomTooltip } from "@/components/custom-tooltip";
 
 interface IconButtonProps {
   screenReader?: string;
@@ -22,22 +23,18 @@ export function IconButton({
   children,
 }: IconButtonProps) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          className={`relative flex h-10 w-10 items-center justify-center ${classes}`}
-          onClick={(e) => handleClick?.(e)}
-          variant={toggled ? "default" : "outline"} // Adjusted variants
-        >
-          <span className="sr-only">{screenReader}</span>
-          <div className="absolute inset-0 flex items-center justify-center">
-            {children}
-          </div>
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side="top" className={tooltipClasses}>
-        {screenReader}
-      </TooltipContent>
-    </Tooltip>
+
+    <CustomTooltip tooltipContent={screenReader} >
+      <Button
+        className={`relative flex h-10 w-10 items-center justify-center ${classes}`}
+        onClick={(e) => handleClick?.(e)}
+        variant={toggled ? "default" : "outline"} // Adjusted variants
+      >
+        <span className="sr-only">{screenReader}</span>
+        <div className="absolute inset-0 flex items-center justify-center">
+          {children}
+        </div>
+      </Button>
+    </CustomTooltip>
   );
 }

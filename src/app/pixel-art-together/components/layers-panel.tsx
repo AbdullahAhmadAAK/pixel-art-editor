@@ -19,6 +19,7 @@ import { Slider } from "@/components/ui/slider";
 
 import { motion } from "framer-motion";
 import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+import { CustomTooltip } from '@/components/custom-tooltip';
 
 export function LayersPanel({
   layers = [],
@@ -254,11 +255,11 @@ export function LayersPanel({
                     slot="trigger"
                     caret
                   >
-                    <SlTooltip content="Blend mode">
+                    <CustomTooltip tooltipContent='Blend mode'>
                       <span className="capitalize" ref={blendTextRef}>
                         {layers[getLayerIndexFromSelected()]?.blendMode || "normal"}
                       </span>
-                    </SlTooltip>
+                    </CustomTooltip>
                   </SlButton>
 
                   <SlMenu className="relative z-10">
@@ -333,7 +334,7 @@ export function LayersPanel({
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.5 }}
                   style={myPresence.selectedLayer === layer.id ?
-                    { backgroundColor: `var(--sl-color-primary-600)`, color: '#fff' } : 
+                    { backgroundColor: `var(--sl-color-primary-600)`, color: '#fff' } :
                     {}
                   }
                   className={`group relative flex cursor-pointer items-center justify-between gap-1 border-t py-0.5 hover:bg-[color:var(--sl-color-primary-50)] ${myPresence?.selectedLayer ===
@@ -406,7 +407,7 @@ export function LayersPanel({
                     {Math.round(layer.opacity * 100)}%, {layer.blendMode}
                   </div>
 
-                  <SlTooltip content="Delete" placement="top">
+                  <CustomTooltip tooltipContent='Delete'>
                     <button
                       onClick={(e) => deleteLayer(layer.id, e)}
                       className={`focus-visible-style relative ${myPresence?.selectedLayer === layer.id
@@ -427,7 +428,7 @@ export function LayersPanel({
                         />
                       </svg>
                     </button>
-                  </SlTooltip>
+                  </CustomTooltip>
                 </motion.div>
               ))}
             </div>
