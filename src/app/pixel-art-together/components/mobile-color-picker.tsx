@@ -1,36 +1,36 @@
-// Note: we used these two lines, due to an error within the shoelace library
-// alpha, saturation, brightness, and hue are all accessible values, but the TS error states that they are private and can't be accessed outside of the class.
-// Since there was no way to resolve them, I disabled typescript checking for this file.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
-import './mobile-color-picker.css'
 import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
 import { Tool } from '@/lib/types/pixel-art-editor/tool';
 import { useMyPresence, useUpdateMyPresence } from "@liveblocks/react";
-import { hexToRgb } from "@/app/pixel-art-together/lib/utils/hex-to-rgb";
-import type SlColorPickerType from '@shoelace-style/shoelace/dist/components/color-picker/color-picker.component.d.ts';
-import { useEffect, useRef, useState } from "react";
-import SlColorPicker, { SlChangeEvent } from '@shoelace-style/shoelace/dist/react/color-picker/index.js';
+import { useEffect, useState } from "react";
 import { DEFAULT_BRUSH_DATA } from '@/app/pixel-art-together/lib/utils/defaults';
 import { Swatch } from '@/app/pixel-art-together/lib/utils/swatch';
 
+import { hsvaToReadable } from '../lib/utils/hsva-to-readable';
+import { RgbaColorPicker } from "react-colorful";
+import { Colord, colord, RgbaColor } from "colord";
+import { hexToRgba } from '../utils/hex-to-rgb';
+import { RGBA } from '@/lib/types/pixel-art-editor/rgba';
+import { RGB } from '@/lib/types/pixel-art-editor/rgb';
+
 interface MobileColorPickerProps {
   handleBrushChange: ({ detail }: { detail: BrushData }) => void,
-  swatch: Swatch
+  updateColor: (hex: string) => void; // this will allow the color value to be set from within the component, as well as outside of it
+  swatch: Swatch,
+  colorValue: string;
+  setColorValue: (colorValue: string) => void;
 }
 
 export function MobileColorPicker({
   handleBrushChange,
-  swatch
+  updateColor,
+  swatch,
+  colorValue,
+  setColorValue
 }: MobileColorPickerProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
-
-  const colorPickerRef = useRef<SlColorPickerType | null>(null)
-  const [colorValue, setColorValue] = useState<string>("")
 
   const [brush, setBrush] = useState<BrushData>(DEFAULT_BRUSH_DATA)
 
@@ -49,49 +49,144 @@ export function MobileColorPicker({
 
   }, [setColorValue])
 
-  useEffect(() => {
-    if (colorPickerRef.current) {
-      colorPickerRef.current.swatches = swatch
-    }
-  }, [swatch])
-
-  // When color changes, update presence
-  function colorChange(e: SlChangeEvent) {
-    const target = e.target as SlColorPickerType
-
-    if (!colorPickerRef.current || !target) {
+  const pickColor = async () => {
+    if (!window.EyeDropper) {
+      alert("Your browser does not support the EyeDropper API.");
       return;
     }
 
-    let chosenColorValue = target.value; // can be in any format
-    if (chosenColorValue[0] !== "#") { // if it is not in hex format, change it
-      // note: I changed from hex to hexa, so that opacity changes in other formats could be detected and shown on the UI. Not sure why this was not an issue on the old repo.
-      chosenColorValue = colorPickerRef.current.getFormattedValue("hexa"); // format the chosen color's value (can be "rgba(147, 72, 72, 1.00)" as well as "#5d1111ff")
+    try {
+      const eyeDropper = new window.EyeDropper();
+      const result = await eyeDropper.open();
+      const colorInRgba = hexToRgba(result.sRGBHex)
+      if (colorInRgba) {
+        setColorRgbaObject(colorInRgba)
+      }
+    } catch (error) {
+      console.error("Eyedropper error:", error);
     }
+  };
 
-    // checks whether it's valid (at this moment, value is now in hex)
-    const rgb = hexToRgb(chosenColorValue.slice(0, 7))
-    if (!rgb) return;
-
-    // Note: we can ignore the errors "Property 'alpha' is private and only accessible within class 'SlColorPicker'.ts(2341)" and those for saturation and lightness, as the values are accessible
-    setBrush(DEFAULT_BRUSH_DATA)
-
-    setColorValue(chosenColorValue)
-
+  function colorChange(colorValueObject: RGBA) {
+    setColorRgbaObject(colorValueObject) // This will automatically set off a useEffect block to make the rest of the changes
     if (myPresence.tool === "eraser") {
-      // myPresence.update({ tool: "brush" });
       updateMyPresence({ tool: Tool.Brush })
     }
   }
 
+  const [colorRgbaObject, setColorRgbaObject] = useState<RGBA>({ r: 255, g: 0, b: 0, a: 1 });
+  const [colorColordInstance, setColorColordInstance] = useState<Colord | null>(null)
+
+  useEffect(() => {
+    const newColordInstance = colord(`rgba(${colorRgbaObject.r}, ${colorRgbaObject.g}, ${colorRgbaObject.b}, ${colorRgbaObject.a})`)
+    setColorColordInstance(newColordInstance)
+
+    updateColor(newColordInstance.toHex())
+
+    const newRgbaColorObject: Partial<RgbaColor> = newColordInstance.toRgb(); // Partial makes 'a' optional
+
+    if (newRgbaColorObject.a === undefined) { // Ensure 'a' is defined
+      newRgbaColorObject.a = 1;
+    }
+
+    const chosenOpacity = newRgbaColorObject.a;
+    const rgbColorObject: RGB = {
+      r: newRgbaColorObject.r! as number,
+      g: newRgbaColorObject.g! as number,
+      b: newRgbaColorObject.b! as number
+    }
+
+    setBrush({
+      color: newColordInstance.toHex(),
+      opacity: chosenOpacity,
+      hue: 1,
+      saturation: 1,
+      lightness: 1,
+      rgb: rgbColorObject
+    })
+
+  }, [colorRgbaObject])
+
+  const possibleFormats = ["hex", "rgba", "hsl", "hsv"] as const;
+  const [format, setFormat] = useState<(typeof possibleFormats)[number]>("hex");
+
+  const toggleFormat = () => {
+    setFormat((prev) => {
+      const currentIndex = possibleFormats.indexOf(prev);
+      return possibleFormats[(currentIndex + 1) % possibleFormats.length];
+    });
+  };
+
+  const [showColorPicker, setShowColorPicker] = useState<boolean>(false)
+
   return (
-    <SlColorPicker
-      ref={colorPickerRef}
-      className="mobile-color-picker"
-      onSlChange={colorChange}
-      opacity
-      value={colorValue}
-    >
-    </SlColorPicker>
+    <div className='relative'>
+      <button
+        className='rounded-full w-12 h-12'
+        style={{ backgroundColor: colorValue }}
+        onClick={() => setShowColorPicker(!showColorPicker)}
+      />
+
+      {showColorPicker && (
+        <div className='p-4 absolute top-[-520px] left-[-200px] w-60 h-[500px] bg-gray-300 border border-black'>
+
+          <div>
+            <RgbaColorPicker
+              color={colorRgbaObject}
+              onChange={colorChange}
+            />
+
+            {colorColordInstance && (
+              <div className="text-sm text-center mt-2">
+                {format === "hex" && <p><strong>HEX:</strong> {colorColordInstance.toHex()}</p>}
+                {format === "rgba" && <p><strong>RGB:</strong> {colorColordInstance.toRgbString()}</p>}
+                {format === "hsl" && <p><strong>HSL:</strong> {colorColordInstance.toHslString()}</p>}
+                {format === "hsv" && <p><strong>HSV:</strong> {hsvaToReadable(colorColordInstance.toHsv())}</p>}
+              </div>
+            )}
+
+            <button
+              onClick={toggleFormat}
+              className='border-gray-200 border-2'
+            >
+              {format}
+            </button>
+
+
+            <div className="grid grid-cols-8 gap-2 p-4">
+              {swatch.map((color, index) => (
+                <div
+                  key={index}
+                  className="w-6 h-6 rounded shadow"
+                  style={{ backgroundColor: color }}
+                  title={color}
+                />
+              ))}
+            </div>
+
+            {/* EyeDropper */}
+            <div className="flex flex-col items-center gap-4">
+              <button
+                onClick={pickColor}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md"
+              >
+                Pick Color
+              </button>
+
+              {colorValue && (
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-10 h-10 border"
+                    style={{ backgroundColor: colorValue }}
+                  ></div>
+                  <p>{colorValue}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 }

@@ -2,9 +2,8 @@
 
 import { copyUrlToClipboard } from "@/app/pixel-art-together/lib/utils/copy-text";
 import { useState } from "react";
-import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
+import { Button } from "@/components/ui/button";
 
-import '@shoelace-style/shoelace/dist/components/button/button.styles.js'
 export function CopyLinkButton() {
   const [copied, setCopied] = useState<boolean>(false)
 
@@ -15,7 +14,7 @@ export function CopyLinkButton() {
   }
 
   return (
-    <SlButton className="mt-2 w-full" disabled={copied} onClick={copy}>
+    <Button className="mt-2 w-full" disabled={copied} onClick={copy}>
       {copied ? (
         <>Copied!</>
       ) : (
@@ -36,6 +35,6 @@ export function CopyLinkButton() {
         </>
       )
       }
-    </SlButton>
+    </Button>
   );
 }

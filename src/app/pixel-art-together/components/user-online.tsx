@@ -3,9 +3,9 @@ import Image from 'next/image';
 import { Tool } from "@/lib/types/pixel-art-editor/tool";
 import ntc from '@/app/pixel-art-together/lib/utils/name-that-color';
 import { useEffect, useMemo, useState } from 'react';
-import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
 import { contrastingTextColour } from '@/app/pixel-art-together/lib/utils/contrasting-text-colour';
 import { BrushData } from "@/lib/types/pixel-art-editor/brush-data";
+import { CustomTooltip } from "@/components/custom-tooltip";
 
 interface UserOnlineProps {
   short?: boolean;
@@ -86,7 +86,7 @@ export function UserOnline({
       {!short && (
         // Copyable color preview 
         <div className={isYou ? "pointer-events-none" : ""}>
-          <SlTooltip content="Use color">
+          <CustomTooltip tooltipContent="Use color">
             <button
               onClick={handleColorChange}
               className="focus-visible-style transparent-bg group relative h-[40px] w-[40px] rounded-[4px]"
@@ -133,7 +133,7 @@ export function UserOnline({
 
               </span>
             </button>
-          </SlTooltip>
+          </CustomTooltip>
         </div>
       )}
     </motion.div>
