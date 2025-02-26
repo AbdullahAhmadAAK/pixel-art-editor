@@ -1,6 +1,8 @@
 import PixelArtEditorClientComponent from './components/page-client-components';
 import { Room } from '../room';
-import "@/shoelace-styles.css"; // TODO: remove at end when everyting converted from shoelace to oter
+
+// This contains a lot of general styles used in the pixel art page, so we kept this, even though it has a lot of styles regarding shoelace components. Would recommend changing its contents or at least renaming it.
+import "@/shoelace-styles.css";
 
 export default function PixelArtEditor() {
   return (
