@@ -75,11 +75,6 @@ export function PixelGrid({
     }
 
     handlePixelChange({ detail: { col, row, hex } })
-    // dispatch("pixelChange", {
-    //   col,
-    //   row,
-    //   hex,
-    // });
   }
 
   // const layerMove = debounce(

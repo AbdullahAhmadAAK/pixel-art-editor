@@ -9,7 +9,6 @@ interface IconButtonProps {
   screenReader?: string;
   toggled?: boolean;
   classes?: string;
-  tooltipClasses?: string;
   handleClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   children?: ReactNode;
 }
@@ -18,7 +17,6 @@ export function IconButton({
   screenReader = "",
   toggled = false,
   classes = "",
-  tooltipClasses = "text-black",
   handleClick,
   children,
 }: IconButtonProps) {

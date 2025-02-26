@@ -4,17 +4,8 @@ import { generateLayer } from "@/app/pixel-art-together/lib/utils/generate-layer
 import { blendModes } from "@/app/pixel-art-together/lib/utils/blend-modes";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import SlMenu from '@shoelace-style/shoelace/dist/react/menu/index.js';
-import SlMenuItem from '@shoelace-style/shoelace/dist/react/menu-item/index.js';
-import SlDropdown from '@shoelace-style/shoelace/dist/react/dropdown/index.js';
-import SlButton from '@shoelace-style/shoelace/dist/react/button/index.js';
-import SlTooltip from '@shoelace-style/shoelace/dist/react/tooltip/index.js';
-import SlRange from '@shoelace-style/shoelace/dist/react/range/index.js';
-import type SlRangeType from '@shoelace-style/shoelace/dist/components/range/range.component.d.ts';
-
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Slider } from "@/components/ui/slider";
 
 import { motion } from "framer-motion";
@@ -53,14 +44,7 @@ export function LayersPanel({
     setWillExceedPixelCount(newBoolean)
   }, [layerPixelCount, maxPixels, layers])
 
-  const rangeElementRef = useRef<SlRangeType | null>(null);
   const blendTextRef = useRef<HTMLSpanElement | null>(null);
-
-  useEffect(() => {
-    if (rangeElementRef?.current) {
-      rangeElementRef.current.tooltipFormatter = (value) => `Opacity: ${value}%`;
-    }
-  }, [rangeElementRef])
 
   const getLayerIndexFromSelected = useCallback(
     () => {
@@ -71,12 +55,6 @@ export function LayersPanel({
       }
       return 0;
     }, [layers, myPresence])
-
-  useEffect(() => {
-    if (rangeElementRef?.current) {
-      rangeElementRef.current.value = layers[getLayerIndexFromSelected()]?.opacity * 100 || 0;
-    }
-  }, [layers, getLayerIndexFromSelected])
 
   const [addingNewLayer, setAddingNewLayer] = useState<boolean>(false)
 
@@ -102,7 +80,7 @@ export function LayersPanel({
   }, [layerStorage, whenLayersUpdate])
 
   // Update current layer blend mode on change
-  const handleBlendModeChange = useMutation(({ storage }, { detail }) => {
+  const handleBlendModeChange = useMutation(({ storage }, args) => {
     const layerStorage = storage.get('layerStorage')
     if (!myPresence || !layerStorage || !blendTextRef?.current) {
       return;
@@ -111,15 +89,25 @@ export function LayersPanel({
     const layerStorageObject = layerStorage.toObject()
     const index = myPresence.selectedLayer;
     const oldLayer = layerStorageObject[index];
-    const newLayer = { ...oldLayer, blendMode: detail.item.dataset.value };
+    const newBlendModeValue = args.target.dataset.value
+    const newLayer = { ...oldLayer, blendMode: newBlendModeValue };
 
     layerStorage.set(myPresence.selectedLayer, newLayer)
-    blendTextRef.current.innerText = detail.item.dataset.value;
+    blendTextRef.current.innerText = newBlendModeValue;
   }, [])
 
+  // console.log('checkgayy meee:', layerStorage)
+  // console.log('seld layer: ', myPresence.selectedLayer);
+
+  // console.log('step 3 access layet: ', layerStorage[myPresence.selectedLayer]);
+
+  // console.log('check meee:', layerStorage, layerStorage[myPresence.selectedLayer].opacity)
+
   // Update current layer opacity on change
-  const handleOpacityChange = useMutation(({ storage }, event) => {
-    const target = event.target
+  // newOpacity will be between 0 and 100, as that's what we've set up the Slider component to be
+  const handleOpacityChange = useMutation(({ storage }, newOpacity) => {
+
+
     const layerStorage = storage.get('layerStorage')
     if (!myPresence || !layerStorage) {
       return;
@@ -128,7 +116,7 @@ export function LayersPanel({
     const layerStorageObject = layerStorage.toObject()
     const firstIndex = myPresence.selectedLayer;
     const oldLayer = layerStorageObject[firstIndex];
-    const newLayer: Layer = { ...oldLayer, opacity: target.value / 100 };
+    const newLayer: Layer = { ...oldLayer, opacity: newOpacity / 100 };
     layerStorage.set(myPresence.selectedLayer, newLayer)
   }, [myPresence.selectedLayer])
 
@@ -218,10 +206,6 @@ export function LayersPanel({
       blendTextRef.current.innerText =
         layers[getLayerIndexFromSelected()]?.blendMode || "normal";
     }
-    if (rangeElementRef.current) {
-      rangeElementRef.current.value =
-        layers[getLayerIndexFromSelected()]?.opacity * 100 || 100;
-    }
   }
 
   // Selects the top layer
@@ -245,7 +229,27 @@ export function LayersPanel({
               <div className="items-middle relative z-10 flex justify-between border-b">
                 <label htmlFor="blend-mode-changer" className="sr-only">Change blend mode</label>
 
-                <SlDropdown
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="focus-visible:z-10">
+                      <CustomTooltip tooltipContent="Blend mode">
+                        <span className="capitalize" ref={blendTextRef}>
+                          {layers[getLayerIndexFromSelected()]?.blendMode || "normal"}
+                        </span>
+                      </CustomTooltip>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="relative z-10">
+                    {blendModes.map((mode) => (
+                      <DropdownMenuItem key={"blendModes" + mode.name} data-value={mode.name} onSelect={handleBlendModeChange}>
+                        <div className="text-sm">{mode.label}</div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* <SlDropdown
                   id="blend-mode-changer"
                   onSelect={handleBlendModeChange}
                 >
@@ -269,14 +273,18 @@ export function LayersPanel({
                       </SlMenuItem>
                     ))}
                   </SlMenu>
-                </SlDropdown>
+                </SlDropdown> */}
 
                 <div className="flex max-w-[140px] items-center justify-center pr-4">
                   <label htmlFor="opacity-changer" className="sr-only">Change opacity</label>
-                  <SlRange
+                  <Slider
                     id="opacity-changer"
-                    onInput={handleOpacityChange}
-                    ref={rangeElementRef}
+                    onValueChange={(valueArray) => handleOpacityChange(valueArray[0])} // Slider returns an array
+                    value={[layers[getLayerIndexFromSelected()]?.opacity * 100]} // Set a default value if needed
+                    max={100}
+                    min={0}
+                    step={1}
+                    className='w-[200px]'
                   />
                 </div>
               </div>
@@ -326,7 +334,7 @@ export function LayersPanel({
 
             {/* <!-- All layers --> */}
             <div className="flex flex-col-reverse">
-              {layers.map(layer => (
+              {layers.map((layer) => (
                 <motion.div
                   key={layer.id}
                   initial={{ opacity: 0, x: -50 }}
@@ -350,7 +358,7 @@ export function LayersPanel({
                   </button>
 
                   <div className="relative flex items-center">
-                    <SlTooltip content={layer.hidden ? "Show" : 'Hide'}>
+                    <CustomTooltip tooltipContent={layer.hidden ? "Show" : 'Hide'}>
                       <button
                         onClick={(e) => toggleVisibility(layer.id, e)}
                         className={`focus-visible-style focus-visible:!opacity-100 ${myPresence?.selectedLayer ===
@@ -396,7 +404,7 @@ export function LayersPanel({
                           </>
                         )}
                       </button>
-                    </SlTooltip>
+                    </CustomTooltip>
 
                     <span className={`font-medium ${myPresence?.selectedLayer === layer.id ? 'font-bold' : ''}`}>
                       Layer {layer.id}
