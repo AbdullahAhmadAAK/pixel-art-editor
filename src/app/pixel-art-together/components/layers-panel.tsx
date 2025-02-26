@@ -241,38 +241,12 @@ export function LayersPanel({
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* <SlDropdown
-                  id="blend-mode-changer"
-                  onSelect={handleBlendModeChange}
-                >
-                  <SlButton
-                    className="focus-visible:z-10"
-                    variant="text"
-                    slot="trigger"
-                    caret
-                  >
-                    <CustomTooltip tooltipContent='Blend mode'>
-                      <span className="capitalize" ref={blendTextRef}>
-                        {layers[getLayerIndexFromSelected()]?.blendMode || "normal"}
-                      </span>
-                    </CustomTooltip>
-                  </SlButton>
-
-                  <SlMenu className="relative z-10">
-                    {blendModes.map(mode => (
-                      <SlMenuItem key={"blendModes" + mode.name} data-value={mode.name}>
-                        <div className="text-sm">{mode.label}</div>
-                      </SlMenuItem>
-                    ))}
-                  </SlMenu>
-                </SlDropdown> */}
-
                 <div className="flex max-w-[140px] items-center justify-center pr-4">
                   <label htmlFor="opacity-changer" className="sr-only">Change opacity</label>
                   <Slider
                     id="opacity-changer"
                     onValueChange={(valueArray) => handleOpacityChange(valueArray[0])} // Slider returns an array
-                    value={[layers[getLayerIndexFromSelected()]?.opacity * 100]} // Set a default value if needed
+                    value={[layers[getLayerIndexFromSelected()]?.opacity * 100]}
                     max={100}
                     min={0}
                     step={1}
