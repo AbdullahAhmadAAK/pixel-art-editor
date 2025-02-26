@@ -1,5 +1,4 @@
 'use client'
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 
@@ -62,6 +61,8 @@ export default function PixelArtEditorClientComponent() {
     window.addEventListener("orientationchange", onResize);
 
   }, [])
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [myPresence, _] = useMyPresence();
   const updateMyPresence = useUpdateMyPresence();
 
@@ -190,7 +191,7 @@ export default function PixelArtEditorClientComponent() {
     })
   }, []);
 
-  const updateLayerStorageWithLayer = useMutation(({ storage }, layerKey, layer) => {
+  const updateLayerStorageWithLayer = useMutation(({ storage }) => {
     const layerStorage = storage.get('layerStorage')
     layerStorage.set(0, {
       id: 0,
@@ -212,12 +213,7 @@ export default function PixelArtEditorClientComponent() {
         });
 
         updatePixelStorageWithLayer(defaultLayerPixels);
-        updateLayerStorageWithLayer(0, {
-          id: 0,
-          opacity: 1,
-          blendMode: "normal",
-          hidden: false,
-        });
+        updateLayerStorageWithLayer();
 
         setName({ detail });
       }

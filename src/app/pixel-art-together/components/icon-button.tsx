@@ -1,6 +1,5 @@
 "use client";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 import { CustomTooltip } from "@/components/custom-tooltip";

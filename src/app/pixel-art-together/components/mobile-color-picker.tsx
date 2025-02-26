@@ -99,13 +99,10 @@ export function MobileColorPicker({
     setBrush({
       color: newColordInstance.toHex(),
       opacity: chosenOpacity,
-      hue: 1,
-      saturation: 1,
-      lightness: 1,
       rgb: rgbColorObject
     })
 
-  }, [colorRgbaObject])
+  }, [colorRgbaObject, updateColor])
 
   const possibleFormats = ["hex", "rgba", "hsl", "hsv"] as const;
   const [format, setFormat] = useState<(typeof possibleFormats)[number]>("hex");
