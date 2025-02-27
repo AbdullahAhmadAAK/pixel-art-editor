@@ -40,7 +40,7 @@ import { UserOnline } from '@/app/pixel-art-together/components/user-online';
 import { PixelGrid as PixelGridSegment } from '@/app/pixel-art-together/components/pixel-grid';
 import Image from 'next/image';
 import { MobileColorPicker } from '@/app/pixel-art-together/components/mobile-color-picker';
-import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+import { DEFAULT_BRUSH_DATA, DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
 import { Swatch } from '../lib/utils/swatch';
 
 import { PixelStorage } from '@/lib/types/pixel-art-editor/pixel-storage';
@@ -236,7 +236,7 @@ export default function PixelArtEditorClientComponent() {
   const [showMove, setShowMove] = useState<boolean>(false)
 
   // This is the value used in brush panel component, added by me only
-  const [colorValue, setColorValue] = useState<string>("")
+  const [colorValue, setColorValue] = useState<string>(DEFAULT_BRUSH_DATA.color)
 
   // Will be bound to a function that allows the current color to be updated
   const updateBrushColor = useCallback((hex: string) => {

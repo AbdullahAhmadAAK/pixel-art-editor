@@ -11,6 +11,7 @@ import { Colord, colord, RgbaColor } from "colord";
 import { hexToRgba } from '../utils/hex-to-rgb';
 import { RGBA } from '@/lib/types/pixel-art-editor/rgba';
 import { RGB } from '@/lib/types/pixel-art-editor/rgb';
+import { pickEyedropperColor } from '../lib/utils/pick-eyedropper-color';
 
 interface MobileColorPickerProps {
   handleBrushChange: ({ detail }: { detail: BrushData }) => void,
@@ -38,33 +39,19 @@ export function MobileColorPicker({
     handleBrushChange({ detail: brush })
   }, [brush, handleBrushChange])
 
-  useEffect(() => {
-    if (setColorValue) {
-      const applyPostmountLogic = async () => {
-        setColorValue("#fa3030")
-      }
-
-      applyPostmountLogic()
-    }
-
-  }, [setColorValue])
-
-  const pickColor = async () => {
-    if (!window.EyeDropper) {
-      alert("Your browser does not support the EyeDropper API.");
-      return;
-    }
-
-    try {
-      const eyeDropper = new window.EyeDropper();
-      const result = await eyeDropper.open();
-      const colorInRgba = hexToRgba(result.sRGBHex)
-      if (colorInRgba) {
-        setColorRgbaObject(colorInRgba)
-      }
-    } catch (error) {
-      console.error("Eyedropper error:", error);
-    }
+  /**
+  * Handles the click event for the color picker button.
+  * 
+  * This function serves as a wrapper around `pickEyedropperColor`, ensuring 
+  * that the function is called with the correct argument (`setColorRgbaObject`) 
+  * without causing TypeScript type mismatches.
+  * 
+  * @param {React.MouseEvent<HTMLButtonElement>} event - The click event from the button.
+  * @returns {Promise<void>} A promise that resolves after picking the color.
+  */
+  const handlePickColor = async (event: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    event.preventDefault(); // Prevents any default button behavior
+    await pickEyedropperColor(setColorRgbaObject);
   };
 
   function colorChange(colorValueObject: RGBA) {
@@ -164,7 +151,7 @@ export function MobileColorPicker({
             {/* EyeDropper */}
             <div className="flex flex-col items-center gap-4">
               <button
-                onClick={pickColor}
+                onClick={handlePickColor}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md"
               >
                 Pick Color

@@ -1,16 +1,37 @@
 'use client'
 
+// React & Hooks
+import { JSX, useState } from "react";
+
+// Utilities & Helpers
 import { copyUrlToClipboard } from "@/app/pixel-art-together/lib/utils/copy-text";
-import { useState } from "react";
+
+// Internal components
 import { Button } from "@/components/ui/button";
 
-export function CopyLinkButton() {
-  const [copied, setCopied] = useState<boolean>(false)
+/**
+ * CopyLinkButton Component
+ *
+ * This component renders a button that allows users to copy the current page URL to their clipboard.
+ * It provides visual feedback by displaying "Copied!" temporarily after the button is clicked.
+ *
+ * @component
+ * @returns {JSX.Element} A button that copies the URL when clicked.
+ */
+export function CopyLinkButton(): JSX.Element {
+  // State to track whether the URL has been copied
+  const [copied, setCopied] = useState<boolean>(false);
 
+  /**
+   * Handles the copy action by copying the URL to the clipboard and 
+   * temporarily displaying a "Copied!" message.
+   */
   function copy() {
     copyUrlToClipboard();
     setCopied(true);
-    setTimeout(() => (setCopied(false)), 1000);
+
+    // Reset copied state after 1 second
+    setTimeout(() => setCopied(false), 1000);
   }
 
   return (
@@ -33,8 +54,7 @@ export function CopyLinkButton() {
           </svg>
           Click to copy link
         </>
-      )
-      }
+      )}
     </Button>
   );
 }

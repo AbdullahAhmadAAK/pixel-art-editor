@@ -23,6 +23,8 @@ export function Room({ children }: { children: ReactNode }) {
 
   return (
     <LiveblocksProvider
+      // This is the API route, to which a POST request is sent containing the 'id' prop we send to RoomProvider as 'room' in the request body 
+      // So if the roomId variable is "3bfa8992ff9a93a67aa1f", the 'room' parameter in the request body will be "sveltekit-pixel-art-3bfa8992ff9a93a67aa1f"
       authEndpoint={'/api/auth'}
     >
       <RoomProvider
