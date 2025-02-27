@@ -8,7 +8,6 @@ import { Swatch } from '@/app/pixel-art-together/lib/utils/swatch';
 import { hsvaToReadable } from '../lib/utils/hsva-to-readable';
 import { RgbaColorPicker } from "react-colorful";
 import { Colord, colord, RgbaColor } from "colord";
-import { hexToRgba } from '../utils/hex-to-rgb';
 import { RGBA } from '@/lib/types/pixel-art-editor/rgba';
 import { RGB } from '@/lib/types/pixel-art-editor/rgb';
 import { pickEyedropperColor } from '../lib/utils/pick-eyedropper-color';

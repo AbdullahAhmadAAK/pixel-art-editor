@@ -1,5 +1,10 @@
-if (!process.env.LIVEBLOCKS_SECRET_KEY) throw new Error("LIVEBLOCKS_SECRET_KEY not set in environment variables");
-
+/**
+ * Configuration settings for the Pixel Art Editor.
+ */
 export const PIXEL_ART_EDITOR_CONFIG = {
-  api_key: process.env.LIVEBLOCKS_SECRET_KEY
-}
+  /**
+   * API key for authenticating with Liveblocks.
+   * This is pulled from the environment variables.
+   */
+  api_key: process.env.LIVEBLOCKS_SECRET_KEY!,
+};

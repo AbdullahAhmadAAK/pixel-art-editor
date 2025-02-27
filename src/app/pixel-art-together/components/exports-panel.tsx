@@ -1,17 +1,34 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Canvg } from "canvg";
+// React & Hooks
 import { useState } from "react";
 
-export function ExportsPanel({
-  width = 2000,
-  ratio = 1,
-}: {
+// Third-Party Libraries
+import { Canvg } from "canvg";
+
+// Internal components
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+/**
+ * Props for the ExportsPanel component
+ */
+interface ExportsPanelProps {
+  /** Width of the export canvas */
   width?: number;
+  /** Aspect ratio of the exported image */
   ratio?: number;
-}) {
-  let renderer;
+}
+
+/**
+ * ExportsPanel allows users to download pixel art in SVG or PNG format.
+ *
+ * @component
+ * @param {ExportsPanelProps} props - The component props
+ */
+export function ExportsPanel({ width = 2000, ratio = 1 }: ExportsPanelProps) {
+  let renderer: Canvg;
   const [selected, setSelected] = useState("svg");
 
+  /**
+   * Handles saving the image as an SVG file.
+   */
   function handleSaveSvg() {
     const queryResult = document.querySelector("#svg-image");
     if (!queryResult) return;
@@ -23,6 +40,9 @@ export function ExportsPanel({
     downloadFile(file);
   }
 
+  /**
+   * Handles saving the image as a PNG file.
+   */
   async function handleSavePng() {
     const svgQueryResult = document.querySelector("#svg-image");
     const canvasQueryResult = document.querySelector(
@@ -50,6 +70,11 @@ export function ExportsPanel({
     });
   }
 
+  /**
+   * Downloads a file by creating a temporary link element.
+   *
+   * @param {File} file - The file to be downloaded
+   */
   function downloadFile(file: File) {
     const link = document.createElement("a");
     link.style.display = "none";
@@ -72,7 +97,7 @@ export function ExportsPanel({
         height={width * ratio}
         id="export-canvas"
         width={width}
-      ></canvas>
+      />
 
       <div className="border-t-2 border-gray-100 p-5">
         <div className="pb-3 text-sm font-semibold text-gray-500">Exports</div>

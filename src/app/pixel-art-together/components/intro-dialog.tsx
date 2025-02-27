@@ -66,7 +66,6 @@ export function IntroDialog({
     <Dialog open={open} onOpenChange={() => { }}>
       <DialogContent className="max-w-sm sm:max-w-md">
         <DialogHeader>
-          asasas
           <DialogTitle className="text-center">Create a Pixel Canvas</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center">

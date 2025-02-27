@@ -16,8 +16,6 @@ export function hexToRgb(hex: string): RGB | null {
 export function hexToRgba(hex: string): RGBA | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
 
-  console.log('for hex input:', hex, 'I got result: ', result)
-
   return result
     ? {
       r: parseInt(result[1], 16),
