@@ -145,7 +145,7 @@ export function LayersPanel({
   const addLayer = useMutation(({ storage }) => {
     if (!layerStorage || !layers[0]?.grid) return;
 
-    let newId = Math.max(...Object.values(layerStorage).map(layer => layer.id), 0) + 1;
+    const newId = Math.max(...Object.values(layerStorage).map(layer => layer.id), 0) + 1;
 
     const generatedLayer = generateLayer({
       layer: newId,
