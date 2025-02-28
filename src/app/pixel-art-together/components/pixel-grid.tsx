@@ -1,22 +1,57 @@
 'use client'
+
+// React & Hooks
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+// Third-Party Libraries
+import { useHistory, useMyPresence } from "@liveblocks/react";
+import panzoom from "panzoom"
+import type { PanZoom } from "panzoom"
 import { motion } from "framer-motion";
 import { debounce } from "lodash"
 
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { useHistory, useMyPresence } from "@liveblocks/react";
-import { IconButton } from '@/app/pixel-art-together/components/icon-button';
+// Types
 import { Layer } from "@/lib/types/pixel-art-editor/layer";
 import { Direction } from "@/lib/types/pixel-art-editor/direction";
-import panzoom from "panzoom"
-import type { PanZoom } from "panzoom"
 
+// Internal components
+import { IconButton } from '@/app/pixel-art-together/components/icon-button';
+
+/**
+ * Props for the PixelGrid component, defining the structure and expected types.
+ */
 interface PixelGridProps {
+  /**
+   * Array of layers representing the pixel grid.
+   */
   layers: Layer[];
+
+  /**
+   * Boolean flag indicating whether the grid lines should be displayed.
+   */
   showGrid: boolean;
+
+  /**
+   * Boolean flag indicating whether the user can move layers.
+   */
   showMove: boolean;
-  mainPanelElementRef: RefObject<HTMLDivElement | null>
-  handlePixelChange: ({ detail }: { detail: { col: number; row: number; hex: string; }; }) => void
-  handleLayerMove: ({ detail }: { detail: { direction: Direction; }; }) => void
+
+  /**
+   * Reference to the main panel container element, used for positioning or event handling.
+   */
+  mainPanelElementRef: RefObject<HTMLDivElement | null>;
+
+  /**
+   * Callback function triggered when a pixel is changed.
+   * Receives an event detail containing column index, row index, and the new hex color.
+   */
+  handlePixelChange: ({ detail }: { detail: { col: number; row: number; hex: string } }) => void;
+
+  /**
+   * Callback function triggered when a layer is moved.
+   * Receives an event detail specifying the movement direction.
+   */
+  handleLayerMove: ({ detail }: { detail: { direction: Direction } }) => void;
 }
 
 export function PixelGrid({
@@ -28,178 +63,148 @@ export function PixelGrid({
   handleLayerMove
 }: PixelGridProps) {
 
+  // -----------------------------------
+  // State & Refs
+  // -----------------------------------
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [myPresence, _] = useMyPresence();
+  const history = useHistory(); // This will be used to allow us to undo/redo changes to the pixels
 
-  const mainPanelWrapperRef = useRef<HTMLDivElement | null>(null)
-  const layersCache = layers;
+  // Tracks whether mouse is pressed, needed to enable tracking of history + change UI of cursor
+  const [mouseIsDown, setMouseIsDown] = useState<boolean>(false);
 
-  // Width and height
-  const cols = layers && layers[0].grid ? layers[0].grid.length : 0;
-  const rows = layers && layers[0].grid ? layers[0].grid[0].length : 0;
+  // Tracks whether the user is currently panning
+  const [panning, setPanning] = useState<boolean>(false);
 
-  const [mouseIsDown, setMouseIsDown] = useState<boolean>(false)
+  // Tracks previously hovered pixel so that we don't end up attempting to color it again
+  const [previousHoveredPixel, setPreviousHoveredPixel] = useState<Element | EventTarget | null>(null);
 
-  const panElementRef = useRef<HTMLDivElement | null>(null)
+  // These 3 refs are needed to enable panzoom and also to bring aspect ratio support for some browsers
+  const mainPanelWrapperRef = useRef<HTMLDivElement | null>(null);
+  const panElementRef = useRef<HTMLDivElement | null>(null);
   const panInstanceRef = useRef<PanZoom | null>(null);
-  const [panning, setPanning] = useState<boolean>(false)
 
-  const history = useHistory();
+  // Memoized values to improve performance
 
-  // This will either turn on or turn off the panning mode on the panzoom instance, based on what the panning state variable is set as
+  // I think we could do without this by directly using 'layers' too. But I did not change this from the sveltekit app so as not to break anything. 
+  const layersCache = useMemo(() => layers, [layers]);
+
+  // These are needed for the styling of the pixel grid + the aspect ratio support for browsers
+  const cols = useMemo(() => layers && layers[0].grid ? layers[0].grid.length : 0, [layers]);
+  const rows = useMemo(() => layers && layers[0].grid ? layers[0].grid[0].length : 0, [layers]);
+
+  // This is needed for styling of the row element in the pixel grid
+  const colsIn100 = useMemo(() => 100 / cols, [cols]);
+
+  // -----------------------------------
+  // useEffect blocks
+  // -----------------------------------
+
+  /**
+   * Enables or disables panning mode on the panzoom instance.
+   */
   useEffect(() => {
     if (panInstanceRef.current) {
       panInstanceRef.current[panning ? "resume" : "pause"]();
     }
-  }, [panInstanceRef, panning])
+  }, [panInstanceRef, panning]);
 
-
-  const [previousHoveredPixel, setPreviousHoveredPixel] = useState<Element | EventTarget | null>(null);
-
-  const handleKeyDown = ({ code }: { code: KeyboardEvent["code"] }) => {
-    if (panInstanceRef.current && code === "Space") {
-      setPanning(true);
-    }
-  };
-
-  const handleKeyUp = ({ code }: { code: KeyboardEvent["code"] }) => {
-    if (panInstanceRef.current && code === "Space") {
-      setPanning(false)
-    }
-  };
-
-  // Change pixel if not panning
-  function pixelChange({ col, row, hex }: { col: number, row: number, hex: string }) {
-    if (panning) {
-      return;
-    }
-
-    handlePixelChange({ detail: { col, row, hex } })
-  }
-
-  // const layerMove = debounce(
-  //   function (direction: Direction) {
-  //     handleLayerMove({ detail: { direction } })
-  //   },
-  //   100,
-  //   true
-  // );
-  const layerMove = (direction: Direction) => {
-    debouncedLayerMove(direction)
-  }
-
-  const debouncedLayerMove = debounce((direction: Direction) => {
-    handleLayerMove({ detail: { direction } });
-  }, 100);
-
-
-  function handleMouseDown() {
-    setMouseIsDown(true);
-    history.pause();
-  }
-
-  function handleMouseUp() {
-    setMouseIsDown(false)
-    history.resume();
-  }
-
-  // If mouse down, change pixel
-  function handleMouseMove({ target, col, row, hex }: { target: Element | EventTarget, col: number, row: number, hex: string }) {
-    if (!mouseIsDown || previousHoveredPixel === target) {
-      return;
-    }
-    setPreviousHoveredPixel(target)
-    pixelChange({ col, row, hex });
-  }
-
-  // TODO: this function was passed hex, row, col, but here definition was only for hex. will be changing the usage of this function against old dev's way
-  // On touch move, take hovered col/row from data-col/data-row and pass to handleMouseMove
-  function handleTouchMove(event: React.TouchEvent<HTMLDivElement>, { hex }: { hex: string }) {
-    const location =
-      event?.touches?.[0] ||
-      event?.changedTouches?.[0] ||
-      event?.targetTouches?.[0];
-    const target = document.elementFromPoint(
-      location.clientX,
-      location.clientY
-    );
-
-    // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)". It was added by old dev.
-    if (target?.dataset?.col && target?.dataset?.row) {
-      // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)". It was added by old dev.
-      const { col, row } = target.dataset;
-
-      const colNumber = Number(col)
-      const rowNumber = Number(row)
-
-      handleMouseMove({ target, hex, col: colNumber, row: rowNumber }); // here, target is sent as Element
-    }
-  }
-
-  // Fallback for browsers that don't support CSS `aspect-ratio` (CSS fallback not possible here)
+  /**
+ * Adjusts element dimensions dynamically for browsers that do not support CSS `aspect-ratio`.
+ * Ensures the main panel maintains the correct aspect ratio (`rows / cols`).
+ *
+ * This function:
+ * - Checks if `aspect-ratio` is supported via `CSS.supports()`.
+ * - If unsupported, calculates the correct width & height for the panel.
+ * - Applies calculated dimensions to maintain the intended aspect ratio.
+ *
+ * Dependencies: `cols` and `rows`
+ *
+ * @function fixAspectRatioSupport
+ * @returns {void} No return value. Updates the `style` of `mainPanelWrapperElement`.
+ */
   const fixAspectRatioSupport = useCallback(() => {
+    // Check if the browser supports CSS aspect-ratio
     if (CSS.supports("aspect-ratio", `${rows} / ${cols}`)) {
-      return;
+      return; // If supported, no need for fallback adjustments
     }
 
     console.warn("CSS aspect-ratio not supported, using fallback");
 
-    const mainPanelWrapperElement = mainPanelWrapperRef?.current
-    const panElement = panElementRef?.current
+    // Get references to the wrapper and pan elements
+    const mainPanelWrapperElement = mainPanelWrapperRef?.current;
+    const panElement = panElementRef?.current;
 
+    // Ensure both elements exist before proceeding
     if (!mainPanelWrapperElement || !panElement) return;
 
+    // Retrieve maximum allowed width and current width of the wrapper
     const maxWidth = parseInt(getComputedStyle(mainPanelWrapperElement).maxWidth);
     const currentWidth = mainPanelWrapperElement.offsetWidth;
 
+    // Get computed padding values of the `panElement`
     const { paddingTop, paddingRight, paddingBottom, paddingLeft } = getComputedStyle(panElement);
+
+    // Get the actual width and height of `panElement`
     const { offsetHeight, offsetWidth } = panElement;
 
+    // Calculate the wrapper's available width & height excluding padding
     const wrapperWidth = offsetWidth - parseFloat(paddingRight) - parseFloat(paddingLeft);
     const wrapperHeight = offsetHeight - parseFloat(paddingTop) - parseFloat(paddingBottom);
 
-    const wrapperRatio = wrapperWidth / wrapperHeight;
-    const artRatio = rows / cols;
+    // Compute aspect ratios for comparison
+    const wrapperRatio = wrapperWidth / wrapperHeight; // Current wrapper ratio
+    const artRatio = rows / cols; // Expected aspect ratio based on `rows` & `cols`
 
+    // Initialize width and height for the wrapper
     let width: string;
     let height: string;
 
+    // Adjust dimensions based on the ratio comparison
     if (wrapperRatio > artRatio) {
+      // Case: Wrapper is wider than the intended aspect ratio
       if (wrapperHeight * artRatio > maxWidth) {
         width = "100%";
-        height = maxWidth * artRatio + "px";
+        height = `${maxWidth * artRatio}px`;
       } else {
         height = "100%";
-        width = wrapperHeight * artRatio + "px";
+        width = `${wrapperHeight * artRatio}px`;
       }
     } else {
+      // Case: Wrapper is taller than the intended aspect ratio
       if (wrapperWidth * artRatio > maxWidth) {
-        height = currentWidth / artRatio + "px";
+        height = `${currentWidth / artRatio}px`;
         width = "100%";
       } else {
-        height = wrapperWidth / artRatio + "px";
+        height = `${wrapperWidth / artRatio}px`;
         width = "100%";
       }
     }
 
+    // Apply computed width & height styles to maintain aspect ratio
     mainPanelWrapperElement.style.height = height;
     mainPanelWrapperElement.style.width = width;
-  }, [cols, rows])
+  }, [cols, rows]);
 
+  /**
+   * Initializes panzoom and sets up event listeners for resizing.
+   */
   useEffect(() => {
-    // Add panning support to canvas (hold space to pan)
     if (panElementRef.current) {
       panInstanceRef.current = panzoom(panElementRef.current);
-      panInstanceRef.current.pause() // The panzoom instance is turned on by default, so we need to pause it until a space keydown event turns it on 
-      setPanning(false)
+      panInstanceRef.current.pause();
+      setPanning(false);
 
       fixAspectRatioSupport();
       window.addEventListener("resize", fixAspectRatioSupport);
       window.addEventListener("orientationchange", fixAspectRatioSupport);
     }
-  }, [fixAspectRatioSupport])
+  }, [fixAspectRatioSupport]);
 
-  // Code for the svelte:window
+  /**
+   * Adds keydown and keyup event listeners for panning.
+   */
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
@@ -210,7 +215,118 @@ export function PixelGrid({
     };
   }, []);
 
-  const colsIn100 = 100 / cols
+  // -----------------------------------
+  // Functions
+  // -----------------------------------
+
+  /**
+   * Handles keydown events to activate the panning state.
+   * @param {Object} event - The keyboard event object.
+   */
+  const handleKeyDown = ({ code }: { code: KeyboardEvent["code"] }) => {
+    if (panInstanceRef.current && code === "Space") {
+      setPanning(true);
+    }
+  };
+
+  /**
+   * Handles keyup events to disable panning.
+   * @param {Object} event - The keyboard event object.
+   */
+  const handleKeyUp = ({ code }: { code: KeyboardEvent["code"] }) => {
+    if (panInstanceRef.current && code === "Space") {
+      setPanning(false);
+    }
+  };
+
+  /**
+   * Updates pixel color if panning is not enabled.
+   */
+  function pixelChange({ col, row, hex }: { col: number; row: number; hex: string }) {
+    if (panning) {
+      return;
+    }
+    handlePixelChange({ detail: { col, row, hex } });
+  }
+
+  /**
+ * Moves layers in the specified direction.
+ * Calls the debounced version of the layer move function.
+ *
+ * @param {Direction} direction - The direction in which to move the layer.
+ */
+  const layerMove = (direction: Direction) => {
+    debouncedLayerMove(direction);
+  };
+
+  /**
+   * Debounced function to move layers.
+   * Uses `debounce` to prevent rapid successive calls.
+   *
+   * @param {Direction} direction - The direction in which to move the layer.
+   */
+  const debouncedLayerMove = debounce((direction: Direction) => {
+    handleLayerMove({ detail: { direction } });
+  }, 100);
+
+  /**
+   * Handles mouse down event to pause history tracking.
+   * This prevents unnecessary history states from being recorded while dragging.
+   */
+  function handleMouseDown() {
+    setMouseIsDown(true);
+    history.pause();
+  }
+
+  /**
+   * Handles mouse up event to resume history tracking.
+   * This allows history tracking to continue after a drag operation.
+   */
+  function handleMouseUp() {
+    setMouseIsDown(false);
+    history.resume();
+  }
+
+  /**
+   * Changes pixel on mouse move if the mouse is down.
+   * Ensures pixels are only modified when the mouse is actively held down and moving.
+   *
+   * @param {Object} param - The function parameters.
+   * @param {Element | EventTarget} param.target - The DOM element being hovered.
+   * @param {number} param.col - The column index of the pixel.
+   * @param {number} param.row - The row index of the pixel.
+   * @param {string} param.hex - The hex color value of the pixel.
+   */
+  function handleMouseMove({ target, col, row, hex }: { target: Element | EventTarget; col: number; row: number; hex: string }) {
+    if (!mouseIsDown || previousHoveredPixel === target) {
+      return;
+    }
+    setPreviousHoveredPixel(target);
+    pixelChange({ col, row, hex });
+  }
+
+  /**
+   * Handles touch movement and triggers pixel change.
+   * Detects the touch position and determines the corresponding grid cell.
+   *
+   * @param {React.TouchEvent<HTMLDivElement>} event - The touch event.
+   * @param {Object} param - Additional parameters.
+   * @param {string} param.hex - The hex color value of the pixel.
+   */
+  function handleTouchMove(event: React.TouchEvent<HTMLDivElement>, { hex }: { hex: string }) {
+    const location = event?.touches?.[0] || event?.changedTouches?.[0] || event?.targetTouches?.[0];
+    const target = document.elementFromPoint(location.clientX, location.clientY);
+
+    // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)". It was added by old dev.
+    if (target?.dataset?.col && target?.dataset?.row) {
+      // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)". It was added by old dev.
+      const colNumber = Number(target.dataset.col);
+      // @ts-expect-error this is to disable the error "Property 'dataset' does not exist on type 'Element'.ts(2339)". It was added by old dev.
+      const rowNumber = Number(target.dataset.row);
+
+      handleMouseMove({ target, hex, col: colNumber, row: rowNumber });
+    }
+  }
 
   return (
     <div

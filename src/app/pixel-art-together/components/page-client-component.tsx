@@ -82,8 +82,7 @@ export default function PixelArtEditorClientComponent() {
   const pixelStorage = useStorage((root) => root.pixelStorage);
   const layerStorage = useStorage((root) => root.layerStorage);
 
-  const maxPixels = 2600;
-
+  const maxPixels: number = 2600;
 
   /**
    * Pixels are stored inside pixelStorage as individual properties in an object
