@@ -73,7 +73,8 @@ import { PixelColor } from '@/lib/types/pixel-art-editor/pixel-color';
  * @module PixelArtEditorClientComponent
  */
 export default function PixelArtEditorClientComponent() {
-  // The current user's presence in the Liveblocks session.
+  // The current user's presence in the Liveblocks session.  
+  // useMyPresence causes a re-render whenever the presence state changes, which is fine as we do want the component to be dependent on myPresence
   const [myPresence, updateMyPresence] = useMyPresence();
 
   // Other users currently in the Liveblocks session.

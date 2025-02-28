@@ -57,7 +57,6 @@ export function BrushPanel({
   // State
   // -----------------------------------
 
-  // useMyPresence causes a re-render whenever the presence state changes, which is fine as we do want the component to be dependent on myPresence
   const [myPresence, updateMyPresence] = useMyPresence();
   const [brush, setBrush] = useState<BrushData>(DEFAULT_BRUSH_DATA)
   const [colorRgbaObject, setColorRgbaObject] = useState<RGBA>({ r: 255, g: 0, b: 0, a: 1 });
@@ -229,6 +228,7 @@ export function BrushPanel({
             </div>
           )}
         </div>
+
       </div>
     </div>
 

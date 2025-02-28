@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
  * @returns {JSX.Element} A button that copies the URL when clicked.
  */
 export function CopyLinkButton(): JSX.Element {
-  // State to track whether the URL has been copied
+  // State to track whether the URL has been copied. This will temporarily be set to true to show the 'Copied!' text
   const [copied, setCopied] = useState<boolean>(false);
 
   /**

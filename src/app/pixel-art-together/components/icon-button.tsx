@@ -36,7 +36,7 @@ export function IconButton({
       <Button
         className={`relative flex h-10 w-10 items-center justify-center ${classes}`}
         onClick={(e) => handleClick?.(e)}
-        variant={toggled ? "default" : "outline"} // Adjusted variants
+        variant={toggled ? "default" : "outline"}
       >
         <span className="sr-only">{screenReader}</span>
         <div className="absolute inset-0 flex items-center justify-center">

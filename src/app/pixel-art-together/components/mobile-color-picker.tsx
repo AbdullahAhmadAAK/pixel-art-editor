@@ -21,10 +21,36 @@ import { RGB } from '@/lib/types/pixel-art-editor/rgb';
 import { DEFAULT_BRUSH_DATA } from '@/app/pixel-art-together/utils/defaults';
 import { possibleFormats } from "../utils/possible-formats";
 
+/**
+ * Props for the MobileColorPicker component.
+ * This interface defines the expected properties for the color picker.
+ */
 interface MobileColorPickerProps {
-  handleBrushChange: ({ detail }: { detail: BrushData }) => void,
-  updateColor: (hex: string) => void; // this will allow the color value to be set from within the component, as well as outside of it
-  swatch: Swatch,
+  /**
+   * Handles changes to the brush.
+   * @param {Object} param - The object containing the brush data.
+   * @param {BrushData} param.detail - The details of the brush (e.g., color, size, etc.).
+   */
+  handleBrushChange: ({ detail }: { detail: BrushData }) => void;
+
+  /**
+   * Updates the color value.
+   * @param {string} hex - The hex color string to update the color.
+   * This method allows the color value to be set both from within the component
+   * and from an external source.
+   */
+  updateColor: (hex: string) => void;
+
+  /**
+   * The swatch object that holds information about the color swatch to be displayed.
+   * @type {Swatch}
+   */
+  swatch: Swatch;
+
+  /**
+   * The current color value represented as a hex string.
+   * @type {string}
+   */
   colorValue: string;
 }
 

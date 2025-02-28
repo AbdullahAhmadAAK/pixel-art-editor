@@ -355,7 +355,6 @@ export function PixelGrid({
             className="absolute inset-0 m-auto max-h-full max-w-full"
             style={{ aspectRatio: `${rows} / ${cols}` }}
           >
-            {/* Part 1 */}
             <div
               className="absolute inset-0 grid select-none"
               style={{ gridTemplateColumns: `repeat(${rows}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${cols}, minmax(0, 1fr))`, transform: `translateZ(0)`, gap: `0` }}
@@ -416,7 +415,7 @@ export function PixelGrid({
               </svg>
             </div>
 
-            {/* <!-- Part 3 Grid overlay --> */}
+            {/* <!--  Grid overlay --> */}
             {showGrid && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -461,7 +460,6 @@ export function PixelGrid({
               </motion.div>
             )}
 
-            {/* Part 4 */}
             {myPresence && (
               <div
                 className="absolute bottom-full left-0 mb-1.5 text-sm font-bold uppercase tracking-wider text-gray-500 md:hidden"
@@ -470,7 +468,6 @@ export function PixelGrid({
               </div>
             )}
 
-            {/* Part 5 */}
             {showMove && (
               <motion.div
                 initial={{ opacity: 0 }}
