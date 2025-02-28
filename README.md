@@ -11,6 +11,6 @@ Onchain multiplayer pixel art making
 
 
 ```bash
-npm install
+npm install 
 npm run dev
 ```
