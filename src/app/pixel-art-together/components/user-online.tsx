@@ -1,23 +1,53 @@
-import { motion } from "framer-motion";
+// React and Next
 import Image from 'next/image';
-import { Tool } from "@/lib/types/pixel-art-editor/tool";
-import ntc from "../utils/name-that-color";
 import { useEffect, useMemo, useState } from 'react';
+
+// Third party libraries
+import { motion } from "framer-motion";
+
+// Utilities
+import ntc from "../utils/name-that-color";
 import { contrastingTextColour } from "../utils/contrasting-text-colour";
+
+// Types
+import { Tool } from "@/lib/types/pixel-art-editor/tool";
 import { BrushData } from "@/lib/types/pixel-art-editor/brush-data";
+
+// Internal components
 import { CustomTooltip } from "@/components/custom-tooltip";
 
 interface UserOnlineProps {
+  /** Whether to show a shortened version. */
   short?: boolean;
+
+  /** Whether the user is the current user. */
   isYou?: boolean;
+
+  /** The user's brush settings. */
   brush: BrushData;
+
+  /** The currently selected layer. */
   selectedLayer: number;
+
+  /** The user's display name. */
   name: string;
+
+  /** The user's profile picture URL. */
   picture: string;
+
+  /** The current tool used by the user. */
   tool: Tool;
-  handleSelectColor?: ({ detail }: { detail: { color: string } }) => void
+
+  /** Function to handle color selection. */
+  handleSelectColor?: (event: { detail: { color: string } }) => void;
 }
 
+
+/**
+ * Renders the UserOnline component, displaying user information and selected tools.
+ * @param {UserOnlineProps} props - The props for the UserOnline component.
+ * @returns {JSX.Element}
+ */
 export function UserOnline({
   short = false,
   isYou = false,
@@ -28,27 +58,30 @@ export function UserOnline({
   tool,
   handleSelectColor
 }: UserOnlineProps) {
-
-  const getColorName = (hex: string) => ntc.name(hex)[1];
-
-  const [blackText, setBlackText] = useState<boolean | undefined>(undefined)
-
+  const [blackText, setBlackText] = useState<boolean | undefined>(undefined);
   const brushOpacity = useMemo(() => brush?.opacity, [brush]);
   const brushRgb = useMemo(() => brush?.rgb, [brush]);
 
+  // This is supposed to tell whether a chosen color is light enough to be given a black text label
   useEffect(() => {
     if (brushOpacity !== undefined) {
-      if (brushOpacity < 35) {
-        setBlackText(true);
-      } else {
-        setBlackText(contrastingTextColour(brushRgb));
-      }
+      setBlackText(brushOpacity < 35 ? true : contrastingTextColour(brushRgb));
     }
   }, [brushOpacity, brushRgb]);
 
+  /**
+   * This returns us a human-friendly name for each color's hex string
+   * @param hex 
+   * @returns 
+   */
+  const getColorName = (hex: string) => (ntc.name(hex)[1] as string);
+
+  /**
+   * This function is used to change the color of the current user's brush to the color of the clicked online user's color circle
+   */
   function handleColorChange() {
     if (brush?.color && handleSelectColor) {
-      handleSelectColor({ detail: { color: brush.color } })
+      handleSelectColor({ detail: { color: brush.color } });
     }
   }
 
@@ -67,24 +100,16 @@ export function UserOnline({
 
         <div className="pl-3">
           <div className="mr-3 font-medium">
-            {name}
-            {isYou && (
-              <>&nbsp;(you)</>
-            )}
+            {name} {isYou && <>&nbsp;(you)</>}
           </div>
           <div className="mr-3.5 w-full max-w-[150px] truncate text-sm text-gray-500">
             <span className="font-semibold">Layer {selectedLayer}</span>
-            {!short && (
-              <>
-                ,{getColorName(brush.color.slice(0, 7))}
-              </>
-            )}
+            {!short && <>,{getColorName(brush.color.slice(0, 7))}</>}
           </div>
         </div>
       </div>
 
       {!short && (
-        // Copyable color preview 
         <div className={isYou ? "pointer-events-none" : ""}>
           <CustomTooltip tooltipContent="Use color">
             <button
@@ -117,20 +142,7 @@ export function UserOnline({
                       />
                     </svg>
                   )}
-
-                  {tool === Tool.Fill && (
-                    <svg
-                      className="mt-1.5 ml-0.5 h-6 w-6 scale-x-[-1]"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M19,11.5C19,11.5 17,13.67 17,15A2,2 0 0,0 19,17A2,2 0 0,0 21,15C21,13.67 19,11.5 19,11.5M5.21,10L10,5.21L14.79,10M16.56,8.94L7.62,0L6.21,1.41L8.59,3.79L3.44,8.94C2.85,9.5 2.85,10.47 3.44,11.06L8.94,16.56C9.23,16.85 9.62,17 10,17C10.38,17 10.77,16.85 11.06,16.56L16.56,11.06C17.15,10.47 17.15,9.5 16.56,8.94Z"
-                      />
-                    </svg>
-                  )}
                 </span>
-
               </span>
             </button>
           </CustomTooltip>
