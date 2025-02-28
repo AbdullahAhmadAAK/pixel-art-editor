@@ -1,146 +1,151 @@
-import type { Layer } from '@/lib/types/pixel-art-editor/layer';
-import { useStorage, useMyPresence, useUpdateMyPresence, useMutation } from '@liveblocks/react';
-import { generateLayer } from '../utils/generate-layer';
-import { blendModes } from '../utils/blend-modes';
-import React, { useCallback, useEffect, useRef, useState } from "react";
+// React & Hooks
+import React, { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 
+// Third-Party Libraries
+import { useStorage, useMyPresence, useMutation } from '@liveblocks/react';
+import { motion } from "framer-motion";
+
+// Utilities & Helpers
+import { generateLayer } from '../utils/generate-layer';
+
+// Types
+import type { Layer } from '@/lib/types/pixel-art-editor/layer';
+
+// Defaults and constants
+import { blendModes } from '../utils/blend-modes';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
+
+// Internal components
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-
-import { motion } from "framer-motion";
-import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
 import { CustomTooltip } from '@/components/custom-tooltip';
+
+/**
+ * Props for the LayersPanel component.
+ */
+export interface LayersPanelProps {
+  layers: Layer[];   // List of layers to display in the panel
+  maxPixels: number;  // Maximum number of pixels allowed per layer
+}
+
+/**
+ * Renders the LayersPanel, displaying a list of layers and controlling their visibility.
+ * 
+ * @param {LayersPanelProps} props - Component properties.
+ * @param {Layer[]} props.layers - The list of layers to display.
+ * @param {number} props.maxPixels - The maximum allowed pixels per layer.
+ * 
+ * @returns {JSX.Element} The rendered LayersPanel component.
+ */
 
 export function LayersPanel({
   layers = [],
   maxPixels = 2600
-}: {
-  layers: Layer[],
-  maxPixels: number
-}) {
+}: LayersPanelProps) {
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [myPresence, _] = useMyPresence();
-  const updateMyPresence = useUpdateMyPresence();
+  // -----------------------------------
+  // State and Refs + 1 callback function
+  // -----------------------------------
+  const [myPresence, updateMyPresence] = useMyPresence();
 
+  /**
+   * This is the subscribed storage object from liveblocks. Whenever the layer data is changed on liveblocks, this will be changed and thus trigger re-renders
+   */
   const layerStorage = useStorage((root) => root.layerStorage);
 
-  const layerPixelCountFinder = (layers: Layer[]) => {
-    if (!layers || layers.length == 0 || !layers[0].grid || !layers[0].grid[0] || layers[0].grid[0].length == 0) return 0
-    else return layers[0].grid.length * layers[0].grid[0].length
-  }
+  /**
+ * Calculates the total number of pixels in a single layer.
+ *
+ * This function determines the total pixel count by multiplying:
+ * - The number of rows (height) in the grid → `layers[0].grid.length`
+ * - The number of columns (width) in the grid → `layers[0].grid[0].length`
+ *
+ * It ensures:
+ * - The `layers` array is not empty.
+ * - The first layer exists and contains a valid grid structure.
+ * - If any condition fails, it returns `0` instead of throwing an error.
+ *
+ * @param {Layer[]} layers - An array of layers where each layer contains a `grid` property.
+ * @returns {number} The total pixel count for a single layer, or `0` if invalid.
+ */
+  const layerPixelCountFinder = useCallback((layers: Layer[]) => {
+    if (!layers.length || !layers[0]?.grid?.length || !layers[0]?.grid[0]?.length) {
+      return 0;
+    }
+    return layers[0].grid.length * layers[0].grid[0].length;
+  }, []);
 
-  const [layerPixelCount, setLayerPixelCount] = useState<number>(layerPixelCountFinder(layers));
+  // This state holds the total number of pixels at any point
+  const [layerPixelCount, setLayerPixelCount] = useState(() => layerPixelCountFinder(layers));
 
-  useEffect(() => {
-    const newLayerPixelCount = layerPixelCountFinder(layers)
-    setLayerPixelCount(newLayerPixelCount)
-  }, [layers])
+  // This helps us determine whether the addition of a new layer will exceed the limit, and thus, whether to allow the user to add a new layer to the canvas
+  const [willExceedPixelCount, setWillExceedPixelCount] = useState(() => (layers.length + 1) * layerPixelCount > maxPixels);
 
-  const [willExceedPixelCount, setWillExceedPixelCount] = useState<boolean>((layers.length + 1) * layerPixelCount > maxPixels)
-  useEffect(() => {
-    const newBoolean = (layers.length + 1) * layerPixelCount > maxPixels
-    setWillExceedPixelCount(newBoolean)
-  }, [layerPixelCount, maxPixels, layers])
-
+  // This is a ref pointing to the span containing the currently selected blend mode. We need this to programatically update the text in that span element.
   const blendTextRef = useRef<HTMLSpanElement | null>(null);
 
-  const getLayerIndexFromSelected = useCallback(
-    () => {
-      if (myPresence) {
-        return layers.findIndex(
-          (layer) => layer.id === myPresence.selectedLayer
-        );
-      }
-      return 0;
-    }, [layers, myPresence])
+  // -----------------------------------
+  // Derived Values & Memoized Functions
+  // -----------------------------------
 
-  const [addingNewLayer, setAddingNewLayer] = useState<boolean>(false)
+  /**
+ * Retrieves the index of the currently selected layer.
+ *
+ * This function searches for the layer whose `id` matches the `selectedLayer` 
+ * attribute in the `myPresence` object.
+ *
+ * Behavior:
+ * - If `myPresence` is defined and `selectedLayer` exists, it finds the corresponding layer's index.
+ * - If no match is found or `myPresence` is undefined, it defaults to `0`.
+ *
+ * @returns {number} The index of the selected layer, or `0` if not found.
+ */
+  const getLayerIndexFromSelected = useCallback(() => {
+    return myPresence ? layers.findIndex(layer => layer.id === myPresence.selectedLayer) : 0;
+  }, [layers, myPresence]);
 
+  /**
+ * Ensures a valid layer is always selected when `layerStorage` updates.
+ *
+ * Behavior:
+ * - If `layerStorage` exists and `selectedLayer` is defined:
+ *   - It checks whether the `selectedLayer` still exists in `layerStorage`.
+ *   - If the `selectedLayer` was deleted, it selects the last available layer.
+ *   - If no layers are available, it defaults to layer `0`.
+ *   - This ensures that when a selected layer is deleted, a new layer is immediately selected and shown.
+ *
+ * @returns {void}
+ */
   const whenLayersUpdate = useCallback(() => {
-    if (
-      layerStorage &&
-      myPresence &&
-      myPresence.selectedLayer !== undefined
-    ) {
-      const currentLayer = myPresence.selectedLayer;
-      if (!layerStorage[currentLayer] && !addingNewLayer) {
-        const tempLayers = Object.values(layerStorage);
-        const newLayer = tempLayers[tempLayers.length > 0 ? tempLayers.length - 1 : 0].id;
-        updateMyPresence({ selectedLayer: newLayer })
-      }
+    if (!layerStorage || myPresence?.selectedLayer === undefined) return;
+
+    const currentLayer = myPresence.selectedLayer;
+
+    // If the selected layer has been deleted, fallback to the last available layer
+    if (!layerStorage[currentLayer]) {
+      const layersArray = Object.values(layerStorage);
+      const newLayer = layersArray.length > 0 ? layersArray[layersArray.length - 1].id : 0;
+
+      updateMyPresence({ selectedLayer: newLayer });
     }
-  }, [addingNewLayer, layerStorage, myPresence, updateMyPresence])
+  }, [layerStorage, myPresence, updateMyPresence]);
 
-  // When layers update, make sure a layer is still selected
-  useEffect(() => {
-    whenLayersUpdate()
-  }, [layerStorage, whenLayersUpdate])
+  // -----------------------------------
+  // Layer Operations (CRUD)
+  // -----------------------------------
 
-  // Update current layer blend mode on change
-  const handleBlendModeChange = useMutation(({ storage }, args) => {
-    const layerStorage = storage.get('layerStorage')
-    if (!myPresence || !layerStorage || !blendTextRef?.current) {
-      return;
-    }
-
-    const layerStorageObject = layerStorage.toObject()
-    const index = myPresence.selectedLayer;
-    const oldLayer = layerStorageObject[index];
-    const newBlendModeValue = args.target.dataset.value
-    const newLayer = { ...oldLayer, blendMode: newBlendModeValue };
-
-    layerStorage.set(myPresence.selectedLayer, newLayer)
-    blendTextRef.current.innerText = newBlendModeValue;
-  }, [myPresence.selectedLayer])
-
-  // Update current layer opacity on change
-  // newOpacity will be between 0 and 100, as that's what we've set up the Slider component to be
-  const handleOpacityChange = useMutation(({ storage }, newOpacity) => {
-
-
-    const layerStorage = storage.get('layerStorage')
-    if (!myPresence || !layerStorage) {
-      return;
-    }
-
-    const layerStorageObject = layerStorage.toObject()
-    const firstIndex = myPresence.selectedLayer;
-    const oldLayer = layerStorageObject[firstIndex];
-    const newLayer: Layer = { ...oldLayer, opacity: newOpacity / 100 };
-    layerStorage.set(myPresence.selectedLayer, newLayer)
-  }, [myPresence.selectedLayer])
-
-  // Toggle visibility of current layer
-  const toggleVisibility = useMutation(({ storage }, layerId: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (event) {
-      event.stopPropagation();
-    }
-
-    const layerStorage = storage.get('layerStorage')
-    const layerStorageObject = layerStorage.toObject()
-    if (!layerStorage) return
-
-    const oldLayer = layerStorageObject[layerId]
-    const newLayer = { ...oldLayer, hidden: !oldLayer.hidden };
-    layerStorage.set(layerId, newLayer)
-  }, [])
-
-  // Adds new layer to top of stack
+  /**
+ * Adds a new layer to the stack and updates Liveblocks storage.
+ * 
+ * - Generates a new layer with the same dimensions as the first layer.
+ * - Updates `pixelStorage` and `layerStorage` in Liveblocks.
+ * - Sets the new layer as the selected layer.
+ */
   const addLayer = useMutation(({ storage }) => {
-    const layerStorage = storage.get('layerStorage')
+    if (!layerStorage || !layers[0]?.grid) return;
 
-    if (!layerStorage || !layers || layers.length == 0 || !layers[0].grid) return;
-
-    const layerStorageObject = layerStorage.toObject()
-    let newId = 0;
-    Object.values(layerStorageObject).map((layer) => {
-      if (layer.id > newId) {
-        newId = layer.id;
-      }
-    });
-    newId++;
+    let newId = Math.max(...Object.values(layerStorage).map(layer => layer.id), 0) + 1;
 
     const generatedLayer = generateLayer({
       layer: newId,
@@ -149,64 +154,193 @@ export function LayersPanel({
       defaultValue: DEFAULT_PIXEL_COLOR_NAME,
     });
 
-    const pixelStorage = storage.get('pixelStorage')
+    const pixelStorageLiveObject = storage.get('pixelStorage');
+    Object.keys(generatedLayer).forEach(key => pixelStorageLiveObject.set(key, generatedLayer[key]));
 
-    Object.keys(generatedLayer).forEach(key => {
-      pixelStorage.set(key, generatedLayer[key])
-    })
+    const newLayerToAdd: Layer = { id: newId, opacity: 1, blendMode: "normal", hidden: false, grid: [] };
+    storage.get('layerStorage').set(newId, newLayerToAdd);
 
-    layerStorage.set(newId, {
-      id: newId,
-      opacity: 1,
-      blendMode: "normal",
-      hidden: false,
-      grid: []
-    })
+    updateMyPresence({ selectedLayer: newId });
+  }, [layerStorage]);
 
-    setAddingNewLayer(true)
-    updateMyPresence({ selectedLayer: newId })
-    setTimeout(() => (setAddingNewLayer(false)));
-  }, [])
-
-
-  // Deletes layer using `id`
-  const deleteLayer = useMutation(({ storage }, id: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (event) {
-      event.stopPropagation();
-    }
-
-    const layerStorage = storage.get('layerStorage')
-    const pixelStorage = storage.get('pixelStorage')
+  /**
+ * Deletes a specified layer from the storage and ensures a new layer is selected.
+ * 
+ * - Uses `useMutation` from Liveblocks to modify the shared live state.
+ * - Stops event propagation to prevent unintended parent event handlers from triggering.
+ * - Removes the layer from `layerStorage` in Liveblocks.
+ * - Iterates through the grid to delete all associated pixels from `pixelStorage`.
+ * - Calls `selectTopLayer()` to ensure another layer is selected after deletion.
+ * 
+ * @param {Storage} storage - Liveblocks storage object.
+ * @param {number} layerId - The ID of the layer to delete.
+ * @param {React.MouseEvent} event - The click event triggering the deletion.
+ */
+  const deleteLayer = useMutation(({ storage }, layerId: number, event: React.MouseEvent) => {
+    event?.stopPropagation(); // Prevents unintended parent event handlers from triggering.
 
     if (layerStorage && layers.length > 1) {
-      layerStorage.delete(`${id}` as unknown as number) // The old developer had layer ID as number, but liveblocks expects strings, so we cast it
+      const layerStorageLiveObject = storage.get('layerStorage');
+      const pixelStorageLiveObject = storage.get('pixelStorage');
 
+      // Remove the layer from live storage.
+      layerStorageLiveObject.delete(`${layerId}` as unknown as number); // Layer ID is stored as a number, but Liveblocks expects a string.
+
+      // Remove all associated pixels from storage.
       for (let row = 0; row < layers[0].grid.length; row++) {
         for (let col = 0; col < layers[0].grid[0].length; col++) {
-          pixelStorage.delete(`${id}_${row}_${col}`)
+          pixelStorageLiveObject.delete(`${layerId}_${row}_${col}`);
         }
       }
+
+      // Select another layer after deletion to maintain active selection.
       selectTopLayer();
     }
-  }, [layers]) // This will update the layers array in the function whenever the layers state changes 
+  }, [layers, layerStorage]);
 
-  // Changes to layer using `id`
-  function changeLayer(id: number) {
-    updateMyPresence({ selectedLayer: id })
+  /**
+  * Changes the currently selected layer and updates the UI accordingly.
+  *
+  * - Updates the `selectedLayer` in Liveblocks presence.
+  * - If the blend mode text reference (`blendTextRef`) exists, updates it to reflect the 
+  *   blend mode of the newly selected layer.
+  *
+  * @param {number} layerId - The ID of the layer to select.
+  */
+  const changeLayer = (layerId: number) => {
+    updateMyPresence({ selectedLayer: layerId });
 
     if (blendTextRef.current) {
-      blendTextRef.current.innerText =
-        layers[getLayerIndexFromSelected()]?.blendMode || "normal";
+      // Updates the blend mode text UI to match the selected layer's blend mode.
+      blendTextRef.current.innerText = layers[getLayerIndexFromSelected()]?.blendMode || "normal";
     }
-  }
+  };
 
-  // Selects the top layer
-  function selectTopLayer() {
+
+  /**
+ * Selects the topmost layer (first in storage) and updates the user's presence.
+ *
+ * - Retrieves the first layer from `layerStorage`.
+ * - Updates the `selectedLayer` in Liveblocks presence to reflect this layer.
+ *
+ * This is typically called when a layer is deleted, ensuring a valid layer remains selected.
+ */
+  const selectTopLayer = () => {
     if (layerStorage && myPresence) {
-      const firstLayer = Object.values(layerStorage)[0].id;
-      updateMyPresence({ selectedLayer: firstLayer })
+      const firstLayer = layerStorage[0].id;
+      updateMyPresence({ selectedLayer: firstLayer });
     }
-  }
+  };
+
+  // -----------------------------------
+  // Layer Property Updates
+  // -----------------------------------
+
+  /**
+ * Handles changing the blend mode for the selected layer.
+ *
+ * - Retrieves `layerStorage` from Liveblocks storage.
+ * - Finds the currently selected layer using `myPresence`.
+ * - Updates the `blendMode` of the selected layer.
+ * - Updates the UI reference `blendTextRef` with the new mode.
+ *
+ * @param storage - Liveblocks storage object.
+ * @param args - Event object containing dataset attributes.
+ */
+  const handleBlendModeChange = useMutation(({ storage }, args: { target: HTMLElement | null }) => {
+    if (!myPresence || !layerStorage || !blendTextRef?.current || !args?.target) return;
+
+    const index = myPresence.selectedLayer;
+    const oldLayer = layerStorage[index];
+
+    // Extract blend mode value from dataset
+    const newBlendModeValue = args.target.dataset.value as CSSProperties['mixBlendMode'];
+    if (!newBlendModeValue) return;
+
+    // Update layer blend mode in storage
+    const layerStorageLiveObject = storage.get('layerStorage');
+    layerStorageLiveObject.set(index, { ...oldLayer, blendMode: newBlendModeValue });
+
+    // Update UI reference text
+    blendTextRef.current.innerText = newBlendModeValue;
+  }, [myPresence?.selectedLayer, layerStorage,]);
+
+  /**
+ * Updates the opacity of the selected layer.
+ *
+ * - Ensures `myPresence` and `layerStorage` exist before proceeding.
+ * - Retrieves the currently selected layer from `myPresence`.
+ * - Converts the new opacity value from a range of **0-100** to **0-1** (normalized).
+ * - Updates the layer’s opacity in **Liveblocks storage**.
+ *
+ * @param storage - Liveblocks storage object for real-time state updates.
+ * @param newOpacity - The new opacity value (expected range: **0-100**).
+ */
+  const handleOpacityChange = useMutation(({ storage }, newOpacity: number) => {
+    if (!myPresence || !layerStorage) return;
+
+    const index = myPresence.selectedLayer;
+    const oldLayer = layerStorage[index];
+
+    const layerStorageLiveObject = storage.get('layerStorage');
+    const normalizedOpacity = newOpacity / 100
+    layerStorageLiveObject.set(index, { ...oldLayer, opacity: normalizedOpacity });
+  }, [myPresence?.selectedLayer, layerStorage]);
+
+
+  /**
+  * Toggles the visibility of a specified layer.
+  *
+  * - Prevents event propagation to avoid unintended side effects.
+  * - Ensures `layerStorage` exists before proceeding.
+  * - Retrieves the current layer state and toggles its `hidden` property.
+  * - Updates the layer's visibility in **Liveblocks storage**.
+  *
+  * @param storage - Liveblocks storage object for real-time state updates.
+  * @param layerId - The ID of the layer whose visibility should be toggled.
+  * @param event - The mouse event, used to stop propagation.
+  */
+  const toggleVisibility = useMutation(({ storage }, layerId: number, event: React.MouseEvent) => {
+    event?.stopPropagation(); // Prevents event bubbling
+    if (!layerStorage) return;
+
+    const oldLayer = layerStorage[layerId];
+
+    const layerStorageLiveObject = storage.get('layerStorage');
+    layerStorageLiveObject.set(layerId, { ...oldLayer, hidden: !oldLayer.hidden }); // Toggle visibility
+  }, [layerStorage]);
+
+  // -----------------------------------
+  // useEffect Blocks
+  // -----------------------------------
+
+  /**
+ * Updates the `layerPixelCount` state whenever layers change.
+ * Calls `layerPixelCountFinder(layers)` to recalculate the total number of pixels in all layers.
+ */
+  useEffect(() => {
+    setLayerPixelCount(layerPixelCountFinder(layers));
+  }, [layers, layerPixelCountFinder]);
+
+  /**
+   * Determines whether adding a new layer would exceed the maximum allowed pixel count.
+   * Updates the `willExceedPixelCount` state to prevent excessive layer creation.
+   */
+  useEffect(() => {
+    setWillExceedPixelCount((layers.length + 1) * layerPixelCount > maxPixels);
+  }, [layerPixelCount, maxPixels, layers]);
+
+  /**
+   * Ensures the selected layer is updated correctly when `layerStorage` changes.
+   * Calls `whenLayersUpdate()` to handle any necessary updates.
+   */
+  useEffect(() => {
+    whenLayersUpdate();
+  }, [layerStorage, whenLayersUpdate]);
+
+  // -----------------------------------
+  // TSX
+  // -----------------------------------
 
   return (
     <>
@@ -220,8 +354,6 @@ export function LayersPanel({
             {layerStorage && myPresence && (
               <div className="items-middle relative z-10 flex justify-between border-b">
                 <label htmlFor="blend-mode-changer" className="sr-only">Change blend mode</label>
-
-
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="focus-visible:z-10">
@@ -234,7 +366,7 @@ export function LayersPanel({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="relative z-10">
                     {blendModes.map((mode) => (
-                      <DropdownMenuItem key={"blendModes" + mode.name} data-value={mode.name} onSelect={handleBlendModeChange}>
+                      <DropdownMenuItem key={"blendModes" + mode.name} data-value={mode.name} onSelect={(e) => handleBlendModeChange({ target: e.currentTarget as HTMLElement })}>
                         <div className="text-sm">{mode.label}</div>
                       </DropdownMenuItem>
                     ))}
