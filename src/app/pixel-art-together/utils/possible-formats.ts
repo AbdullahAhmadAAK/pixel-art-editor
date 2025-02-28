@@ -1,0 +1,1 @@
+export const possibleFormats = ["hex", "rgba", "hsl", "hsv"] as const;

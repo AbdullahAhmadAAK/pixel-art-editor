@@ -1,9 +1,47 @@
-import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
-import { Tool } from '@/lib/types/pixel-art-editor/tool';
-import { contrastingTextColour } from "@/app/pixel-art-together/lib/utils/contrasting-text-colour";
-import { useEffect, useState } from "react";
+// React & Hooks
+import { JSX, useEffect, useState } from "react";
+
+// Third-Party Libraries
 import { motion, useSpring, useMotionValue } from "framer-motion";
 
+// Utilities & Helpers
+import { contrastingTextColour } from "../utils/contrasting-text-colour";
+
+// Types
+import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
+import { Tool } from '@/lib/types/pixel-art-editor/tool';
+
+
+/**
+ * Props for the Cursor component.
+ *
+ * @interface CursorProps
+ * @property {boolean} shrink - Whether the cursor should be slightly smaller.
+ * @property {BrushData} brush - The brush data containing color and properties.
+ * @property {Tool} tool - The currently selected tool (Brush, Eraser, Fill).
+ * @property {string} name - The name of the user associated with the cursor.
+ * @property {number} [x=100] - The x-coordinate of the cursor (optional, defaults to 100).
+ * @property {number} [y=100] - The y-coordinate of the cursor (optional, defaults to 100).
+ */
+interface CursorProps {
+  shrink?: boolean;
+  brush: BrushData;
+  tool?: Tool;
+  name?: string;
+  x?: number;
+  y?: number;
+}
+
+/**
+ * Cursor Component
+ *
+ * This component displays a cursor with an animated movement effect. It updates its position smoothly using Framer Motion springs.
+ * The cursor displays the user's name, tool icon, and brush color.
+ *
+ * @component
+ * @param {CursorProps} props - The props for the Cursor component.
+ * @returns {JSX.Element} The Cursor component.
+ */
 export function Cursor({
   shrink = false,
   brush,
@@ -11,55 +49,47 @@ export function Cursor({
   name = "",
   x = 100,
   y = 100
-}: {
-  shrink: boolean,
-  brush: BrushData,
-  tool: Tool,
-  name: string,
-  x?: number, // TODO: why is this optional btw? change it if not needed 
-  y?: number
-}) {
+}: CursorProps): JSX.Element {
 
-  // Initialize motion values
+  // Initialize motion values for smooth cursor animation
   const motionX = useMotionValue(x);
   const motionY = useMotionValue(y);
 
-  // Framer's `useSpring` replicates Svelte's spring animation
+  // Framer's `useSpring` adds smooth transitions to motion values
   const springX = useSpring(motionX, { stiffness: 70, damping: 35 });
   const springY = useSpring(motionY, { stiffness: 70, damping: 35 });
 
-  // add explanation for this too
+  /**
+   * Updates motion values when `x` or `y` props change.
+   */
   useEffect(() => {
     motionX.set(x);
     motionY.set(y);
-  }, [x, y, motionX, motionY]); // Runs whenever `x` or `y` changes
+  }, [x, y, motionX, motionY]);
 
-  // Should text be black or white on this colour
-  const [blackText, setBlackText] = useState<boolean>(true)
+  // Determines whether text should be black or white for contrast
+  const [blackText, setBlackText] = useState<boolean>(true);
+
+  // When the brush color changes, this will change the state of the blackText condition 
   useEffect(() => {
-    const newBlackText = contrastingTextColour(brush.rgb)
-    setBlackText(newBlackText)
-  }, [brush])
-
+    setBlackText(contrastingTextColour(brush.rgb));
+  }, [brush.rgb]);
 
   return (
     <motion.div
       className="absolute -top-4 -left-4"
-      style={{ x: springX, y: springY }} // Use Framer's `x` and `y` instead of transform
+      style={{ x: springX, y: springY }} // Use Framer's animated x and y
     >
       <div
-        className={`inner-border absolute top-7 left-7 origin-top-left overflow-hidden whitespace-nowrap rounded-full text-sm font-medium drop-shadow-sm transition-transform duration-150 ${shrink
-          ? 'scale-95'
-          : ''}`
-        }
+        className={`inner-border absolute top-7 left-7 origin-top-left overflow-hidden whitespace-nowrap rounded-full text-sm font-medium drop-shadow-sm transition-transform duration-150 ${shrink ? 'scale-95' : ''
+          }`}
       >
         <div
-          className={`flex px-2.5 py-1.5 mix-blend-luminosity ${blackText
-            ? 'text-gray-800'
-            : 'text-gray-200'}`}
+          className={`flex px-2.5 py-1.5 mix-blend-luminosity ${blackText ? 'text-gray-800' : 'text-gray-200'
+            }`}
           style={{ backgroundColor: brush.color.slice(0, 7) }}
         >
-          {/* <!-- Current tool icon --> */}
+          {/* Tool Icons */}
           <div className="mr-2 w-3">
             <div className="absolute top-2">
               {tool === Tool.Brush && (
@@ -70,7 +100,6 @@ export function Cursor({
                   />
                 </svg>
               )}
-
               {tool === Tool.Eraser && (
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                   <path
@@ -79,7 +108,6 @@ export function Cursor({
                   />
                 </svg>
               )}
-
               {tool === Tool.Fill && (
                 <svg className="-ml-0.5 h-5 w-5 scale-x-[-1]" viewBox="0 0 24 24">
                   <path
@@ -88,16 +116,15 @@ export function Cursor({
                   />
                 </svg>
               )}
-
             </div>
           </div>
 
-          {/* <!-- Current user's name --> */}
+          {/* User Name */}
           {name}
         </div>
       </div>
 
-      {/* Cursor icon  */}
+      {/* Cursor Pointer */}
       <div className="absolute top-0 left-0 block">
         <svg className="block h-10 w-10 scale-75">
           <path

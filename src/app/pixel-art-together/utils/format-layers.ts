@@ -2,24 +2,58 @@ import { PixelObject } from "@/lib/types/pixel-art-editor/pixel-object";
 import { Layer } from "@/lib/types/pixel-art-editor/layer";
 import { PixelGrid } from "@/lib/types/pixel-art-editor/pixel-grid";
 import { CSSProperties } from "react";
-import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
 
+/**
+ * Arguments for formatting layers in the pixel art editor.
+ */
 interface FormatLayersArgs {
+  /**
+   * A storage object mapping unique pixel keys to their corresponding color values.
+   * @readonly
+   */
   pixelStorage: {
     readonly [x: string]: string;
-  }
+  };
+
+  /**
+   * A storage object mapping layer indices to their respective layer data.
+   * @readonly
+   */
   layerStorage: {
     readonly [x: number]: {
+      /** The unique ID of the layer. */
       readonly id: number;
+
+      /** The pixel grid representing the layer. */
       readonly grid: PixelGrid;
+
+      /** The opacity level of the layer (0-100). */
       readonly opacity: number;
+
+      /** The blend mode used for rendering the layer. */
       readonly blendMode: CSSProperties["mixBlendMode"];
+
+      /** Whether the layer is hidden. */
       readonly hidden: boolean;
     };
   };
+
+  /**
+   * Function that converts a pixel storage key into a `PixelObject`.
+   * @param {string} key - The key representing a pixel.
+   * @returns {PixelObject} - The pixel object derived from the key.
+   */
   keyToPixel: (key: string) => PixelObject;
+
+  /**
+   * Function that retrieves pixel data, including color.
+   * @param {PixelObject} pixelProps - The pixel properties to fetch color for.
+   * @returns {{ color: string }} - The color information of the pixel.
+   */
   getPixel: (pixelProps: PixelObject) => { color: string };
 }
+
 
 /**
  * Returns an object containing all layers and pixel grids, for general use
