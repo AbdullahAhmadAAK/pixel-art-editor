@@ -1,13 +1,24 @@
 'use client'
 
+// React
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+
+// Third party libraries
 import { QRCodeCanvas } from "qrcode.react";
+
+// Internal components
 import { CustomTooltip } from "@/components/custom-tooltip";
+import { Button } from "@/components/ui/button";
 
-
+/**
+ * QRCodeButton component that generates and displays a QR code for the current page URL.
+ * Initially, it displays a button, and upon clicking, it generates a QR code.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered QRCodeButton component.
+ */
 export function QRCodeButton() {
-  const [clicked, setClicked] = useState<boolean>(false)
+  const [clicked, setClicked] = useState<boolean>(false);
 
   return (
     <div className="flex justify-center mt-6">
@@ -19,7 +30,6 @@ export function QRCodeButton() {
           </p>
         </div>
       ) : (
-
         <CustomTooltip tooltipContent="Click to generate a QR code">
           <Button className="mt-2 w-full" onClick={() => setClicked(true)}>
             <svg
@@ -42,5 +52,5 @@ export function QRCodeButton() {
         </CustomTooltip>
       )}
     </div>
-  )
+  );
 }

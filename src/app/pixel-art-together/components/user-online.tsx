@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import Image from 'next/image';
 import { Tool } from "@/lib/types/pixel-art-editor/tool";
-import ntc from '@/app/pixel-art-together/lib/utils/name-that-color';
+import ntc from "../utils/name-that-color";
 import { useEffect, useMemo, useState } from 'react';
-import { contrastingTextColour } from '@/app/pixel-art-together/lib/utils/contrasting-text-colour';
+import { contrastingTextColour } from "../utils/contrasting-text-colour";
 import { BrushData } from "@/lib/types/pixel-art-editor/brush-data";
 import { CustomTooltip } from "@/components/custom-tooltip";
 

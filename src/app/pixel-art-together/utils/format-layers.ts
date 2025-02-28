@@ -2,7 +2,7 @@ import { PixelObject } from "@/lib/types/pixel-art-editor/pixel-object";
 import { Layer } from "@/lib/types/pixel-art-editor/layer";
 import { PixelGrid } from "@/lib/types/pixel-art-editor/pixel-grid";
 import { CSSProperties } from "react";
-import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
 
 interface FormatLayersArgs {
   pixelStorage: {

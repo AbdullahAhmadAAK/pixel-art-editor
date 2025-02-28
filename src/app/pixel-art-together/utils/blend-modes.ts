@@ -1,5 +1,11 @@
 import { BlendMode } from "@/lib/types/pixel-art-editor/blend-mode";
 
+/**
+ * An array of blend mode options for the pixel art editor.
+ * Each blend mode includes a `name` (CSS blend mode) and a `label` (user-friendly name).
+ *
+ * @constant {BlendMode[]} blendModes
+ */
 export const blendModes: BlendMode[] = [
   {
     name: "normal",

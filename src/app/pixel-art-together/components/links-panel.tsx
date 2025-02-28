@@ -1,7 +1,15 @@
+// Next JS
 import Link from "next/link";
 import Image from "next/image";
+import { JSX } from "react";
 
-export function LinksPanel() {
+/**
+ * LinksPanel component that displays a link to Liveblocks.io with an image.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered LinksPanel component.
+ */
+export function LinksPanel(): JSX.Element {
   return (
     <div className="mx-5 mb-16 flex w-full pb-1 md:mb-0 md:pb-0 xl:mt-5 xl:justify-end">
       <Link

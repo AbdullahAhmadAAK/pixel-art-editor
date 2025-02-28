@@ -9,25 +9,24 @@ import { Colord, colord, RgbaColor } from "colord";
 import { RgbaColorPicker } from "react-colorful";
 
 // Utilities & Helpers
-import { hsvaToReadable } from "../lib/utils/hsva-to-readable";
-import { pickEyedropperColor } from "../lib/utils/pick-eyedropper-color";
+import { hsvaToReadable } from "../utils/hsva-to-readable";
+import { pickEyedropperColor } from "../utils/pick-eyedropper-color";
 
 // Types
 import { BrushData } from "@/lib/types/pixel-art-editor/brush-data";
 import { Tool } from "@/lib/types/pixel-art-editor/tool";
-import { Swatch } from "@/app/pixel-art-together/lib/utils/swatch";
+import { Swatch } from "../../../lib/types/pixel-art-editor/swatch";
 import { RGBA } from "@/lib/types/pixel-art-editor/rgba";
 import { RGB } from "@/lib/types/pixel-art-editor/rgb";
 
 // Defaults & Configurations
-import { DEFAULT_BRUSH_DATA } from "@/app/pixel-art-together/lib/utils/defaults";
-import { possibleFormats } from "../lib/utils/possible-formats";
+import { DEFAULT_BRUSH_DATA } from "@/app/pixel-art-together/utils/defaults";
+import { possibleFormats } from "../utils/possible-formats";
 
 interface BrushPanelProps {
   handleBrushChange: ({ detail }: { detail: BrushData }) => void;
   updateColor: (hex: string) => void;
   colorValue: string;
-  setColorValue: (colorValue: string) => void;
   swatch: Swatch
 }
 
@@ -44,7 +43,6 @@ interface BrushPanelProps {
  *        It receives an event with `detail` containing `BrushData`.
  * @param {function} props.updateColor - Function to update the selected color externally.
  * @param {string} [props.colorValue=""] - The current color value (controlled externally).
- * @param {function} props.setColorValue - Function to update the color value internally.
  * @param {Swatch} [props.swatch=[]] - Array of predefined color swatches.
  *
  * @returns {JSX.Element} The BrushPanel UI component.
@@ -53,7 +51,6 @@ export function BrushPanel({
   handleBrushChange,
   updateColor,
   colorValue = "",
-  setColorValue,
   swatch = []
 }: BrushPanelProps): JSX.Element {
   // -----------------------------------

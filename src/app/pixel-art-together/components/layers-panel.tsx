@@ -1,7 +1,7 @@
 import type { Layer } from '@/lib/types/pixel-art-editor/layer';
 import { useStorage, useMyPresence, useUpdateMyPresence, useMutation } from '@liveblocks/react';
-import { generateLayer } from "@/app/pixel-art-together/lib/utils/generate-layer";
-import { blendModes } from "@/app/pixel-art-together/lib/utils/blend-modes";
+import { generateLayer } from '../utils/generate-layer';
+import { blendModes } from '../utils/blend-modes';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
 import { motion } from "framer-motion";
-import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
 import { CustomTooltip } from '@/components/custom-tooltip';
 
 export function LayersPanel({

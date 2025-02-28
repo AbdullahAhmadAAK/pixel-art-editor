@@ -1,9 +1,17 @@
+// Internal components
 import { CopyLinkButton } from "./copy-link-button";
 import { QRCodeButton } from "./qr-code-button";
 
+/**
+ * SharePanel component that provides options to share the current page.
+ * It includes buttons to copy the link and generate a QR code for sharing.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered SharePanel component.
+ */
 export function SharePanel() {
   return (
-    <div className="mt-3 border-t-2 border-gray-100 px-5 pt-5 ">
+    <div className="mt-3 border-t-2 border-gray-100 px-5 pt-5">
       <div className="pb-1 text-sm font-semibold text-gray-500">Share with friends</div>
       <CopyLinkButton />
       <p className="mt-2 mb-2.5 text-center text-sm text-gray-600">

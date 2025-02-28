@@ -5,7 +5,7 @@ import { JSX, useEffect, useState } from "react";
 import { motion, useSpring, useMotionValue } from "framer-motion";
 
 // Utilities & Helpers
-import { contrastingTextColour } from "@/app/pixel-art-together/lib/utils/contrasting-text-colour";
+import { contrastingTextColour } from "../utils/contrasting-text-colour";
 
 // Types
 import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';

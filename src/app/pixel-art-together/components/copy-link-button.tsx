@@ -4,7 +4,7 @@
 import { JSX, useState } from "react";
 
 // Utilities & Helpers
-import { copyUrlToClipboard } from "@/app/pixel-art-together/lib/utils/copy-text";
+import { copyUrlToClipboard } from "../utils/copy-text";
 
 // Internal components
 import { Button } from "@/components/ui/button";

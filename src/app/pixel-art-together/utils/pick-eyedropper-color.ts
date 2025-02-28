@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { hexToRgba } from "../../utils/hex-to-rgb";
+import { hexToRgba } from "./hex-to-rgba";
 import { RGBA } from "@/lib/types/pixel-art-editor/rgba";
 
 export const pickEyedropperColor = async (setColorRgbaObject: Dispatch<SetStateAction<RGBA>>) => {

@@ -13,8 +13,8 @@ import {
 
 import { motion, useSpring } from "framer-motion";
 import { useCallback, useState, useEffect, useRef } from 'react';
-import { formatLayers } from '../lib/utils/format-layers';
-import { generateLayer } from '../lib/utils/generate-layer';
+import { formatLayers } from "../utils/format-layers";
+import { generateLayer } from "../utils/generate-layer";
 import { useStorage, useMutation } from "@liveblocks/react";
 
 import { Direction } from '@/lib/types/pixel-art-editor/direction';
@@ -22,8 +22,8 @@ import { Tool } from '@/lib/types/pixel-art-editor/tool';
 import { Layer } from '@/lib/types/pixel-art-editor/layer';
 import { PanelName } from '@/lib/types/pixel-art-editor/panel-name';
 
-import { getFillPixels } from '../lib/utils/get-fill-pixels';
-import { getMovePixels } from '../lib/utils/get-move-pixels';
+import { getFillPixels } from "../utils/get-fill-pixels";
+import { getMovePixels } from "../utils/get-move-pixels";
 
 import { Cursor } from "@/app/pixel-art-together/components/cursor";
 import { IntroDialog } from "@/app/pixel-art-together/components/intro-dialog";
@@ -40,8 +40,8 @@ import { UserOnline } from '@/app/pixel-art-together/components/user-online';
 import { PixelGrid as PixelGridSegment } from '@/app/pixel-art-together/components/pixel-grid';
 import Image from 'next/image';
 import { MobileColorPicker } from '@/app/pixel-art-together/components/mobile-color-picker';
-import { DEFAULT_BRUSH_DATA, DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
-import { Swatch } from '../lib/utils/swatch';
+import { DEFAULT_BRUSH_DATA, DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
+import { Swatch } from "../../../lib/types/pixel-art-editor/swatch";
 
 import { PixelStorage } from '@/lib/types/pixel-art-editor/pixel-storage';
 import { PixelObject } from '@/lib/types/pixel-art-editor/pixel-object';
@@ -546,7 +546,6 @@ export default function PixelArtEditorClientComponent() {
                 handleBrushChange={handleBrushChange}
                 updateColor={updateBrushColor}
                 colorValue={colorValue}
-                setColorValue={setColorValue}
                 swatch={recentColors}
               />
               <LayersPanel layers={layers} maxPixels={maxPixels} />
@@ -850,7 +849,6 @@ export default function PixelArtEditorClientComponent() {
                   updateColor={updateBrushColor}
                   swatch={recentColors}
                   colorValue={colorValue}
-                  setColorValue={setColorValue}
                 />
               </div>
             </div>

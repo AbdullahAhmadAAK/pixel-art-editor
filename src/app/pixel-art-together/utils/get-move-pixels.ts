@@ -2,7 +2,7 @@ import { PixelColor } from "@/lib/types/pixel-art-editor/pixel-color";
 import { PixelKey } from "@/lib/types/pixel-art-editor/pixel-key";
 import { PixelObject } from "@/lib/types/pixel-art-editor/pixel-object";
 import { Direction } from "@/lib/types/pixel-art-editor/direction";
-import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/lib/utils/defaults';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
 
 export function getMovePixels({
   detail,
