@@ -328,6 +328,10 @@ export function PixelGrid({
     }
   }
 
+  // -----------------------------------
+  // TSX
+  // -----------------------------------
+
   return (
     <div
       className="focus-visible-style absolute inset-0 touch-none"

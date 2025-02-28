@@ -59,3 +59,10 @@ export const INITIAL_LIVEBLOCKS_STORAGE = {
   pixelStorage: new LiveObject<Record<PixelKey, PixelColor>>({}),
   layerStorage: new LiveObject<Record<number, Layer>>({}),
 };
+
+/**
+ * Default color used in the swatch.
+ * Represents a fully opaque white color in RGBA hex format.
+ * @constant {string}
+ */
+export const DEFAULT_SWATCH_COLOR = "#ffffffff";
