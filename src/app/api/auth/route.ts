@@ -16,11 +16,35 @@ const liveblocks = new Liveblocks({ secret: PIXEL_ART_EDITOR_CONFIG.api_key });
  */
 export const POST = async (req: NextRequest): Promise<NextResponse> => {
   try {
+    console.log("Incoming request:", req.method, req.headers.get("content-type"));
+
+    // Validate content type
+    const contentType = req.headers.get("content-type");
+    if (!contentType?.includes("application/json")) {
+      return NextResponse.json({ error: "Invalid content type, expected application/json" }, { status: 400 });
+    }
+
+    // Read raw request body before parsing JSON 
+    const rawBody = await req.text();
+    console.log("Raw request body:", rawBody);
+
+    // Ensure request body is not empty (This is to prevent unhandled "Unexpected end of JSON input" errors that would come without this)
+    if (!rawBody.trim()) {
+      return NextResponse.json({ error: "Empty JSON body" }, { status: 400 });
+    }
+
     // Parse the request body to extract the 'room' parameter
-    const { room } = await req.json();
+    let room: string;
+    try {
+      ({ room } = JSON.parse(rawBody));
+    } catch (parseError) {
+      console.error("JSON parsing error:", parseError);
+      return NextResponse.json({ error: "Invalid JSON format" }, { status: 400 });
+    }
 
     // Ensure that the room parameter is provided
-    // It must be present for us to be able to authorize the user and assign him user info. Any future auth-related changes would most likely involve this file as well. 
+    // It must be present for us to be able to authorize the user and assign him user info. 
+    // Any future auth-related changes would most likely involve this file as well.
     if (!room) {
       return NextResponse.json({ error: "Missing room parameter" }, { status: 400 });
     }
@@ -53,7 +77,13 @@ export const POST = async (req: NextRequest): Promise<NextResponse> => {
     const { status, body } = await session.authorize();
 
     // Extract the authorization token from the response body
-    const token = JSON.parse(body).token;
+    let token: string;
+    try {
+      token = JSON.parse(body).token;
+    } catch (parseError) {
+      console.error("Error parsing Liveblocks response:", parseError);
+      return NextResponse.json({ error: "Invalid response from Liveblocks" }, { status: 500 });
+    }
 
     // Return the generated token along with the authorization status
     return NextResponse.json({ token, status });
