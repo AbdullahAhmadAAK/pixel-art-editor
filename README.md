@@ -16,9 +16,12 @@ The migration included full replication of complex functionalities, such as:
 
 Initially, Liveblocks sessions were used for authentication, but I later upgraded the system to use authentication via ID tokens, providing a more secure and scalable solution (in the client's repo).
 
+**What it entails:**
+Brush tool, erase tool, fill tool, undo button, redo button, layers, layer opacities and blend modes, comments on drawings along with reacts and mentions, custom notifications, CRON jobs to keep drawings' statuses updated, ability to mark a drawing as complete v/s in-progress, inviting collaborators, speculator view v/s artist view, live previews for each drawing's history, social engagement stats of each drawing, and much more!
+
 **What now?**
 
-Future development for this project is ongoing in a private repository owned by the client, and can be seen at [basemint.fun](https://basemint.fun/). Stay tuned!
+Future development for this project is ongoing in a private repository owned by the client, and can be seen at [basemint.fun](https://basemint.fun/). My role was to build up the UX to a stable point, which was successfully delivered in May 2025 to the client. The client, NPC Labs, aims to integrate crypto wallet functionalities into this so that users can mint their drawings as NFTs, as well as let buy and sell different shares of the drawings made. Stay tuned and keep following [the domain](https://basemint.fun/) for the latest info, or [NPC Labs' LinkedIn profile](https://www.linkedin.com/search/results/all/?keywords=npc%20labs&origin=GLOBAL_SEARCH_HEADER&sid=7X_).
 
 **Live App Demonstration:** 
 
