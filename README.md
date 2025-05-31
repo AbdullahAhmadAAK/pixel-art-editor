@@ -21,4 +21,6 @@ Initially, Liveblocks sessions were used for authentication, but I later upgrade
 Future development for this project is ongoing in a private repository owned by the client, and can be seen at [basemint.fun](https://basemint.fun/). Stay tuned!
 
 **Live App Demonstration:** 
-The app is still being in-progress on 27 April 2025, so I will be recording a video within a few weeks and sharing it here as soon as it's done.
+
+[🎥 Watch the Live App Demonstration](https://www.linkedin.com/posts/abdullah-ahmad-aak_been-cooking-for-the-past-couple-of-weeks-activity-7333960331016241154-tebk?utm_source=share&utm_medium=member_desktop&rcm=ACoAACIGBTsBFuHj96s-al5LEwhuaPOGcyJctrg)
+
