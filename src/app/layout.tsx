@@ -4,10 +4,9 @@ import { Providers } from "@/components/providers/Providers";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "Testnet Questers | NFT Drop",
+  title: "Pixel Art Together - Next.js App",
   description:
-    "A platform for minting NFTs for fun, built on the B3 blockchain.",
-  metadataBase: new URL("https://basemint.fun"),
+    "A platform for making drawings with Liveblocks.",
 };
 
 export default function RootLayout({

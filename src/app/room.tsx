@@ -7,10 +7,10 @@ import { JSX, ReactNode, useEffect, useState } from "react";
 import { LiveblocksProvider, RoomProvider, ClientSideSuspense } from "@liveblocks/react";
 
 // Utilities & Helpers
-import { createRoomId } from "./pixel-art-together/utils/create-room-id";
+import { createRoomId } from "./utils/create-room-id";
 
 // Defaults
-import { INITIAL_LIVEBLOCKS_PRESENCE, INITIAL_LIVEBLOCKS_STORAGE } from "./pixel-art-together/utils/defaults";
+import { INITIAL_LIVEBLOCKS_PRESENCE, INITIAL_LIVEBLOCKS_STORAGE } from "./utils/defaults";
 
 /**
  * Room Component

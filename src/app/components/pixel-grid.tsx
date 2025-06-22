@@ -15,7 +15,7 @@ import { Layer } from "@/lib/types/pixel-art-editor/layer";
 import { Direction } from "@/lib/types/pixel-art-editor/direction";
 
 // Internal components
-import { IconButton } from '@/app/pixel-art-together/components/icon-button';
+import { IconButton } from '@/app/components/icon-button';
 
 /**
  * Props for the PixelGrid component, defining the structure and expected types.
