@@ -27,3 +27,11 @@ Future development for this project is ongoing in a private repository owned by 
 
 [🎥 Watch the Live App Demonstration](https://www.linkedin.com/posts/abdullah-ahmad-aak_been-cooking-for-the-past-couple-of-weeks-activity-7333960331016241154-tebk?utm_source=share&utm_medium=member_desktop&rcm=ACoAACIGBTsBFuHj96s-al5LEwhuaPOGcyJctrg)
 
+**How to Run It Locally**
+
+1. Clone it
+2. Run npm install
+3. Create a .env file, with LIVEBLOCKS_SECRET_KEY="SECRET_KEY" in it. SECRET_KEY will be the one you get from Liveblocks after creating an account there.
+4. Run npm run dev
+5. Open localhost:3000
+6. Enjoy
