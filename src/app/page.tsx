@@ -1,5 +1,5 @@
 import PixelArtEditorClientComponent from './components/page-client-component';
-import { Room } from '../room';
+import { Room } from './room';
 
 // This file imports general styles used across the pixel art editor page.
 // Note: The styles include Shoelace component styles, which might not be ideal for this component.

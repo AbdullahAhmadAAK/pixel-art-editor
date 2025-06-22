@@ -13,7 +13,7 @@ import type { Layer } from '@/lib/types/pixel-art-editor/layer';
 
 // Defaults and constants
 import { blendModes } from '../utils/blend-modes';
-import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/pixel-art-together/utils/defaults';
+import { DEFAULT_PIXEL_COLOR_NAME } from '@/app/utils/defaults';
 
 // Internal components
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";

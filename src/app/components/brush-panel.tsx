@@ -15,12 +15,12 @@ import { pickEyedropperColor } from "../utils/pick-eyedropper-color";
 // Types
 import { BrushData } from "@/lib/types/pixel-art-editor/brush-data";
 import { Tool } from "@/lib/types/pixel-art-editor/tool";
-import { Swatch } from "../../../lib/types/pixel-art-editor/swatch";
+import { Swatch } from "../../lib/types/pixel-art-editor/swatch";
 import { RGBA } from "@/lib/types/pixel-art-editor/rgba";
 import { RGB } from "@/lib/types/pixel-art-editor/rgb";
 
 // Defaults & Configurations
-import { DEFAULT_BRUSH_DATA } from "@/app/pixel-art-together/utils/defaults";
+import { DEFAULT_BRUSH_DATA } from "@/app/utils/defaults";
 import { possibleFormats } from "../utils/possible-formats";
 
 interface BrushPanelProps {

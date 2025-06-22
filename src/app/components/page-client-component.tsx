@@ -24,25 +24,25 @@ import { PixelStorage } from '@/lib/types/pixel-art-editor/pixel-storage';
 import { PixelObject } from '@/lib/types/pixel-art-editor/pixel-object';
 import { PixelKey } from '@/lib/types/pixel-art-editor/pixel-key';
 import { BrushData } from '@/lib/types/pixel-art-editor/brush-data';
-import { Swatch } from "../../../lib/types/pixel-art-editor/swatch";
+import { Swatch } from "../../lib/types/pixel-art-editor/swatch";
 
 // Defaults & Configurations
-import { DEFAULT_BRUSH_DATA, DEFAULT_PIXEL_COLOR_NAME, DEFAULT_SWATCH_COLOR, INITIAL_LIVEBLOCKS_PRESENCE } from '@/app/pixel-art-together/utils/defaults';
+import { DEFAULT_BRUSH_DATA, DEFAULT_PIXEL_COLOR_NAME, DEFAULT_SWATCH_COLOR, INITIAL_LIVEBLOCKS_PRESENCE } from '@/app/utils/defaults';
 
 // Internal Components
 import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
-import { Cursor } from "@/app/pixel-art-together/components/cursor";
-import { IntroDialog } from "@/app/pixel-art-together/components/intro-dialog";
-import { BrushPanel } from "@/app/pixel-art-together/components/brush-panel";
-import { LayersPanel } from '@/app/pixel-art-together/components/layers-panel';
-import { ExportsPanel } from "@/app/pixel-art-together/components/exports-panel";
-import { SharePanel } from "@/app/pixel-art-together/components/share-panel";
-import { MobileLinksPanel } from "@/app/pixel-art-together/components/mobile-links-panel";
-import { LinksPanel } from "@/app/pixel-art-together/components/links-panel";
-import { UserOnline } from '@/app/pixel-art-together/components/user-online';
-import { PixelGrid as PixelGridSegment } from '@/app/pixel-art-together/components/pixel-grid';
-import { MobileColorPicker } from '@/app/pixel-art-together/components/mobile-color-picker';
+import { Cursor } from "@/app/components/cursor";
+import { IntroDialog } from "@/app/components/intro-dialog";
+import { BrushPanel } from "@/app/components/brush-panel";
+import { LayersPanel } from '@/app/components/layers-panel';
+import { ExportsPanel } from "@/app/components/exports-panel";
+import { SharePanel } from "@/app/components/share-panel";
+import { MobileLinksPanel } from "@/app/components/mobile-links-panel";
+import { LinksPanel } from "@/app/components/links-panel";
+import { UserOnline } from '@/app/components/user-online';
+import { PixelGrid as PixelGridSegment } from '@/app/components/pixel-grid';
+import { MobileColorPicker } from '@/app/components/mobile-color-picker';
 import { CustomTooltip } from "@/components/custom-tooltip";
 
 // Import CSS
