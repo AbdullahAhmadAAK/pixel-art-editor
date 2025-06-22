@@ -70,6 +70,8 @@ export function IntroDialog({
   const pixelSizeMin: number = 2;
   const pixelSizeMax: number = 48;
 
+  // Local name is what gets shown on the dialog. The user can change it as he likes until he is sure about it.
+  // Once it's confirmed, the setName function can then mark the UI outside the dialog with the finalized name
   const [name, setLocalName] = useState<string>("");
   const [width, setWidth] = useState<number>(16);
   const [height, setHeight] = useState<number>(16);
@@ -111,7 +113,9 @@ export function IntroDialog({
    * @param {Object} event - Keyboard event object.
    * @param {string} event.code - Key code of the pressed key.
    */
-  function handleInputKeyDown({ code }: { code: KeyboardEvent["code"] }) {
+
+  function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    const { code } = event;
     if (code === "Enter") {
       setTimeout(() => submitDialog(), 20);
     }
@@ -137,7 +141,7 @@ export function IntroDialog({
               className="mt-1"
               placeholder="Enter your name"
               value={name}
-              onChange={(e) => setName({ detail: { name: e.target.value } })}
+              onChange={(e) => { setLocalName(e.target.value) }}
               onKeyDown={handleInputKeyDown}
             />
           </div>
